@@ -1,10 +1,10 @@
 # About
 
-Andy Sun is a software engineer passionate about building
-elegant solutions to complex problems.
+andy is a swe passionate about building
+elegant(or not) solutions to complex problems.
 
 ## Education
-- **University of Chicago** — Computer Science
+- **University of Chicago** — caam and cs
 
 ## Skills
 - **Languages**: Go, Python, JavaScript, TypeScript
@@ -14,7 +14,8 @@ elegant solutions to complex problems.
 - **Tools**: Git, VS Code, Figma
 
 ## Interests
-- Systems programming
-- Terminal-based interfaces
-- Open source software
-- Creative technology
+- human computer interaction
+- terminal-based interfaces
+- open source software
+- not sleep
+- creative technology

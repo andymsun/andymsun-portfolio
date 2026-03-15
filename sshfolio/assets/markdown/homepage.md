@@ -9,13 +9,11 @@
 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 ---
-Andy Sun is a software engineer
-who builds things for the web.
+andy sun is a cs major that does not sleep
+i love caffeine
 
+he studies caam and cs at uchicago 
+(not bizcon)
 
-He studies Computer Science at
-the University of Chicago.
-
-
-Find him on GitHub, LinkedIn,
-or reach out via email.
+find him on github, linkedin, email,
+or just instagram @nachtglas
