@@ -86,6 +86,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			ui.CurrentTheme = m.Theme
 			return m, nil
 
+		// Refresh layout - 'r' key
+		case msg.String() == "r":
+			return m, tea.WindowSize()
+
 		case key.Matches(msg, ui.DefaultKeyMap.Navigate):
 			break
 		case key.Matches(msg, ui.DefaultKeyMap.Up):

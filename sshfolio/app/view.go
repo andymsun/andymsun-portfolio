@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-const version = "v0.1.0"
+
 
 // Switch case with each page/TUI view
 func (m Model) View() string {
@@ -37,21 +37,21 @@ func (m Model) View() string {
 	// Build bottom bar
 	bottomBar := m.renderBottomBar()
 
-	// Calculate vertical centering for home page
-	if m.PageIndex == 0 {
-		navHeight := lipgloss.Height(nav)
-		bottomHeight := lipgloss.Height(bottomBar)
-		contentHeight := lipgloss.Height(mainContent)
-		availableHeight := m.Height - navHeight - bottomHeight
-		topPadding := (availableHeight - contentHeight) / 2
-		if topPadding < 1 {
-			topPadding = 1
-		}
-		padding := strings.Repeat("\n", topPadding)
-		return nav + padding + mainContent + "\n" + bottomBar
+	// Calculate vertical centering for all pages
+	navHeight := lipgloss.Height(nav)
+	bottomHeight := lipgloss.Height(bottomBar)
+	contentHeight := lipgloss.Height(mainContent)
+	availableHeight := m.Height - navHeight - bottomHeight
+	topPadding := (availableHeight - contentHeight) / 2
+	if topPadding < 1 {
+		topPadding = 1
+	}
+	bottomPadding := availableHeight - contentHeight - topPadding
+	if bottomPadding < 0 {
+		bottomPadding = 0
 	}
 
-	return nav + "\n" + mainContent + "\n" + bottomBar
+	return nav + strings.Repeat("\n", topPadding) + mainContent + strings.Repeat("\n", bottomPadding) + bottomBar
 }
 
 func (m Model) renderNav() string {
@@ -125,18 +125,14 @@ func (m Model) renderViewport() string {
 }
 
 func (m Model) renderBottomBar() string {
-	versionText := ui.GetVersionStyle().Render(fmt.Sprintf(" %s", version))
-
 	themeName := ui.Themes[m.Theme].Name
 	controls := ui.GetControlsStyle().Render(
-		fmt.Sprintf("←→ navigate  t theme (%s)  q quit ", themeName),
+		fmt.Sprintf("←→ navigate  t theme (%s)  r refresh  q quit", themeName),
 	)
+	version := ui.GetVersionStyle().Render("v0.1.0")
 
-	gap := m.Width - lipgloss.Width(versionText) - lipgloss.Width(controls)
-	if gap < 0 {
-		gap = 0
-	}
-	spacer := strings.Repeat(" ", gap)
+	centeredControls := lipgloss.PlaceHorizontal(m.Width, lipgloss.Center, controls)
+	centeredVersion := lipgloss.PlaceHorizontal(m.Width, lipgloss.Center, version)
 
-	return versionText + spacer + controls
+	return centeredControls + "\n" + centeredVersion
 }

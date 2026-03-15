@@ -1,21 +1,25 @@
-# About
+# about
 
-andy is a swe passionate about building
-elegant(or not) solutions to complex problems.
+andy is passionate about (sometimes) building
+elegant (or not) solutions to complex problems.
 
-## Education
-- **University of Chicago** — caam and cs
+## education
+- **university of chicago** — caam and cs, co'2028
 
-## Skills
-- **Languages**: Go, Python, JavaScript, TypeScript
-- **Frontend**: React, Next.js
-- **Backend**: Node.js, Express
-- **Infrastructure**: Docker, Linux, AWS
-- **Tools**: Git, VS Code, Figma
+## skills
+- **languages**: Go, Python, JavaScript, TypeScript
+- **frontend**: React, Next.js
+- **backend**: Node.js, Express
+- **infrastructure**: Docker, Linux, AWS
+- **tools**: Git, VS Code, Figma
 
-## Interests
+## interests
 - human computer interaction
 - terminal-based interfaces
 - open source software
 - not sleep
-- creative technology
+- coffee
+- coffee
+- coffee
+- artificial intelligence
+- neural networks
