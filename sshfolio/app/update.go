@@ -88,7 +88,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// Refresh layout - 'r' key
 		case msg.String() == "r":
-			return m, tea.WindowSize()
+			return m, func() tea.Msg {
+				return tea.WindowSizeMsg{Width: m.Width, Height: m.Height}
+			}
 
 		case key.Matches(msg, ui.DefaultKeyMap.Navigate):
 			break
