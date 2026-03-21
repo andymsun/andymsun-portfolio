@@ -1,0 +1,10 @@
+{
+  "name": "ascii-gen",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "ink": "^5.2.0",
+    "ink-picture": "^1.0.0",
+    "react": "^19.0.0"
+  }
+}
