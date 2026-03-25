@@ -12,6 +12,7 @@ if you want to test the terminal app on your own machine without a server:
 - `cd sshfolio`
 - run `go run .`
 - bottom text
+- i also hopefully wont steal your data lol
 
 ### updating projects in the terminal
 if i ever actually build something new, here's how to update the list:
