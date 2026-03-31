@@ -49,22 +49,31 @@
   </main>
 
   <!-- Hand that swats the cursor -->
-  <div id="swat-hand" class="swat-hand" aria-hidden="true" style="font-size: 64px; line-height: 1; user-select: none;">
-    ✊
+  <div id="swat-hand" class="swat-hand" aria-hidden="true"
+    style="font-size: 64px; line-height: 1; user-select: none; display: flex; align-items: center; justify-content: center;">
+    <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/270a.svg"
+      style="width: 1em; height: 1em; pointer-events: none;" alt="" />
   </div>
 
   <!-- Hammer that smashes the cursor -->
   <div id="smash-hammer" class="smash-hammer" aria-hidden="true"
-    style="font-size: 80px; line-height: 1; user-select: none;">
-    🔨
+    style="font-size: 80px; line-height: 1; user-select: none; display: flex; align-items: center; justify-content: center;">
+    <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f528.svg"
+      style="width: 1em; height: 1em; pointer-events: none;" alt="" />
   </div>
 
   <!-- Pinching hands for green dot -->
-  <div id="pinch-left" class="pinch-hand" aria-hidden="true" style="font-size: 50px; line-height: 1; user-select: none;">
-    🤏
+  <div id="pinch-left" class="pinch-hand" aria-hidden="true"
+    style="font-size: 50px; line-height: 1; user-select: none; display: flex; align-items: center; justify-content: center;">
+    <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f90f.svg"
+      style="width: 1em; height: 1em; pointer-events: none;" alt="" />
   </div>
-  <div id="pinch-right" class="pinch-hand" aria-hidden="true" style="font-size: 50px; line-height: 1; user-select: none;">
-    <div style="transform: scaleX(-1); display: inline-block;">🤏</div>
+  <div id="pinch-right" class="pinch-hand" aria-hidden="true"
+    style="font-size: 50px; line-height: 1; user-select: none; display: flex; align-items: center; justify-content: center;">
+    <div style="transform: scaleX(-1); display: flex; align-items: center; justify-content: center;">
+      <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f90f.svg"
+        style="width: 1em; height: 1em; pointer-events: none;" alt="" />
+    </div>
   </div>
 
   <!-- Fake cursor that gets thrown -->
@@ -156,7 +165,7 @@
         hand.style.transform = 'rotate(-30deg) scale(0.5)';
         hand.style.opacity = '0';
         hand.style.display = 'block';
-        hand.textContent = '✊'; // Start as a fist grabbing the cursor
+        hand.innerHTML = '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/270a.svg" style="width: 1em; height: 1em; pointer-events: none;" alt="" />'; // Start as a fist grabbing the cursor
 
         // Phase 1: Hand swings in (fast)
         requestAnimationFrame(() => {
@@ -182,7 +191,7 @@
 
         // Phase 2: Hand throws — switch to open hand and fling the cursor
         setTimeout(() => {
-          hand.textContent = '🖐️'; // Open hand to release cursor
+          hand.innerHTML = '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f590.svg" style="width: 1em; height: 1em; pointer-events: none;" alt="" />'; // Open hand to release cursor
           hand.style.transition = 'all 0.1s cubic-bezier(0, 0.55, 0.45, 1)'; // Explosive forward whip
           const swatAngle = throwRight ? 45 + Math.random() * 20 : -45 - Math.random() * 20;
           hand.style.transform = `rotate(${swatAngle}deg) scale(1.1) translateX(${throwRight ? 30 : -30}px)`;
@@ -249,7 +258,7 @@
 
         // 2) Position hammer perfectly so the head aligns with the cursor upon impact
         // Mathematically aligned based on browser subagent bounding box pixel measurements
-        hammer.style.left = (startX - 2) + 'px';
+        hammer.style.left = (startX + 25) + 'px';
         hammer.style.top = (startY - 110) + 'px';
         hammer.style.transformOrigin = 'bottom right';
         hammer.style.transform = 'rotate(25deg) scale(1.2)';
@@ -349,17 +358,17 @@
         const handY = startY - 10;
         pinchLeft.style.transition = 'none';
         pinchRight.style.transition = 'none';
-        
-        pinchLeft.style.left = (startX - 125) + 'px';
+
+        pinchLeft.style.left = (startX - 119) + 'px';
         pinchLeft.style.top = handY + 'px';
         pinchLeft.style.transform = 'rotate(-10deg) scale(1)';
         pinchLeft.style.opacity = '0';
         pinchLeft.style.display = 'block';
-        
+
         // Right hand has internal scaleX(-1) in HTML, so we just treat it normally here
-        pinchRight.style.left = (startX + 35) + 'px';
+        pinchRight.style.left = (startX + 40) + 'px';
         pinchRight.style.top = handY + 'px';
-        pinchRight.style.transform = 'rotate(10deg) scale(1)'; 
+        pinchRight.style.transform = 'rotate(10deg) scale(1)';
         pinchRight.style.opacity = '0';
         pinchRight.style.display = 'block';
 
@@ -386,7 +395,7 @@
           // Apply physical separation of hands smoothly
           pinchLeft.style.transition = `transform ${duration}ms cubic-bezier(0.6, 0.04, 0.98, 0.33)`;
           pinchLeft.style.transform = `translate(-180px, 0) rotate(-15deg) scale(1.1)`;
-          
+
           pinchRight.style.transition = `transform ${duration}ms cubic-bezier(0.6, 0.04, 0.98, 0.33)`;
           pinchRight.style.transform = `translate(90px, 0) rotate(15deg) scale(1.1)`;
 
@@ -395,15 +404,15 @@
             if (!pulling) return;
             const elapsed = time - startTime;
             progress = Math.min(elapsed / duration, 1);
-            
+
             // Cursor gets exponentially massive
             const currentScale = 1 + (25 * Math.pow(progress, 3));
-            
+
             fakeCursor.style.transition = 'none';
             fakeCursor.style.transform = `scale(${currentScale})`;
 
             // Shake increases aggressively as mass increases
-            const shakeIntensity = Math.max(0, (currentScale - 2) * 1.5); 
+            const shakeIntensity = Math.max(0, (currentScale - 2) * 1.5);
             if (shakeIntensity > 0) {
               const offsetX = (Math.random() - 0.5) * shakeIntensity;
               const offsetY = (Math.random() - 0.5) * shakeIntensity;
@@ -445,7 +454,7 @@
           fakeCursor.style.transition = 'top 0.6s cubic-bezier(0.5, 0, 1, 1), opacity 0.3s ease 0.3s';
           fakeCursor.style.top = (window.innerHeight + finalScale * 30) + 'px';
           fakeCursor.style.opacity = '0';
-          
+
           // Cleanup variables
           setTimeout(() => {
             pinchLeft.style.display = 'none';
