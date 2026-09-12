@@ -1,172 +1,263 @@
 package app
 
 import (
-	"sshfolio/ui"
+	"strings"
+	"time"
 
-	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/viewport"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
-// Bubbletea update/msg handling
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	// Commands to be returned for Viewport updating
-	var (
-		ViewportCMD     tea.Cmd
-		ProjectsListCMD tea.Cmd
-		cmds            []tea.Cmd
-	)
+	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
-	case tea.MouseMsg:
-		switch tea.MouseAction(msg.Button) {
-		case 1: // Mouse left click
-			for i, title := range m.Pages {
-				x, y := m.CalculateNavItemPosition(title)
-				width, height := ui.CalculateNavItemSize(title)
-
-				if msg.X >= x && msg.X <= x+width && msg.Y >= y && msg.Y <= y+height {
-					m.PageIndex = i
-					m.Viewport.SetContent(SaturateContent(m, m.Viewport.Width))
-					m.Viewport.GotoTop()
-					return m, nil
-				} else if msg.Y >= ui.TermHeight-3 {
-					m.Help.ShowAll = !m.Help.ShowAll
-					return m, nil
-				}
-			}
-			if m.PageIndex == 2 && !m.ProjectOpen && msg.Y >= 16 && msg.Y < ui.TermHeight-3 {
-				projectIndex := 0
-				for i := 16; projectIndex <= len(m.Projects)-1; i += 3 {
-					if i <= msg.Y && msg.Y <= i+1 {
-						if m.List.Index() == projectIndex {
-							m.ClickCounter++
-						} else {
-							m.ClickCounter = 0
-						}
-						m.List.Select(projectIndex)
-					} else {
-						projectIndex++
-					}
-					if m.ClickCounter >= 2 {
-						m.ClickCounter = 0
-						m.ProjectOpen = true
-						m.OpenProject = m.List.Index()
-					}
-				}
-			}
-		case 4: // Scroll wheel up
-			if m.PageIndex == 2 && !m.ProjectOpen {
-				if m.List.Index() == 0 {
-					m.List.Select(len(m.Projects))
-				} else {
-					m.List.Select(m.List.Index() - 1)
-				}
-			}
-		case 5: // Scroll wheel down
-			if m.PageIndex == 2 && !m.ProjectOpen {
-				if m.List.Index() == len(m.Projects)-1 {
-					m.List.Select(0)
-				} else {
-					m.List.Select(m.List.Index() + 1)
-				}
-			}
-		}
-	case tea.KeyMsg:
-		switch {
-		case key.Matches(msg, ui.DefaultKeyMap.Quit):
-			return m, tea.Quit
-		case key.Matches(msg, ui.DefaultKeyMap.Help):
-			m.Help.ShowAll = !m.Help.ShowAll
-
-		// Theme toggle - 't' key
-		case msg.String() == "t":
-			m.Theme = (m.Theme + 1) % len(ui.Themes)
-			ui.CurrentTheme = m.Theme
-			return m, nil
-
-		// Refresh layout - 'r' key
-		case msg.String() == "r":
-			return m, func() tea.Msg {
-				return tea.WindowSizeMsg{Width: m.Width, Height: m.Height}
-			}
-
-		case key.Matches(msg, ui.DefaultKeyMap.Navigate):
-			break
-		case key.Matches(msg, ui.DefaultKeyMap.Up):
-			break
-		case key.Matches(msg, ui.DefaultKeyMap.Down):
-			break
-		case key.Matches(msg, ui.DefaultKeyMap.RCycle):
-			cycled := m.CyclePage("right")
-			cycled.Viewport.SetContent(SaturateContent(cycled, m.Viewport.Width))
-			cycled.Viewport.GotoTop()
-			return cycled, nil
-		case key.Matches(msg, ui.DefaultKeyMap.LCycle):
-			cycled := m.CyclePage("left")
-			m.Viewport.SetContent(SaturateContent(cycled, m.Viewport.Width))
-			m.Viewport.GotoTop()
-			return m.CyclePage("left"), nil
-		case key.Matches(msg, ui.DefaultKeyMap.Left):
-			if m.PageIndex > 0 {
-				m.PageIndex--
-				m.Viewport.SetContent(SaturateContent(m, m.Viewport.Width))
-				m.Viewport.GotoTop()
-			}
-			return m, nil
-		case key.Matches(msg, ui.DefaultKeyMap.Right):
-			if m.PageIndex < len(m.Pages)-1 {
-				m.PageIndex++
-				m.Viewport.SetContent(SaturateContent(m, m.Viewport.Width))
-				m.Viewport.GotoTop()
-			}
-			return m, nil
-		case key.Matches(msg, ui.DefaultKeyMap.Enter):
-			if m.PageIndex == 2 {
-				m.ProjectOpen = true
-				m.OpenProject = m.List.Index()
-				m.Viewport.GotoTop()
-			}
-		case key.Matches(msg, ui.DefaultKeyMap.Back):
-			if m.PageIndex == 2 {
-				m.ProjectOpen = false
-				m.List.Select(m.OpenProject)
-			}
-		}
 	case tea.WindowSizeMsg:
-		// Store dimensions
-		m.Width = msg.Width
-		m.Height = msg.Height
+		m.width, m.height = msg.Width, msg.Height
+		m.layout()
+		if !m.ready {
+			m.ready = true
+			cmds = append(cmds, textinput.Blink)
+		}
 
-		// Set new terminal height for proper click areas
-		ui.TermHeight = msg.Height
-		// Setup for Viewport sizing
-		headerHeight := lipgloss.Height(m.ViewportHeader(m.Pages[m.PageIndex]))
-		footerHeight := lipgloss.Height(m.ViewportFooter())
-		verticalMarginHeight := headerHeight + footerHeight
-		// Project List size
-		ListMarginWidth, ListMarginHeight := ui.ListStyle.GetFrameSize()
-		m.List.SetSize(msg.Width-ListMarginWidth, msg.Height-ListMarginHeight-verticalMarginHeight-11)
+	case tickMsg:
+		if time.Now().After(m.statusTo) {
+			m.status = ""
+		}
+		if quit := m.advance(); quit {
+			return m, tea.Quit
+		}
+		cmds = append(cmds, tick())
 
-		// Viewport creation & management
-		if !m.Ready {
-			m.Viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight-11)
-			m.Viewport.SetContent(SaturateContent(m, m.Viewport.Width))
-			m.Ready = true
-		} else {
-			m.Viewport.Width = msg.Width
-			m.Viewport.Height = msg.Height - verticalMarginHeight - 11
+	case tea.MouseMsg:
+		var c tea.Cmd
+		m.vp, c = m.vp.Update(msg)
+		cmds = append(cmds, c)
+
+	case tea.KeyMsg:
+		switch msg.Type {
+		case tea.KeyCtrlC:
+			if time.Since(m.ctrlC) < 2*time.Second {
+				return m, tea.Quit
+			}
+			m.ctrlC = time.Now()
+			m.setStatus("Press Ctrl-C again to exit", 2*time.Second)
+			return m, nil
+		case tea.KeyCtrlD:
+			return m, tea.Quit
+		case tea.KeyEsc:
+			if m.running() {
+				m.skip = true
+				return m, nil
+			}
+			m.in.SetValue("")
+			return m, nil
+		}
+		if m.booting {
+			return m, nil
+		}
+		items := m.menuItems()
+		switch msg.Type {
+		case tea.KeyEnter:
+			if len(items) > 0 && items[m.menuSel].Name != m.in.Value() {
+				m.in.SetValue(items[m.menuSel].Name)
+				m.in.CursorEnd()
+				return m, nil
+			}
+			m.submit(m.in.Value())
+			return m, nil
+		case tea.KeyTab:
+			if len(items) > 0 {
+				m.in.SetValue(items[m.menuSel].Name)
+				m.in.CursorEnd()
+			}
+			return m, nil
+		case tea.KeyUp:
+			if len(items) > 0 {
+				m.menuSel = (m.menuSel - 1 + len(items)) % len(items)
+			} else if len(m.history) > 0 {
+				if m.histIdx < len(m.history)-1 {
+					m.histIdx++
+				}
+				m.in.SetValue(m.history[len(m.history)-1-m.histIdx])
+				m.in.CursorEnd()
+			}
+			return m, nil
+		case tea.KeyDown:
+			if len(items) > 0 {
+				m.menuSel = (m.menuSel + 1) % len(items)
+			} else if m.histIdx >= 0 {
+				m.histIdx--
+				if m.histIdx < 0 {
+					m.in.SetValue("")
+				} else {
+					m.in.SetValue(m.history[len(m.history)-1-m.histIdx])
+					m.in.CursorEnd()
+				}
+			}
+			return m, nil
+		}
+		if msg.String() == "?" && m.in.Value() == "" && !m.running() {
+			m.submit("/help")
+			return m, nil
+		}
+		if m.running() {
+			return m, nil // one thing at a time, like the real one
+		}
+		var c tea.Cmd
+		m.in, c = m.in.Update(msg)
+		m.menuSel = 0
+		cmds = append(cmds, c)
+	default:
+		var c tea.Cmd
+		m.in, c = m.in.Update(msg)
+		cmds = append(cmds, c)
+	}
+
+	m.layout()
+	return m, tea.Batch(cmds...)
+}
+
+func (m *Model) running() bool { return m.cur != nil || len(m.queue) > 0 }
+
+func (m *Model) setStatus(s string, d time.Duration) {
+	m.status = s
+	m.statusTo = time.Now().Add(d)
+}
+
+func (m *Model) submit(text string) {
+	text = strings.TrimSpace(text)
+	if text == "" {
+		return
+	}
+	m.history = append(m.history, text)
+	m.histIdx = -1
+	m.in.SetValue("")
+	m.menuSel = 0
+	m.transcript = append(m.transcript, m.renderUser(text))
+	m.queue = append(m.queue, m.handle(text)...)
+	m.scrollBottom()
+}
+
+// menuItems returns the slash commands matching the prompt, or nil.
+func (m *Model) menuItems() []Command {
+	v := m.in.Value()
+	if !strings.HasPrefix(v, "/") || strings.Contains(v, " ") || m.booting {
+		return nil
+	}
+	var out []Command
+	for _, c := range Commands {
+		if strings.HasPrefix(c.Name, v) {
+			out = append(out, c)
 		}
 	}
-
-	if m.PageIndex == 2 && m.ProjectOpen {
-		m.Viewport.SetContent(ui.OpenProject(m.OpenProject, m.Projects, m.Viewport.Width))
+	if m.menuSel >= len(out) {
+		m.menuSel = 0
 	}
-	// Handle keyboard and mouse events in the Viewport
-	m.Viewport, ViewportCMD = m.Viewport.Update(msg)
-	m.List, ProjectsListCMD = m.List.Update(msg)
-	cmds = append(cmds, ViewportCMD, ProjectsListCMD)
+	return out
+}
 
-	return m, tea.Batch(cmds...)
+// advance plays the current step forward. Returns true when the program should quit.
+func (m *Model) advance() bool {
+	for {
+		if m.cur == nil {
+			if len(m.queue) == 0 {
+				return false
+			}
+			s := m.queue[0]
+			m.queue = m.queue[1:]
+			m.cur = &s
+			m.curStart = time.Now()
+			m.curVerb = randVerb()
+			m.tokens = 0
+			m.in.Blur()
+		}
+		done, quit := m.stepTick()
+		if quit {
+			return true
+		}
+		if !done {
+			m.scrollBottom()
+			return false
+		}
+		m.cur = nil
+		if !m.running() {
+			m.skip = false
+			if !m.booting {
+				m.in.Focus()
+			}
+		}
+		m.scrollBottom()
+	}
+}
+
+// stepTick renders the in-progress step into m.live and reports whether it finished.
+func (m *Model) stepTick() (done bool, quit bool) {
+	s := m.cur
+	el := time.Since(m.curStart)
+	ms := int(el.Milliseconds())
+	switch s.kind {
+	case stThink:
+		if ms >= s.ms || m.skip {
+			m.live = ""
+			return true, false
+		}
+		frame := ms / 110
+		m.tokens += (ms*7 + 13) % 41 / 3
+		m.live = m.renderSpinner(frame, m.curVerb, ms/1000, m.tokens)
+		return false, false
+	case stSay:
+		r := []rune(s.text)
+		n := ms * s.cps / 1000
+		if m.skip || n >= len(r) {
+			m.live = ""
+			m.transcript = append(m.transcript, m.renderAssist(s.text, s.style, false))
+			return true, false
+		}
+		m.live = m.renderAssist(string(r[:n]), s.style, true)
+		return false, false
+	case stTool:
+		if ms >= 300 || m.skip {
+			m.live = ""
+			m.transcript = append(m.transcript, m.renderTool(s.fn, s.arg, s.res))
+			return true, false
+		}
+		m.live = m.renderToolPending(s.fn, s.arg)
+		return false, false
+	case stCard:
+		m.transcript = append(m.transcript, m.renderCard(s.proj))
+		return true, false
+	case stRaw:
+		m.transcript = append(m.transcript, m.renderRaw(s.text))
+		return true, false
+	case stPause:
+		return ms >= s.ms || m.skip, false
+	case stType:
+		r := []rune(s.text)
+		n := ms / 55
+		if m.skip {
+			n = len(r)
+		}
+		if n > len(r) {
+			n = len(r)
+		}
+		m.in.SetValue(string(r[:n]))
+		m.in.CursorEnd()
+		if n == len(r) && (ms >= len(r)*55+350 || m.skip) {
+			m.in.SetValue("")
+			m.transcript = append(m.transcript, m.renderUser(s.text))
+			return true, false
+		}
+		return false, false
+	case stBootDone:
+		m.booting = false
+		m.skip = false
+		m.in.Placeholder = "Try \"/about\", \"why ssh?\", or \"/exit\""
+		m.in.Focus()
+		return true, false
+	case stQuit:
+		m.quitting = true
+		return true, true
+	}
+	return true, false
 }

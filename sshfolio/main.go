@@ -1,26 +1,32 @@
+// sshfolio: andymsun.com as a program you ssh into.
+//
+//	SSH_SERVER_ENABLED=false  run the agent in this terminal
+//	SSH_SERVER_ENABLED=true   serve it on HOST:PORT (the server uses 22)
 package main
 
 import (
 	"os"
-	"sshfolio/app"
-	"sshfolio/ui"
 	"strconv"
+
+	"sshfolio/app"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Loads .env and SSH_SERVER_ENABLED value
-	err := godotenv.Load()
-	ui.Check(err, "Loading .env in main... Make sure you have your .env file in the root directory of this program", true)
-	// Starts either the TUI SSH session or TUI program depending on if the flag is true or false.
-	SSHEnabled, err := strconv.ParseBool(os.Getenv("SSH_SERVER_ENABLED"))
-	ui.Check(err, "Parsing .env SSH_SERVER_ENABLED bool in main", true)
+	_ = godotenv.Load() // .env is optional; env vars win
 
-	// Starts the app :D
-	if SSHEnabled {
-		app.RunSSHTUI()
-	} else {
+	serve, _ := strconv.ParseBool(os.Getenv("SSH_SERVER_ENABLED"))
+	if !serve {
 		app.RunTUI()
+		return
 	}
+	host, port := os.Getenv("HOST"), os.Getenv("PORT")
+	if host == "" {
+		host = "0.0.0.0"
+	}
+	if port == "" {
+		port = "22"
+	}
+	app.RunSSHTUI(host, port)
 }

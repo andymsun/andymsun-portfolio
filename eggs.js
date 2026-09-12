@@ -1,0 +1,364 @@
+// The three dots. Red flings your cursor, yellow hammers it flat, green stretches it until the floor gives.
+// Restored from the original page (commit 91d7f1e); elements live in index.html.
+/* ── Red Dot Easter Egg ─────────────────────────── */
+(() => {
+  const dotRed = document.getElementById('dot-red');
+  const hand = document.getElementById('swat-hand');
+  const fakeCursor = document.getElementById('fake-cursor');
+  let isAnimating = false;
+
+  dotRed.addEventListener('click', (e) => {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    const dotRect = dotRed.getBoundingClientRect();
+    const startX = e.clientX;
+    const startY = e.clientY;
+
+    // Generate a random target for the fling (anywhere on the screen width)
+    const margin = 50;
+    const minX = margin;
+    const maxX = window.innerWidth - margin;
+    // Ensure it travels a decent distance
+    let throwTargetX;
+    do {
+      throwTargetX = Math.random() * (maxX - minX) + minX;
+    } while (Math.abs(throwTargetX - startX) < 150 && maxX - minX > 300);
+
+    // Toss it upwards randomly (between 50px and 250px above starting point, keeping it on screen)
+    const throwTargetY = Math.max(margin, startY - (Math.random() * 200 + 50));
+
+    const throwRight = throwTargetX > startX;
+
+    // Random spin amount (1 to 2 full rotations, varying direction)
+    const spinAmount = (Math.random() * 360 + 360) * (throwRight ? 1 : -1);
+
+    // 1) Show fake cursor at real cursor position, hide real cursor
+    fakeCursor.style.left = startX + 'px';
+    fakeCursor.style.top = startY + 'px';
+    fakeCursor.style.opacity = '1';
+    fakeCursor.style.display = 'block';
+    fakeCursor.style.transition = 'none';
+    fakeCursor.style.transform = 'rotate(0deg)'; // Reset rotation
+    document.body.classList.add('hide-cursor');
+
+    // 2) Bring the hand in from above the dot — swinging down
+    const handStartX = dotRect.left - 10;
+    const handStartY = dotRect.top - 60;
+    hand.style.left = handStartX + 'px';
+    hand.style.top = handStartY + 'px';
+    hand.style.transform = 'rotate(-30deg) scale(0.5)';
+    hand.style.opacity = '0';
+    hand.style.display = 'block';
+    hand.innerHTML = '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/270a.svg" style="width: 1em; height: 1em; pointer-events: none;" alt="" />'; // Start as a fist grabbing the cursor
+
+    // Phase 1: Hand swings in (fast)
+    requestAnimationFrame(() => {
+      hand.style.transition = 'all 0.25s cubic-bezier(0.22, 1, 0.36, 1)';
+      hand.style.transform = 'rotate(15deg) scale(1)';
+      hand.style.opacity = '1';
+      hand.style.top = (dotRect.top - 8) + 'px';
+      hand.style.left = (dotRect.left - 16) + 'px';
+    });
+
+    // Phase 1.5: Windup (pull hand and cursor back before throwing)
+    setTimeout(() => {
+      const windupX = throwRight ? -25 : 25;
+      const windupY = 10;
+      const windupAngle = throwRight ? 5 : 25;
+
+      hand.style.transition = 'all 0.15s cubic-bezier(0.42, 0, 1, 1)';
+      hand.style.transform = `rotate(${windupAngle}deg) scale(1) translate(${windupX}px, ${windupY}px)`;
+
+      fakeCursor.style.transition = 'all 0.15s cubic-bezier(0.42, 0, 1, 1)';
+      fakeCursor.style.transform = `translate(${windupX}px, ${windupY}px)`;
+    }, 240); // Trigger right as Phase 1 (swing in) finishes
+
+    // Phase 2: Hand throws — switch to open hand and fling the cursor
+    setTimeout(() => {
+      hand.innerHTML = '<img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f590.svg" style="width: 1em; height: 1em; pointer-events: none;" alt="" />'; // Open hand to release cursor
+      hand.style.transition = 'all 0.1s cubic-bezier(0, 0.55, 0.45, 1)'; // Explosive forward whip
+      const swatAngle = throwRight ? 45 + Math.random() * 20 : -45 - Math.random() * 20;
+      hand.style.transform = `rotate(${swatAngle}deg) scale(1.1) translateX(${throwRight ? 30 : -30}px)`;
+
+      // Fling the fake cursor to the random point, spinning it
+      fakeCursor.style.transition = 'left 0.4s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+      fakeCursor.style.left = throwTargetX + 'px';
+      fakeCursor.style.top = throwTargetY + 'px';
+      fakeCursor.style.transform = `rotate(${spinAmount}deg)`;
+    }, 400);
+
+    // Phase 3: Hand retreats
+    setTimeout(() => {
+      hand.style.transition = 'all 0.35s ease-in';
+      hand.style.opacity = '0';
+      hand.style.transform = 'rotate(-20deg) scale(0.5) translateY(-40px)';
+    }, 650);
+
+    // Phase 4: Fake cursor falls
+    setTimeout(() => {
+      fakeCursor.style.transition = 'top 1.0s cubic-bezier(0.55, 0, 1, 0.45), opacity 0.4s ease 0.6s, transform 0.8s ease-in';
+      fakeCursor.style.top = (window.innerHeight + 50) + 'px';
+      fakeCursor.style.opacity = '0';
+      fakeCursor.style.transform = `rotate(${throwRight ? spinAmount + 90 : spinAmount - 90}deg)`;
+    }, 850);
+
+    // Phase 5: Clean up
+    setTimeout(() => {
+      hand.style.display = 'none';
+      fakeCursor.style.display = 'none';
+      document.body.classList.remove('hide-cursor');
+      isAnimating = false;
+    }, 2200);
+  });
+
+  // Visual feedback: dot pulses on hover
+  dotRed.style.cursor = 'pointer';
+  dotRed.addEventListener('mouseenter', () => {
+    if (!isAnimating) dotRed.classList.add('dot-hover');
+  });
+  dotRed.addEventListener('mouseleave', () => {
+    dotRed.classList.remove('dot-hover');
+  });
+
+  /* ── Yellow Dot Easter Egg ─────────────────────────── */
+  const dotYellow = document.querySelector('.dot-yellow');
+  const hammer = document.getElementById('smash-hammer');
+
+  dotYellow.addEventListener('click', (e) => {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+
+    // 1) Show fake cursor 
+    fakeCursor.style.left = startX + 'px';
+    fakeCursor.style.top = startY + 'px';
+    fakeCursor.style.opacity = '1';
+    fakeCursor.style.display = 'block';
+    fakeCursor.style.transition = 'none';
+    fakeCursor.style.transform = 'rotate(0deg) scale(1)'; // normal
+    document.body.classList.add('hide-cursor');
+
+    // 2) Position hammer perfectly so the head aligns with the cursor upon impact
+    // Mathematically aligned based on browser subagent bounding box pixel measurements
+    hammer.style.left = (startX + 25) + 'px';
+    hammer.style.top = (startY - 110) + 'px';
+    hammer.style.transformOrigin = 'bottom right';
+    hammer.style.transform = 'rotate(25deg) scale(1.2)';
+    hammer.style.opacity = '0';
+    hammer.style.display = 'block';
+    hammer.style.transition = 'none';
+
+    // Phase 1: Hammer fades in
+    requestAnimationFrame(() => {
+      hammer.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+      hammer.style.opacity = '1';
+    });
+
+    // Phase 2: Hammer SLAMS down
+    setTimeout(() => {
+      hammer.style.transition = 'transform 0.15s cubic-bezier(0.5, 0, 1, 1)';
+      // Swing forward so the head (top-left) hits the cursor
+      hammer.style.transform = 'rotate(-60deg) scale(1.2) translateY(5px)';
+
+      // Squash the cursor precisely when hammer hits
+      setTimeout(() => {
+        fakeCursor.style.transition = 'transform 0.05s ease';
+        fakeCursor.style.transform = 'scale(1.5, 0.2) translateY(30px)';
+
+        // Subtle screen shake
+        document.body.style.transition = 'none';
+        document.body.style.transform = 'translateY(8px)';
+        setTimeout(() => {
+          document.body.style.transition = 'transform 0.1s ease-out';
+          document.body.style.transform = 'translateY(0)';
+        }, 50);
+
+      }, 120); // Sync squash with hammer hit
+    }, 300);
+
+    // Phase 3: Hammer pauses, then lifts off slightly
+    setTimeout(() => {
+      hammer.style.transition = 'transform 0.3s ease-out';
+      hammer.style.transform = 'rotate(-30deg) scale(1.2) translateY(-20px)';
+
+      // Cursor falls down squashed
+      fakeCursor.style.transition = 'top 1s cubic-bezier(0.55, 0, 1, 0.45), opacity 0.4s ease 0.6s';
+      fakeCursor.style.top = (window.innerHeight + 50) + 'px';
+      fakeCursor.style.opacity = '0';
+    }, 700);
+
+    // Phase 4: Hammer retreats
+    setTimeout(() => {
+      hammer.style.transition = 'all 0.3s ease-in';
+      hammer.style.opacity = '0';
+      hammer.style.transform = 'rotate(25deg) scale(1.2) translateY(-50px)';
+    }, 1100);
+
+    // Phase 5: Clean up
+    setTimeout(() => {
+      hammer.style.display = 'none';
+      fakeCursor.style.display = 'none';
+      fakeCursor.style.transform = 'none';
+      document.body.classList.remove('hide-cursor');
+      isAnimating = false;
+    }, 1500);
+  });
+
+  // Hover glow effect
+  dotYellow.style.cursor = 'pointer';
+  dotYellow.addEventListener('mouseenter', () => {
+    if (!isAnimating) dotYellow.classList.add('dot-hover');
+  });
+  dotYellow.addEventListener('mouseleave', () => {
+    dotYellow.classList.remove('dot-hover');
+  });
+
+  /* ── Green Dot Easter Egg ─────────────────────────── */
+  const dotGreen = document.querySelector('.dot-green');
+  const pinchLeft = document.getElementById('pinch-left');
+  const pinchRight = document.getElementById('pinch-right');
+  let shakeRaf;
+
+  dotGreen.addEventListener('click', (e) => {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+
+    // 1) Show fake cursor 
+    fakeCursor.style.left = startX + 'px';
+    fakeCursor.style.top = startY + 'px';
+    fakeCursor.style.opacity = '1';
+    fakeCursor.style.display = 'block';
+    fakeCursor.style.transition = 'none';
+    fakeCursor.style.transform = 'rotate(0deg) scale(1)';
+    fakeCursor.style.transformOrigin = 'center'; // Center scale
+    document.body.classList.add('hide-cursor');
+
+    // 2) Position pinching hands wide initially
+    const handY = startY - 10;
+    pinchLeft.style.transition = 'none';
+    pinchRight.style.transition = 'none';
+
+    pinchLeft.style.left = (startX - 119) + 'px';
+    pinchLeft.style.top = handY + 'px';
+    pinchLeft.style.transform = 'rotate(-10deg) scale(1)';
+    pinchLeft.style.opacity = '0';
+    pinchLeft.style.display = 'block';
+
+    // Right hand has internal scaleX(-1) in HTML, so we just treat it normally here
+    pinchRight.style.left = (startX + 40) + 'px';
+    pinchRight.style.top = handY + 'px';
+    pinchRight.style.transform = 'rotate(10deg) scale(1)';
+    pinchRight.style.opacity = '0';
+    pinchRight.style.display = 'block';
+
+    let progress = 0;
+    let pulling = false;
+
+    // Phase 1: Hands move in and grab
+    requestAnimationFrame(() => {
+      pinchLeft.style.transition = 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)';
+      pinchLeft.style.opacity = '1';
+      pinchLeft.style.transform = `translate(70px, 0) rotate(0deg) scale(1)`;
+
+      pinchRight.style.transition = 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)';
+      pinchRight.style.opacity = '1';
+      pinchRight.style.transform = `translate(-30px, 0) rotate(0deg) scale(1)`;
+    });
+
+    // Phase 2: Slowly pull apart and scale cursor up
+    setTimeout(() => {
+      pulling = true;
+      const duration = 2500; // Pulling tension duration
+      const startTime = performance.now();
+
+      // Apply physical separation of hands smoothly
+      pinchLeft.style.transition = `transform ${duration}ms cubic-bezier(0.6, 0.04, 0.98, 0.33)`;
+      pinchLeft.style.transform = `translate(-180px, 0) rotate(-15deg) scale(1.1)`;
+
+      pinchRight.style.transition = `transform ${duration}ms cubic-bezier(0.6, 0.04, 0.98, 0.33)`;
+      pinchRight.style.transform = `translate(90px, 0) rotate(15deg) scale(1.1)`;
+
+      // Engine for Cursor Scaling and Screen Shake
+      function pullAnimation(time) {
+        if (!pulling) return;
+        const elapsed = time - startTime;
+        progress = Math.min(elapsed / duration, 1);
+
+        // Cursor gets exponentially massive
+        const currentScale = 1 + (25 * Math.pow(progress, 3));
+
+        fakeCursor.style.transition = 'none';
+        fakeCursor.style.transform = `scale(${currentScale})`;
+
+        // Shake increases aggressively as mass increases
+        const shakeIntensity = Math.max(0, (currentScale - 2) * 1.5);
+        if (shakeIntensity > 0) {
+          const offsetX = (Math.random() - 0.5) * shakeIntensity;
+          const offsetY = (Math.random() - 0.5) * shakeIntensity;
+          document.body.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+        }
+
+        if (progress < 1) {
+          shakeRaf = requestAnimationFrame(pullAnimation);
+        } else {
+          breakFloor(currentScale);
+        }
+      }
+      shakeRaf = requestAnimationFrame(pullAnimation);
+
+    }, 500);
+
+    function breakFloor(finalScale) {
+      pulling = false;
+      // Final massive explosive floor break
+      document.body.style.transform = `translate(0px, 20px)`;
+      setTimeout(() => {
+        document.body.style.transform = `translate(0px, -15px)`;
+        setTimeout(() => {
+          document.body.style.transition = 'transform 0.2s ease-out';
+          document.body.style.transform = `translate(0px, 0px)`;
+        }, 50);
+      }, 50);
+
+      // Hands recoil outward
+      pinchLeft.style.transition = 'all 0.3s ease-out';
+      pinchLeft.style.transform = `translate(-200px, -50px) rotate(30deg) scale(1.5)`;
+      pinchLeft.style.opacity = '0';
+
+      pinchRight.style.transition = 'all 0.3s ease-out';
+      pinchRight.style.transform = `translate(200px, -50px) rotate(-30deg) scale(1.5)`;
+      pinchRight.style.opacity = '0';
+
+      // Cursor plummets off-screen
+      fakeCursor.style.transition = 'top 0.6s cubic-bezier(0.5, 0, 1, 1), opacity 0.3s ease 0.3s';
+      fakeCursor.style.top = (window.innerHeight + finalScale * 30) + 'px';
+      fakeCursor.style.opacity = '0';
+
+      // Cleanup variables
+      setTimeout(() => {
+        pinchLeft.style.display = 'none';
+        pinchRight.style.display = 'none';
+        fakeCursor.style.display = 'none';
+        fakeCursor.style.transform = 'none';
+        fakeCursor.style.transformOrigin = '0 0';
+        document.body.classList.remove('hide-cursor');
+        isAnimating = false;
+      }, 800);
+    }
+  });
+
+  // Hover glow effect
+  dotGreen.style.cursor = 'pointer';
+  dotGreen.addEventListener('mouseenter', () => {
+    if (!isAnimating) dotGreen.classList.add('dot-hover');
+  });
+  dotGreen.addEventListener('mouseleave', () => {
+    dotGreen.classList.remove('dot-hover');
+  });
+})();

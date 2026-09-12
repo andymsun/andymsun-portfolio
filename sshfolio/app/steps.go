@@ -1,0 +1,131 @@
+package app
+
+import (
+	"fmt"
+	"math/rand"
+	"strings"
+)
+
+// A step is one unit of the agent's output. Handlers return a list of them
+// and the model plays them back on a timer so the terminal feels alive.
+type stepKind int
+
+const (
+	stThink    stepKind = iota // spinner for ms
+	stSay                      // stream text at cps
+	stTool                     // "⏺ Fn(arg)" then "⎿ result"
+	stCard                     // a project card, instantly
+	stRaw                      // a pre-rendered block, instantly
+	stPause                    // wait ms
+	stType                     // type text into the prompt, then submit it
+	stBootDone                 // hand the prompt to the user
+	stQuit                     // leave
+)
+
+type step struct {
+	kind         stepKind
+	text         string
+	style        string // "", "ok", "clay" for the ⏺ colour
+	ms           int
+	cps          int
+	fn, arg, res string
+	proj         *Project
+}
+
+func think(ms int) step             { return step{kind: stThink, ms: ms} }
+func say(t string) step             { return step{kind: stSay, text: t, cps: 320} }
+func sayAs(t, style string) step    { return step{kind: stSay, text: t, cps: 320, style: style} }
+func tool(fn, arg, res string) step { return step{kind: stTool, fn: fn, arg: arg, res: res} }
+func card(p *Project) step          { return step{kind: stCard, proj: p} }
+func raw(t string) step             { return step{kind: stRaw, text: t} }
+func pause(ms int) step             { return step{kind: stPause, ms: ms} }
+func typeIn(t string) step          { return step{kind: stType, text: t} }
+
+func randVerb() string { return Verbs[rand.Intn(len(Verbs))] }
+
+// bootSteps is the autoplayed session everyone sees on connect.
+func bootSteps() []step {
+	s := []step{raw("conn"), pause(600), raw("welcome"), pause(700),
+		typeIn("who is andy?"), think(900), say(About[0]), pause(300),
+		typeIn("/now"), think(500), tool("Bash", "ps -o pid,stat,tag,cmd", fmt.Sprintf("%d processes", len(Now))), raw("now"),
+		sayAs("That is the current state. The prompt is yours: /projects reads the work, / lists everything, or ask me something.", "ok"),
+		step{kind: stBootDone}}
+	return s
+}
+
+// handle turns a submitted line into steps.
+func (m *Model) handle(text string) []step {
+	text = strings.TrimSpace(text)
+	cmd := strings.ToLower(strings.Fields(text + " ")[0])
+	switch cmd {
+	case "/help", "?":
+		return []step{say("Things I can do:"), raw("help"), say("Or just ask something. I only know about Andy, so keep it on topic.")}
+	case "/now":
+		return []step{think(500), tool("Bash", "ps -o pid,stat,tag,cmd", fmt.Sprintf("%d processes", len(Now))), raw("now")}
+	case "/about":
+		s := []step{think(900), tool("Read", "about.md", "Read 18 lines")}
+		for _, p := range About {
+			s = append(s, say(p))
+		}
+		return append(s, say("For what he is doing right now, /now."))
+	case "/projects":
+		s := []step{think(1100), say("Reading the project files.")}
+		for i := range Projects {
+			p := &Projects[i]
+			s = append(s, tool("Read", p.File, fmt.Sprintf("Read %d lines", p.Lines)), card(p))
+		}
+		return append(s, sayAs("Five entries. Lawvics and Rivendell are the loud ones; sshfolio is the one you are inside of.", "ok"))
+	case "/contact":
+		return []step{think(500), tool("Read", "contact.md", "Read 4 lines"), raw("contact")}
+	case "/web":
+		return []step{think(500), tool("Bash", "open https://andymsun.com", "cannot open a browser from in here. it is the same agent with more pixels:"), raw("web")}
+	case "/model":
+		return []step{say("andy-3 (third year). Context window: two cups of coffee. Knowledge cutoff: whenever he last slept.")}
+	case "/cost":
+		secs := int(m.uptime().Seconds())
+		return []step{say(fmt.Sprintf("Session: %ds wall time, ≈ %.1f coffees, $0.00. Andy is a student; this runs on a €5 VPS.", secs, float64(secs)/900+1))}
+	case "/clear":
+		m.transcript = nil
+		return []step{raw("welcome")}
+	case "/exit", "/quit":
+		return []step{sayAs("Bye. andymsun.com has the same thing with more pixels.", "clay"), pause(900), step{kind: stQuit}}
+	}
+	if strings.HasPrefix(text, "/") {
+		return []step{say(fmt.Sprintf("Unknown command: %s. /help lists the real ones.", text))}
+	}
+	return chat(text)
+}
+
+func chat(text string) []step {
+	t := strings.ToLower(text)
+	has := func(ws ...string) bool {
+		for _, w := range ws {
+			if strings.Contains(t, w) {
+				return true
+			}
+		}
+		return false
+	}
+	th := think(700 + rand.Intn(700))
+	switch {
+	case has("why ssh", "ssh?", "why a terminal", "why terminal"):
+		return []step{th, say("An SSH session is the smallest interface there is: no layout engine, no fonts, no mouse required, a grid of cells. Designing for it forces a decision about what matters. andymsun.com is this same program with more pixels.")}
+	case has("coffee"):
+		return []step{th, say("Yes. Interests, in order: coffee, coffee, coffee, HCI. He would like you to know the order is a joke, and that it is not.")}
+	case has("sleep"):
+		return []step{th, say("The bio used to say \"a cs major that does not sleep\". It was removed for being too accurate.")}
+	case has("badminton"):
+		return []step{th, say("Every open gym. Logistics officer for the UChicago club, which mostly means dues, suppliers, and a live board of who is on which court.")}
+	case has("hire", "job", "intern", "recruit", "resume", "cv"):
+		return []step{th, say("Good instinct. Email is fastest: andy@andymsun.com. He is a third year, graduating June 2028, and likes teams where he can own a large part of the outcome.")}
+	case has("hello", "hi ", "hey", "yo"):
+		return []step{th, say("Hi. I am a small Go program pretending to be a coding agent pretending to be Andy. Try /now.")}
+	case has("who are you", "what are you", "what is this"):
+		return []step{th, say("A terminal agent that only knows about one person. Type / to see what I can do, or ask why ssh.")}
+	case has("hci", "interaction", "interface"):
+		return []step{th, say("Human–computer interaction is the part he keeps coming back to: making capable systems usable by people who did not build them. Interfaces for models that are not a chat box, and terminals, obviously.")}
+	case has("claude", "anthropic", "copy"):
+		return []step{th, say("Inspired by, not affiliated with. The prompt box, the ⏺ bullets, and the spinner verbs are a homage. The content is all Andy.")}
+	}
+	return []step{th, say("I only know things about Andy. Try /now, /projects, or ask \"why ssh?\"")}
+}

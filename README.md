@@ -1,26 +1,47 @@
-# andy's portfolio
+# andymsun.com
 
-hello gang. this is the monorepo for my portfolio stuff. it's has two main pieces going on right now:
+A portfolio that pretends to be a coding agent. It only knows about Andy.
 
-## 1. the regular website
-there's a regular static site right here in the root folder (`index.html` and `style.css`). it's just a landing page if you don't feel like sshing into a terminal right now.
+- **Web**: `index.html`, `style.css`, `app.js` in the repo root. A fake terminal
+  session that boots, asks itself who Andy is, reads the project files, and
+  then hands you the prompt. Slash commands, a completion menu, a spinner with
+  silly verbs, cards that unfold out of `Read()` calls, and a character grid
+  behind it that reacts to the mouse. No framework, no build step; Vercel serves
+  it as static files. `?fast` in the URL skips the animations.
+- **Terminal**: `sshfolio/`, the same agent in Go, served over ssh. Runs on a
+  small Hetzner VPS on port 22, so `ssh ssh.andymsun.com` is the whole install.
 
-## 2. the ssh tui app (`sshfolio` folder)
-cool stuff. custom terminal app in `sshfolio/` folder. if you ssh into ssh.andymsun.com, you get my portfolio
+Both are a homage to the Claude Code CLI: the prompt box, the `⏺` bullets, the
+`⎿` tool results, `Ctrl-C again to exit`. Not affiliated.
 
-if you want to test the terminal app on your own machine without a server:
-- `cd sshfolio`
-- run `go run .`
-- bottom text
-- i also hopefully wont steal your data lol
+## run the terminal version locally
 
-### updating projects in the terminal
-if i ever actually build something new, here's how to update the list:
-- go to `sshfolio/.env` and add the new project info at the bottom (make sure the numbers stay in order, like project_1, project_2, etc).
-- drop a new file matching the title straight into `sshfolio/assets/markdown/projects/` with all 
-- bottom text
+```bash
+cd sshfolio
+SSH_SERVER_ENABLED=false go run .        # in this terminal
+PORT=2323 go run .                       # or serve it, then: ssh -p 2323 localhost
+```
 
-### deploying
-just commit to github, ssh into the real server (make sure you use the actual ssh port since my thing steals port 22by convention), run `git pull`, and rebuild the app (like `docker-compose up -d --build` or whatever we gonna use for our vps). used hetzner vps for this btw, whatever their cheapest on demand vps thing was
+## edit content
 
-have fun lol
+The agent's knowledge is a couple of arrays, written twice:
+
+- `app.js` (web): `ABOUT`, `PROJECTS`, `VERBS`, `COMMANDS`, and the replies in `chat()`.
+- `sshfolio/app/content.go` and `steps.go` (terminal): the same names.
+
+Change both. Merging them into one JSON file both sides read is the first item
+in `docs/direction.md`.
+
+## deploy
+
+See [`deploy/README.md`](deploy/README.md): how to get a shell on the box when
+port 22 is taken by the portfolio, the systemd unit, and the one-line update.
+
+## layout
+
+```
+index.html style.css app.js    web front end
+sshfolio/                      go ssh server + agent (see sshfolio/README.md)
+deploy/                        systemd unit, deploy script, server notes
+docs/direction.md              why it looks like this and what is next
+```

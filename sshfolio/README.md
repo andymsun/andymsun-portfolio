@@ -1,47 +1,58 @@
-# SSHFolio
+# sshfolio
 
-A custom Terminal User Interface (TUI) portfolio that acts as an interactive SSH server. When users SSH into your domain, they are presented with a navigated terminal app summarizing your projects and background.
-
-## Running Locally
-
-To run the application locally without needing an SSH connection, ensure you have Go installed and use the following command in the `sshfolio` directory:
+The terminal half of andymsun.com: a Go SSH server (charmbracelet `wish`) that
+gives every connection a small "coding agent" that only knows about Andy. Same
+prompt box, `⏺` bullets, spinner verbs, slash menu, and `Ctrl-C again to exit`
+as the tool it is a homage to.
 
 ```bash
-go run .
+go run .              # runs the agent in this terminal (SSH_SERVER_ENABLED=false)
 ```
 
-This will run the interactive session directly in your current terminal window.
+Serve it locally on a port that does not need root, then connect:
 
-## Adding and Editing Projects
-
-The project list is dynamically generated based on your environment variables and markdown files.
-
-### 1. Configure the `.env` file
-Open the `.env` file in the root of the `sshfolio` folder. For each project, you must define the following three variables in a strict numerical sequence (1, 2, 3...):
-
-```env
-PROJECT_1_DISPLAY_TITLE="Project Name"
-PROJECT_1_MARKDOWN_FILE_TITLE="project-file"
-PROJECT_1_DESCRIPTION="A brief summary of the project."
+```bash
+PORT=2323 SSH_SERVER_ENABLED=true go run .
+ssh -p 2323 localhost
 ```
 
-*Note: The sequence must be unbroken. If you have `PROJECT_1` and `PROJECT_3` with no `2`, the app will stop reading at `1`.*
+## what it does
 
-### 2. Create the Markdown file
-The actual content of the project page is stored in `assets/markdown/projects/`. 
-Create a new file with the exact name you used for `PROJECT_X_MARKDOWN_FILE_TITLE` in your `.env` file, appending the `.md` extension.
+On connect it plays a short session (welcome box, `who is andy?`, `/projects`
+with the project cards), then hands over the prompt. `esc` skips the intro.
 
-For example, given the `.env` above, you would create or edit:
-`assets/markdown/projects/project-file.md`
+| input | does |
+|---|---|
+| `/` | opens the command menu; `↑` `↓` pick, `tab` or `enter` complete |
+| `/about` `/projects` `/contact` `/web` `/help` `/model` `/cost` `/clear` `/exit` | the commands |
+| `?` on an empty prompt | `/help` |
+| anything else | a keyword-matched reply (try `why ssh?`, `coffee`, `hire`) |
+| `esc` | interrupt whatever is streaming |
+| `↑` `↓` | prompt history |
+| `Ctrl-C` twice, `Ctrl-D`, or `/exit` | leave |
 
-## Deployment (Hetzner VPS)
+Mouse wheel scrolls the transcript.
 
-Because the `sshfolio` application binds to port `22` (the default SSH port) for visitors, your typical `ssh root@domain.com` login command will launch the TUI rather than a shell session.
+## layout
 
-To apply updates:
-1. **Commit and push:** Make sure all your `.env` and `.md` changes are completed, committed, and pushed to your GitHub repository.
-2. **Access your server shell:** SSH into your server using your alternative SSH port or IP.
-   - Using the alternate port: `ssh -p <YOUR_OPENSSH_PORT> root@your-server-ip`
-   - Alternatively, use the **Web Console** located in the [Hetzner Cloud Dashboard](https://console.hetzner.cloud/).
-3. **Pull changes:** Navigate to the project directory on the server and run `git pull`.
-4. **Rebuild the app:** Restart the service (for example, with `docker-compose up -d --build` or by running `go build .` and restarting your system service, depending on your setup).
+```
+main.go          reads .env, picks local or ssh mode
+app/content.go   everything the agent knows: about, projects, verbs, commands
+app/steps.go     command handlers; each returns a list of steps (think, say, tool, card…)
+app/update.go    bubbletea update loop, key handling, step playback
+app/view.go      rendering: header, transcript viewport, menu, prompt box, status
+app/model.go     model struct, tick timer
+app/runner.go    local runner and the wish ssh server
+ui/styles.go     palette (same colours as style.css on the web)
+ascii-gen/       older script that turns a photo into text art; not used by the agent
+```
+
+Content lives in `app/content.go` and is duplicated in `app.js` on the web.
+Change both.
+
+## deploy
+
+See `../deploy/README.md`: Docker Compose on the Hetzner box, `ssh andy-vps`
+for a shell. `.env` on the server says `PORT=22`; the checked-in file says `23`
+so `go run .` works without root. The host key in `.ssh/` is generated on first
+start and is deliberately not in git.

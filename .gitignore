@@ -1,0 +1,12 @@
+# dependencies
+node_modules/
+
+# build output
+sshfolio/sshfolio
+sshfolio/sshfolio.exe
+
+# host keys are generated on the server, never committed
+sshfolio/.ssh/
+
+# scratch
+.DS_Store

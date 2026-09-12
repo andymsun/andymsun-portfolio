@@ -1,0 +1,9 @@
+services:
+  sshfolio:
+    build: .
+    restart: always
+    ports:
+      - "22:22"
+    volumes:
+      - ./.ssh:/app/.ssh   # host key lives on the host, survives rebuilds
+    env_file: .env

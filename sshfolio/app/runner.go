@@ -12,65 +12,66 @@ import (
 
 	"sshfolio/ui"
 
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 	"github.com/charmbracelet/ssh"
 	"github.com/charmbracelet/wish"
 	"github.com/charmbracelet/wish/activeterm"
 	"github.com/charmbracelet/wish/bubbletea"
 	"github.com/charmbracelet/wish/logging"
-	"github.com/joho/godotenv"
-
-	tea "github.com/charmbracelet/bubbletea"
 )
 
+var programOptions = []tea.ProgramOption{tea.WithAltScreen(), tea.WithMouseCellMotion()}
+
+// RunTUI runs the agent in the current terminal.
 func RunTUI() {
-	model, options := TUIConfig()
-
-	p := tea.NewProgram(model, options...)
-
-	if _, err := p.Run(); err != nil {
-		fmt.Println("Error running program:", err)
+	m := NewModel(ui.NewStyles(lipgloss.DefaultRenderer()), 0, 0)
+	if _, err := tea.NewProgram(m, programOptions...).Run(); err != nil {
+		fmt.Println("error:", err)
 		os.Exit(1)
 	}
 }
 
-func RunSSHTUI() {
-	err := godotenv.Load()
-	ui.Check(err, "Loading .env to run SSH TUI", true)
+// sshHandler builds a fresh model per connection, with colours negotiated for
+// that session's terminal rather than the server's stdout.
+func sshHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
+	r := bubbletea.MakeRenderer(s)
+	pty, _, _ := s.Pty()
+	m := NewModel(ui.NewStyles(r), pty.Window.Width, pty.Window.Height)
+	return m, programOptions
+}
 
-	var (
-		host = os.Getenv("HOST")
-		port = os.Getenv("PORT")
-	)
-
+// RunSSHTUI serves the agent over ssh on HOST:PORT.
+func RunSSHTUI(host, port string) {
 	server, err := wish.NewServer(
 		wish.WithAddress(net.JoinHostPort(host, port)),
 		wish.WithHostKeyPath(".ssh/id_ed25519"),
 		wish.WithMiddleware(
-			bubbletea.Middleware(SSHTUIConfig),
+			bubbletea.Middleware(sshHandler),
 			activeterm.Middleware(),
 			logging.Middleware(),
 		),
 	)
 	if err != nil {
-		log.Error("Could not start server", "error", err)
+		log.Fatal("could not create server", "error", err)
 	}
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	log.Info("Starting SSH server", "host", host, "port", port)
+	log.Info("starting ssh server", "host", host, "port", port)
 	go func() {
 		if err = server.ListenAndServe(); err != nil && !errors.Is(err, ssh.ErrServerClosed) {
-			log.Error("Could not start server", "error", err)
+			log.Error("could not start server", "error", err)
 			done <- nil
 		}
 	}()
 
 	<-done
-	log.Info("Stopping SSH server")
+	log.Info("stopping ssh server")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer func() { cancel() }()
+	defer cancel()
 	if err := server.Shutdown(ctx); err != nil && !errors.Is(err, ssh.ErrServerClosed) {
-		log.Error("Could not stop server", "error", err)
+		log.Error("could not stop server", "error", err)
 	}
 }
