@@ -20,6 +20,7 @@ const (
 	stType                     // type text into the prompt, then submit it
 	stBootDone                 // hand the prompt to the user
 	stQuit                     // leave
+	stAnim                     // an animation in the live slot for ms
 )
 
 type step struct {
@@ -89,6 +90,25 @@ func (m *Model) handle(text string) []step {
 		}
 		m.setPersona(arg)
 		return []step{raw("welcome"), say("Now dressed as " + m.p.Name + ". Same Andy underneath.")}
+	case "/whoami":
+		return []step{think(300), tool("Bash", "whoami; who am i; tput cols lines", "3 commands"), raw("whoami")}
+	case "/uptime":
+		return []step{tool("Bash", "uptime", "1 line"), raw("uptime")}
+	case "/context":
+		return []step{raw("context")}
+	case "/coffee":
+		m.cups++
+		return []step{anim("brew", 2600), sayAs(fmt.Sprintf("☕ Brewed. Context window: %d cups.", m.cups), "ok")}
+	case "/fortune":
+		return []step{tool("Bash", "fortune andy", "1 fortune"), say(Fortunes[rand.Intn(len(Fortunes))])}
+	case "/badminton":
+		return []step{say("Open gym. You serve."), anim("rally", 5200), sayAs("21–19, Andy. He plays every open gym; you played one rally.", "ok")}
+	case "/matrix":
+		return []step{anim("matrix", 3200), sayPlain("Wake up, Andy. The statutes have you.")}
+	case "/resume":
+		return []step{say("Nothing to resume. You were here the whole time.")}
+	case "/party":
+		return m.partySteps()
 	case "/model":
 		return []step{say(m.p.Model + ". Context window: two cups of coffee. Knowledge cutoff: whenever he last slept.")}
 	case "/cost":
@@ -102,6 +122,9 @@ func (m *Model) handle(text string) []step {
 	}
 	if strings.HasPrefix(text, "/") {
 		return []step{say(fmt.Sprintf("Unknown command: %s. /help lists the real ones.", text))}
+	}
+	if s := m.shell(text); s != nil {
+		return s
 	}
 	return chat(text)
 }
@@ -138,4 +161,14 @@ func chat(text string) []step {
 		return []step{th, say("Inspired by, not affiliated with. The prompt box, the ⏺ bullets, and the spinner verbs are a homage. The content is all Andy.")}
 	}
 	return []step{th, say("I only know things about Andy. Try /now, /projects, or ask \"why ssh?\"")}
+}
+
+// partySteps is what the Konami code (or /party) does.
+func (m *Model) partySteps() []step {
+	if m.party {
+		m.party = false
+		return []step{sayPlain("Party off. The verbs are calm again.")}
+	}
+	m.party = true
+	return []step{anim("confetti", 2200), sayAs("↑↑↓↓←→←→BA. Andy mode. The header is a rainbow now and the spinner has lost its mind. /party turns it off.", "clay")}
 }

@@ -24,7 +24,8 @@ var programOptions = []tea.ProgramOption{tea.WithAltScreen(), tea.WithMouseCellM
 
 // RunTUI runs the agent in the current terminal.
 func RunTUI() {
-	m := NewModel(lipgloss.DefaultRenderer(), 0, 0)
+	loadVisits()
+	m := NewModel(lipgloss.DefaultRenderer(), 0, 0, Session{Visitor: countVisit()})
 	if _, err := tea.NewProgram(m, programOptions...).Run(); err != nil {
 		fmt.Println("error:", err)
 		os.Exit(1)
@@ -36,12 +37,14 @@ func RunTUI() {
 func sshHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	r := bubbletea.MakeRenderer(s)
 	pty, _, _ := s.Pty()
-	m := NewModel(r, pty.Window.Width, pty.Window.Height)
+	sess := Session{User: s.User(), Addr: s.RemoteAddr().String(), Term: pty.Term, Cols: pty.Window.Width, Rows: pty.Window.Height, Visitor: countVisit()}
+	m := NewModel(r, pty.Window.Width, pty.Window.Height, sess)
 	return m, programOptions
 }
 
 // RunSSHTUI serves the agent over ssh on HOST:PORT.
 func RunSSHTUI(host, port string) {
+	loadVisits()
 	server, err := wish.NewServer(
 		wish.WithAddress(net.JoinHostPort(host, port)),
 		wish.WithHostKeyPath(".ssh/id_ed25519"),

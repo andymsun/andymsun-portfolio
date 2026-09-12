@@ -80,6 +80,9 @@ func (m Model) View() string {
 
 	// header
 	left := " " + st.Clay.Render(m.p.Star) + " " + st.Bold.Render(m.p.Title)
+	if m.party {
+		left = " " + gradient(m.r, m.p.Star+" "+m.p.Title, "#f87171", "#facc15", "#7fb069", "#7aa2f7", "#9b72cb")
+	}
 	right := m.renderRuler() + "  " + st.Dim.Render("andymsun.com") + " "
 	gap := m.width - lipgloss.Width(left) - lipgloss.Width(right)
 	if gap < 1 {
@@ -115,6 +118,9 @@ func (m Model) View() string {
 
 	// status line
 	l := " " + st.Dimmer.Render("? for shortcuts")
+	if m.sess.Visitor > 0 && !m.booting {
+		l += st.Dimmer.Render(fmt.Sprintf("   visitor #%d", m.sess.Visitor))
+	}
 	var r string
 	switch {
 	case m.status != "":
@@ -158,6 +164,9 @@ func (m *Model) renderUser(text string) string {
 func (m *Model) renderAssist(text, style string, streaming bool) string {
 	if streaming {
 		text += "▌"
+	}
+	if style == "plain" { // shell output: no bullet, dimmer
+		return wrap(m.st.Dim.Render(text), m.textWidth())
 	}
 	if m.p.Bullet == "" { // codex: a dim label line, no bullet
 		return m.st.Dim.Render(m.p.Label) + "\n" + wrap(m.st.Fg.Render(text), m.textWidth())
@@ -226,6 +235,9 @@ func (m *Model) renderCard(p *Project) string {
 
 func (m *Model) renderRaw(kind string) string {
 	st := m.st
+	if out, ok := m.renderEgg(kind); ok {
+		return out
+	}
 	switch kind {
 	case "conn":
 		return st.Dim.Render("$ ssh ssh.andymsun.com") + "\n" +
@@ -310,6 +322,6 @@ func (m *Model) renderWelcome(now time.Time) string {
 	text := st.Clay.Render("✻") + " Welcome to " + st.Bold.Render("andy code") + "!\n\n" +
 		st.Dim.Render("/help for help, /now for what is running") + "\n\n" +
 		st.Dim.Render("cwd: ~/andymsun") + "\n" +
-		st.Dim.Render("model: andy-3 (third year) · context: 2 cups")
+		st.Dim.Render(fmt.Sprintf("model: andy-3 (third year) · context: %d cups", m.cups))
 	return st.Welcome.Render(lipgloss.JoinHorizontal(lipgloss.Center, cup, "  ", text))
 }

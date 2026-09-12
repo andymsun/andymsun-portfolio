@@ -23,6 +23,12 @@ type Model struct {
 	st            *ui.Styles
 	r             *lipgloss.Renderer
 	p             Persona
+	sess          Session
+	cups          int
+	party         bool
+	lastKey       time.Time
+	nudged        bool
+	keys          []string // recent key names, for the konami code
 	width, height int
 	ready         bool
 
@@ -49,14 +55,14 @@ type Model struct {
 	started  time.Time
 }
 
-func NewModel(r *lipgloss.Renderer, w, h int) Model {
+func NewModel(r *lipgloss.Renderer, w, h int, sess Session) Model {
 	p := Personas["claude"]
 	st := ui.NewStyles(r, p.Accent, p.Ok)
 	in := textinput.New()
 	in.Prompt = ""
 	in.CharLimit = 200
 	in.Cursor.Style = st.Clay
-	m := Model{st: st, r: r, p: p, width: w, height: h, in: in, booting: true, started: time.Now(), histIdx: -1}
+	m := Model{st: st, r: r, p: p, sess: sess, cups: 2, width: w, height: h, in: in, booting: true, started: time.Now(), lastKey: time.Now(), histIdx: -1}
 	m.queue = bootSteps()
 	if w > 0 && h > 0 { // over ssh the size comes from the pty, not a WindowSizeMsg
 		m.ready = true

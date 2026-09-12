@@ -1,6 +1,7 @@
 package app
 
 import (
+	"math/rand"
 	"strings"
 	"time"
 
@@ -24,6 +25,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if time.Now().After(m.statusTo) {
 			m.status = ""
 		}
+		if !m.booting && !m.running() && !m.nudged && time.Since(m.lastKey) > 90*time.Second {
+			m.nudged = true
+			m.queue = append(m.queue, sayPlain("Still here. /coffee if you need a minute, Ctrl-C twice if you do not."))
+		}
 		if quit := m.advance(); quit {
 			return m, tea.Quit
 		}
@@ -45,6 +50,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case tea.KeyCtrlD:
 			return m, tea.Quit
+		case tea.KeyCtrlL:
+			m.transcript = nil
+			m.queue = append(m.queue, raw("welcome"))
+			return m, nil
 		case tea.KeyEsc:
 			if m.running() {
 				m.skip = true
@@ -53,8 +62,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.in.SetValue("")
 			return m, nil
 		}
+		m.lastKey = time.Now()
+		m.nudged = false
 		if m.booting {
 			return m, nil
+		}
+		// the konami code: tracked regardless of what the keys otherwise do,
+		// so history and typing keep working; on a match the prompt is wiped.
+		if !m.running() {
+			m.keys = append(m.keys, msg.String())
+			if len(m.keys) > len(konami) {
+				m.keys = m.keys[len(m.keys)-len(konami):]
+			}
+			if len(m.keys) == len(konami) && strings.Join(m.keys, " ") == strings.Join(konami, " ") {
+				m.keys = nil
+				m.in.SetValue("")
+				m.histIdx = -1
+				m.queue = append(m.queue, m.partySteps()...)
+				return m, nil
+			}
 		}
 		items := m.menuItems()
 		switch msg.Type {
@@ -169,6 +195,9 @@ func (m *Model) advance() bool {
 			m.cur = &s
 			m.curStart = time.Now()
 			m.curVerb = randVerb()
+			if m.party {
+				m.curVerb = PartyVerbs[rand.Intn(len(PartyVerbs))]
+			}
 			m.tokens = 0
 			m.in.Blur()
 		}
@@ -258,6 +287,13 @@ func (m *Model) stepTick() (done bool, quit bool) {
 	case stQuit:
 		m.quitting = true
 		return true, true
+	case stAnim:
+		if ms >= s.ms || m.skip {
+			m.live = ""
+			return true, false
+		}
+		m.live = m.renderAnim(s.text, ms, s.ms)
+		return false, false
 	}
 	return true, false
 }

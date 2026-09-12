@@ -67,6 +67,20 @@ Round three keeps the agent and rebuilds the frame around nine borrowed details
   gradient wordmark, `✦` bullets, braille spinner, blue. `?agent=` on the web
   picks one for a link. Same Andy underneath.
 
+**Eggs** (`sshfolio/app/eggs.go`)
+
+- Honest tool calls: `/whoami` shows the ssh user, address, terminal and size;
+  `/uptime` and `neofetch` show real uptime and real visitor counts (persisted in
+  `.ssh/visits`, so they survive rebuilds); the status line shows your visitor
+  number; `/context` is a bar that fills with the transcript and empties when
+  you `/coffee`.
+- A fake shell: `ls`, `cat`, `cd`, `pwd`, `sudo`, `rm`, `vim`, `git status`,
+  `top`, `ping`, `man andy`, `date`, `echo`, `exit`, and a few more, each
+  answered in character.
+- Animations in the live slot: `/coffee` pours, `/badminton` rallies,
+  `/matrix` rains, the Konami code drops confetti and turns the header into a
+  rainbow. `Ctrl-L` clears. Ninety seconds of silence gets one nudge.
+
 **Terminal** (`sshfolio/`)
 
 - Same additions where a terminal can carry them: connection banner, hostname
