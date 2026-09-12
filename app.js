@@ -20,13 +20,59 @@
   ];
   // /now, as a process table. pid is arbitrary but stable; status is honest.
   const NOW = [
-    { pid: '0214', st: 'running', tag: 'job', what: 'KindEd', note: 'software engineering intern · K–12 portals · 2026 –' },
-    { pid: '0301', st: 'running', tag: 'research', what: 'CUNY CSI', note: 'an AI system that revises documents · H200/A100 · 2026 –' },
-    { pid: '0188', st: 'running', tag: 'job', what: 'Outlier AI', note: 'prompt engineer · where pre-release models fail · 2025 –' },
+    { pid: '0214', st: 'running', tag: 'job', what: 'KindEd', note: 'software engineering intern · Django Channels, WebSockets, Redis · 2026 –' },
+    { pid: '0301', st: 'running', tag: 'research', what: 'CUNY CSI', note: 'undergraduate researcher · Span-Aware Mixture of Agents · 2026 –' },
+    { pid: '0188', st: 'running', tag: 'contract', what: 'Scale AI', note: 'prompt engineer · red-teaming pre-release LLMs · 2025 –' },
+    { pid: '0333', st: 'running', tag: 'cohort', what: 'Financial Markets', note: 'three-year quant finance program, Booth coursework · 2025 –' },
+    { pid: '0090', st: 'daily', tag: 'life', what: 'badminton', note: 'logistics officer, UChicago club · every open gym · 2025 –' },
     { pid: '0546', st: 'active', tag: 'oss', what: 'sshfolio', note: 'this program · 2026' },
     { pid: '0402', st: 'active', tag: 'side', what: 'pSiren', note: 'take a song apart, rebuild it · 2025 –' },
+    { pid: '0410', st: 'active', tag: 'cert', what: 'Google Data Analytics', note: 'in progress · 2025 –' },
+    { pid: '0290', st: 'stopped', tag: 'job', what: 'TipTop Technologies', note: 'software engineering intern (Metcalf) · summer 2026' },
+    { pid: '0250', st: 'stopped', tag: 'job', what: 'LawBandit', note: 'software engineering intern · spring 2026' },
     { pid: '0116', st: 'stopped', tag: 'job', what: 'CareLumi', note: 'software engineering intern · fall 2025' },
-    { pid: '0090', st: 'daily', tag: 'life', what: 'badminton', note: 'every open gym · logistics officer, UChicago club' },
+  ];
+  // /experience: every job, research post, cohort, program, honor, and high-school role. end '' = present.
+  const EXPERIENCE = [
+    ['jobs', [
+      ['TipTop Technologies', 'software engineering intern (Metcalf)', '2026-06', '2026-08', 'iOS Live Activity and Dynamic Island through a Swift Capacitor plugin; a CSS-token theming engine (light, dark, OLED, skins) raised to WCAG AA; fixed a navigation crash by lifting session state.'],
+      ['KindEd', 'software engineering intern', '2026-03', '', 'real-time collaboration on Django Channels, WebSockets, and Redis; multi-tenant portals with role-scoped access and invite onboarding; closed a cross-tenant data leak.'],
+      ['LawBandit', 'software engineering intern', '2026-03', '2026-05', 'a library of 25+ modular UI components standardising the front end of a legal AI adoption manual.'],
+      ['Scale AI', 'prompt engineer (contract)', '2025-05', '', 'red-team pre-release LLMs, 50+ critical model failures catalogued; synthetic-data pipelines feeding fine-tuning; trained and evaluated contractors across four teams.'],
+      ['CareLumi', 'software engineering intern', '2025-09', '2025-12', 'fine-tuned domain LLMs behind a multi-agent clinical documentation system; production AWS infrastructure (S3, EC2, Cognito, Neptune); real pilot data in the evaluation pipeline.'],
+    ]],
+    ['research', [
+      ['CUNY College of Staten Island', 'undergraduate researcher, advised by Prof. Yumei Huo and Prof. Tianxiao Zhang', '2026-05', '', 'Span-Aware Mixture of Agents: layered multi-agent aggregation extended to span-level selection. Owns the code, tests, ablations against the MoA baseline, and the literature review.'],
+    ]],
+    ['leadership and cohorts', [
+      ['Financial Markets Program', 'selected cohort member', '2025-07', '', 'selective three-year quantitative finance program with coursework at Chicago Booth.'],
+      ['UChicago Badminton Club', 'logistics officer', '2025-04', '', 'dues, registrations, suppliers, inventory, an annual regional tournament for 100+ members; the club site and live play board.'],
+      ['Goldman Sachs Virtual Insight Series', 'participant', '2025-05', '2025-06', 'four-week program on the firm\'s structure and career paths.'],
+      ['Goldman Sachs Possibilities Summit', 'participant', '2024-12', '2025-06', 'competitive career-development program: risk analysis, data analytics, operations.'],
+      ['Trott Emerging Business Leaders', 'selected cohort member', '2024-09', '2025-05', 'one-year business-acumen cohort; TEBL Scholar; TEBL Google Professional Certificate grant.'],
+    ]],
+    ['programs', [
+      ['San Francisco Tech & AI Trek', 'UChicago', '2026-03', '2026-03', 'a week of Bay Area startups and labs.'],
+      ['AI Integration Program', 'UChicago', '2026-01', '2026-03', 'winter 2026.'],
+      ['Succeeding in the Entrepreneurial Workplace', 'UChicago, advanced cohort', '2026-01', '2026-03', 'winter 2026.'],
+      ['Berlin & Frankfurt STEM & Startups Trek', 'UChicago', '2025-12', '2025-12', 'a week of German startups and research institutes.'],
+      ['Google Data Analytics Professional Certificate', 'Coursera', '2025-06', '', 'in progress.'],
+    ]],
+    ['honors', [
+      ['Odyssey Scholar · First Phoenix Scholar · QuestBridge Scholar', 'UChicago', '2024-09', '', 'first-generation, low-income scholarships; QuestBridge National College Match, December 2023.'],
+      ['Financial Markets Scholar · TEBL Scholar', 'UChicago', '2024-09', '', 'with the cohorts above.'],
+      ['AP Scholar · ARISTA National Honor Society · Principal\'s Honor Roll · Regents Mastery', 'Queens High School for the Sciences at York College', '2020-09', '2024-06', '4.00 GPA, Advanced Regents Diploma.'],
+    ]],
+    ['high school', [
+      ['Queens Youth Volunteering Community', 'founding member and volunteer', '2021-11', '2024-06', 'helped grow the organisation to 300+ members.'],
+      ['QHSS Model United Nations', 'secretary and delegate', '2021-09', '2024-06', 'competitive conference team.'],
+      ['NYPD PSA 9', 'communications assistant', '2023-07', '2023-08', 'planned and attended community outreach events.'],
+      ['Ivy Road Prep', 'teaching assistant', '2022-07', '2022-11', '200+ hours of teaching assistance.'],
+    ]],
+    ['education', [
+      ['The University of Chicago', 'B.S. computer science + computational and applied mathematics', '2024-09', '2028-06', 'expected June 2028. Coursework: mathematical foundations of ML, abstract linear algebra, analysis in Rⁿ, systems programming.'],
+      ['Queens High School for the Sciences at York College', 'Advanced Regents Diploma', '2020-09', '2024-06', 'Flushing, Queens; 4.00.'],
+    ]],
   ];
   const PROJECTS = [
     { file: 'projects/lawvics.md', lines: 31, name: 'Lawvics', year: '2026', figure: 'swarm',
@@ -56,6 +102,7 @@
   const GLYPHS = ['·', '✢', '✳', '✶', '✻', '✽', '✻', '✶', '✳', '✢'];
   const COMMANDS = [
     ['/now', 'what is running'],
+    ['/experience', 'the whole log, like git log'],
     ['/about', 'who andy is'],
     ['/projects', 'read the work'],
     ['/contact', 'email, github, linkedin'],
@@ -225,6 +272,14 @@
   }
 
   function welcome() { add(el('div', 'welcome-wrap', P.welcome())); }
+  function hash(str) { let h = 5381; for (const c of str) h = ((h << 5) + h + c.charCodeAt(0)) >>> 0; return h.toString(16).padStart(7, '0').slice(0, 7); }
+  function experienceLog() {
+    const t = el('pre', 'gitlog');
+    t.innerHTML = EXPERIENCE.map(([label, rows]) => `<span class="lbl">── ${esc(label)}</span>\n` + rows.map(([org, title, start, end, line]) =>
+      `<span class="${end ? 'dot off' : 'dot on'}">*</span> <span class="h">${hash(org + title)}</span> <span class="d">${start} → ${end || 'now'}</span>  <b>${esc(org)}</b> · ${esc(title)}\n<span class="d">|</span>         <span class="d">${esc(line)}</span>`).join('\n')).join('\n');
+    t.innerHTML += `\n<span class="d">(${EXPERIENCE.reduce((n, [, r]) => n + r.length, 0)} entries · /now for what is running)</span>`;
+    return t;
+  }
   function psTable() {
     const t = el('div', 'ps');
     t.innerHTML = `<div class="h">PID   STATUS     TAG        PROCESS</div>` + NOW.map((r) => {
@@ -247,6 +302,12 @@
       await think(500);
       await tool('Bash', 'ps -o pid,stat,tag,cmd', `${NOW.length} processes`, psTable());
     },
+    async '/experience'() {
+      await think(400);
+      await tool('Bash', 'git log --all --oneline --date=short', `${EXPERIENCE.reduce((n, [, r]) => n + r.length, 0)} entries`, experienceLog());
+    },
+    async '/history'() { await HANDLERS['/experience'](); },
+    async '/resume'() { await say('Nothing to resume; you were here the whole time. The other kind of résumé:'); await HANDLERS['/experience'](); },
     async '/about'() {
       await think(900);
       await tool('Read', 'about.md', 'Read 18 lines');

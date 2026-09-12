@@ -264,6 +264,9 @@ func (m *Model) renderRaw(kind string) string {
 	if kind == "inbox" {
 		return m.renderInbox()
 	}
+	if kind == "experience" {
+		return m.renderExperience()
+	}
 	switch kind {
 	case "conn":
 		return st.Dim.Render("$ ssh ssh.andymsun.com") + "\n" +

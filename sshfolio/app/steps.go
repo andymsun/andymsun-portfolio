@@ -66,6 +66,8 @@ func (m *Model) handle(text string) []step {
 		return []step{say("Things I can do:"), raw("help"), say("Or just ask something. I only know about Andy, so keep it on topic.")}
 	case "/now":
 		return []step{think(500), tool("Bash", "ps -o pid,stat,tag,cmd", fmt.Sprintf("%d processes", len(Now))), raw("now")}
+	case "/experience", "/history", "/cv":
+		return []step{think(400), tool("Bash", "git log --all --oneline --date=short", fmt.Sprintf("%d entries", len(Experiences))), raw("experience")}
 	case "/about":
 		s := []step{think(900), tool("Read", "about.md", "Read 18 lines")}
 		for _, p := range About {
@@ -189,7 +191,7 @@ func (m *Model) handle(text string) []step {
 	case "/matrix":
 		return []step{anim("matrix", 3200), sayPlain("Wake up, Andy. The statutes have you.")}
 	case "/resume":
-		return []step{say("Nothing to resume. You were here the whole time.")}
+		return append([]step{say("Nothing to resume; you were here the whole time. The other kind of résumé:")}, m.handle("/experience")...)
 	case "/party":
 		return m.partySteps()
 	case "/model":

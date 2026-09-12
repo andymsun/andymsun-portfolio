@@ -49,7 +49,10 @@ Round three keeps the agent and rebuilds the frame around nine borrowed details
 
 **Commands**
 
-- `/now` prints a process table: PID, status dot, tag, what (destel.dev).
+- `/now` prints a process table: PID, status dot, tag, what (destel.dev). Eleven
+  rows now: running jobs, research, cohorts, side projects, and the stopped
+  internships. `/experience` is the full log (25 entries, from TipTop back to
+  high school) drawn like `git log`. Outlier is named Scale AI, as a contract.
 - `/lights` turns the room black and gives you a flashlight; Esc or a click
   outside the window turns them back on (pankajtanwar.in).
 - The Lawvics card carries a figure you can operate: fifty cells, a batch

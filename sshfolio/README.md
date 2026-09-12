@@ -24,7 +24,7 @@ with the project cards), then hands over the prompt. `esc` skips the intro.
 | input | does |
 |---|---|
 | `/` | opens the command menu; `↑` `↓` pick, `tab` or `enter` complete |
-| `/now` `/about` `/projects` `/contact` `/web` `/help` `/model` `/cost` `/clear` `/exit` | the commands |
+| `/now` `/experience` `/about` `/projects` `/contact` `/web` `/help` `/model` `/cost` `/clear` `/exit` | the commands. `/experience` (also `git log`, `cat resume.md`, `/cv`) is every job, research post, cohort, program, honor, and high-school role, drawn like git log |
 | `/agent claude` `/agent codex` `/agent agy` | reskin the session: the cup, the `>_` box, or the gradient wordmark |
 | `/whoami` `/uptime` `/context` | honest tool calls: what the server sees, real uptime and visitor counts, a context bar that fills as you talk |
 | `/coffee` `/badminton` `/matrix` `/fortune` | brew a cup (adds a cup to your context), one rally, three seconds of rain, a small truth |

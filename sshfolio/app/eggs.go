@@ -1,6 +1,7 @@
 package app
 
 import (
+	"crypto/sha1"
 	"fmt"
 	"math/rand"
 	"os"
@@ -105,6 +106,8 @@ func (m *Model) shell(text string) []step {
 			return m.handle("/now")
 		case "projects", "projects/":
 			return m.handle("/projects")
+		case "resume", "experience", "cv":
+			return m.handle("/experience")
 		case "":
 			return []step{sayPlain(cmd + ": which file? try ls")}
 		}
@@ -136,6 +139,9 @@ func (m *Model) shell(text string) []step {
 	case "vim", "vi", "nvim", "nano", "emacs", "code":
 		return []step{sayPlain("You cannot exit " + cmd + ", and you cannot enter it here either. Both problems solved.")}
 	case "git":
+		if arg == "log" || strings.HasPrefix(arg, "log ") {
+			return m.handle("/experience")
+		}
 		return []step{raw("git")}
 	case "ping":
 		host := arg
@@ -287,7 +293,7 @@ func (m *Model) renderEgg(kind string) (string, bool) {
 	switch kind {
 	case "ls":
 		d := func(s string) string { return st.Clay.Render(s) }
-		return d("projects/") + "   about.md   contact.md   now.txt   " + d("coffee/") + "   " + st.Dimmer.Render(".sleep (empty)"), true
+		return d("projects/") + "   about.md   resume.md   contact.md   now.txt   " + d("coffee/") + "   " + st.Dimmer.Render(".sleep (empty)"), true
 	case "git":
 		return st.Fg.Render("On branch ") + st.Clay.Render("coffee") + "\n" +
 			st.Dim.Render("Your branch is 3 commits behind 'sleep'.") + "\n\n" +
@@ -375,3 +381,44 @@ func (m *Model) renderEgg(kind string) (string, bool) {
 
 // konami is the sequence that turns the party on.
 var konami = []string{"up", "up", "down", "down", "left", "right", "left", "right", "b", "a"}
+
+// renderExperience is /experience: every entry, newest first, drawn like git log.
+func (m *Model) renderExperience() string {
+	st := m.st
+	kinds := []struct{ key, label string }{
+		{"job", "jobs"}, {"research", "research"}, {"lead", "leadership and cohorts"}, {"program", "programs"},
+		{"honor", "honors"}, {"school", "high school"}, {"education", "education"},
+	}
+	var b strings.Builder
+	for _, k := range kinds {
+		first := true
+		for _, e := range Experiences {
+			if e.Kind != k.key {
+				continue
+			}
+			if first {
+				b.WriteString(st.Dimmer.Render("── ") + st.Fg.Render(k.label) + "\n")
+				first = false
+			}
+			end := "now"
+			if e.End != "" {
+				end = e.End
+			}
+			mark := st.Clay.Render("*")
+			if e.End != "" {
+				mark = st.Dim.Render("*")
+			}
+			b.WriteString(fmt.Sprintf("%s %s %s  %s %s\n", mark, st.Clay.Render(shortHash(e.Org+e.Title)), st.Dim.Render(e.Start+" → "+end), st.Bold.Render(e.Org), st.Fg.Render("· "+e.Title)))
+			for _, l := range strings.Split(wrap(e.Line, m.textWidth()-12), "\n") {
+				b.WriteString(st.Dimmer.Render("|") + "         " + st.Dim.Render(l) + "\n")
+			}
+		}
+	}
+	b.WriteString(st.Dimmer.Render(fmt.Sprintf("(%d entries · LawBandit dates are from the résumé bank and may be a year off · /now for what is running)", len(Experiences))))
+	return b.String()
+}
+
+func shortHash(s string) string {
+	h := sha1.Sum([]byte(s))
+	return fmt.Sprintf("%x", h[:])[:7]
+}

@@ -180,6 +180,9 @@ main { display: grid; place-items: center; flex: 1; }
 .ps .on { color: var(--ok); } .ps .off { color: var(--dimmer); } .ps .tag { color: var(--dim); } .ps .what { color: var(--fg); }
 .ps .what span { color: var(--dim); }
 
+.gitlog { margin: 4px 0 13px 2ch; white-space: pre-wrap; word-wrap: break-word; font: inherit; line-height: 1.5; }
+.gitlog .lbl { color: var(--fg); } .gitlog .h { color: var(--clay); } .gitlog .d { color: var(--dim); }
+.gitlog .dot.on { color: var(--clay); } .gitlog .dot.off { color: var(--dimmer); } .gitlog b { font-weight: 600; }
 .help-table { margin: 0 0 13px 2ch; display: grid; grid-template-columns: max-content 1fr; gap: 0 3ch; }
 .help-table .k { color: var(--clay); } .help-table .d { color: var(--dim); }
 .cmdline { display: inline-flex; align-items: center; gap: 2ch; border: 1px solid var(--line); border-radius: 5px; padding: 4px 12px; background: var(--bg-2); margin: 2px 0 12px 2ch; }

@@ -7,7 +7,7 @@ const SSHCommand = "ssh ssh.andymsun.com"
 var About = []string{
 	"Andy is a third-year at the University of Chicago studying computer science and computational & applied mathematics (class of 2028). Odyssey, First Phoenix, and QuestBridge scholar. From Flushing, Queens.",
 	"The through-line is human–computer interaction: making capable systems usable by people who did not build them. Lately that means interfaces for language models that are not a chat box, evaluation work where the uncertainty stays on the page, and terminal software like the one you are talking to.",
-	"Right now: software engineering intern at KindEd (K–12 portals), undergraduate researcher at CUNY College of Staten Island (an AI system that revises documents, run on H200/A100/V100s), and prompt engineer at Outlier AI (finding where pre-release models fail).",
+	"Right now: software engineering intern at KindEd (K–12 portals), undergraduate researcher at CUNY College of Staten Island (Span-Aware Mixture of Agents, on H200/A100/V100s), and prompt engineer on contract at Scale AI (finding where pre-release models fail). Before that: TipTop, LawBandit, CareLumi. /experience has all of it.",
 }
 
 type Project struct {
@@ -54,19 +54,65 @@ var Glyphs = []string{"·", "✢", "✳", "✶", "✻", "✽", "✻", "✶", "�
 type Proc struct{ PID, Status, Tag, What, Note string }
 
 var Now = []Proc{
-	{"0214", "running", "job", "KindEd", "software engineering intern · K–12 portals · 2026 –"},
-	{"0301", "running", "research", "CUNY CSI", "an AI system that revises documents · H200/A100 · 2026 –"},
-	{"0188", "running", "job", "Outlier AI", "prompt engineer · where pre-release models fail · 2025 –"},
+	{"0214", "running", "job", "KindEd", "software engineering intern · Django Channels, WebSockets, Redis · 2026 –"},
+	{"0301", "running", "research", "CUNY CSI", "undergraduate researcher · Span-Aware Mixture of Agents · 2026 –"},
+	{"0188", "running", "contract", "Scale AI", "prompt engineer · red-teaming pre-release LLMs · 2025 –"},
+	{"0333", "running", "cohort", "Financial Markets", "three-year quant finance program, Booth coursework · 2025 –"},
+	{"0090", "daily", "life", "badminton", "logistics officer, UChicago club · every open gym · 2025 –"},
 	{"0546", "active", "oss", "sshfolio", "this program · 2026"},
 	{"0402", "active", "side", "pSiren", "take a song apart, rebuild it · 2025 –"},
+	{"0410", "active", "cert", "Google Data Analytics", "in progress · 2025 –"},
+	{"0290", "stopped", "job", "TipTop Technologies", "software engineering intern (Metcalf) · summer 2026"},
+	{"0250", "stopped", "job", "LawBandit", "software engineering intern · spring 2026"},
 	{"0116", "stopped", "job", "CareLumi", "software engineering intern · fall 2025"},
-	{"0090", "daily", "life", "badminton", "every open gym · logistics officer, UChicago club"},
+}
+
+// Experience is the full log: every job, research post, cohort, program,
+// honor, and high-school role. /experience prints it like git log.
+type Experience struct {
+	Kind, Org, Title, Start, End, Line string // End "" means present
+}
+
+var Experiences = []Experience{
+	// jobs
+	{"job", "TipTop Technologies", "software engineering intern (Metcalf)", "2026-06", "2026-08", "iOS Live Activity and Dynamic Island through a Swift Capacitor plugin; a CSS-token theming engine (light, dark, OLED, skins) raised to WCAG AA; fixed a navigation crash by lifting session state."},
+	{"job", "KindEd", "software engineering intern", "2026-03", "", "real-time collaboration on Django Channels, WebSockets, and Redis; multi-tenant portals with role-scoped access and invite onboarding; closed a cross-tenant data leak with origin validation and object-level scoping."},
+	{"job", "LawBandit", "software engineering intern", "2026-03", "2026-05", "a library of 25+ modular UI components standardising the front end of a legal AI adoption manual."},
+	{"job", "Scale AI", "prompt engineer (contract)", "2025-05", "", "red-team pre-release LLMs, 50+ critical model failures catalogued; synthetic-data pipelines feeding fine-tuning; trained and evaluated contractors across four teams."},
+	{"job", "CareLumi", "software engineering intern", "2025-09", "2025-12", "fine-tuned domain LLMs behind a multi-agent clinical documentation system; production AWS infrastructure (S3, EC2, Cognito, Neptune) for pilot deployments; real pilot data in the evaluation pipeline."},
+	// research
+	{"research", "CUNY College of Staten Island", "undergraduate researcher, advised by Prof. Yumei Huo and Prof. Tianxiao Zhang", "2026-05", "", "Span-Aware Mixture of Agents: layered multi-agent aggregation extended to span-level selection. Owns the code, tests, ablations against the MoA baseline, and the literature review. Runs on H200, A100, V100."},
+	// leadership and cohorts
+	{"lead", "Financial Markets Program", "selected cohort member", "2025-07", "", "selective three-year quantitative finance program with coursework at Chicago Booth, weekly workshops, employer visits."},
+	{"lead", "UChicago Badminton Club", "logistics officer", "2025-04", "", "dues, registrations, suppliers, inventory, an annual regional tournament for 100+ members; the club site and live play board."},
+	{"lead", "Goldman Sachs Virtual Insight Series", "participant", "2025-05", "2025-06", "four-week program on the firm's structure and career paths."},
+	{"lead", "Goldman Sachs Possibilities Summit", "participant", "2024-12", "2025-06", "competitive career-development program: risk analysis, data analytics, operations."},
+	{"lead", "Trott Emerging Business Leaders", "selected cohort member", "2024-09", "2025-05", "one-year business-acumen cohort; TEBL Scholar; TEBL Google Professional Certificate grant."},
+	// UChicago programs
+	{"program", "San Francisco Tech & AI Trek", "UChicago", "2026-03", "2026-03", "a week of Bay Area startups and labs."},
+	{"program", "AI Integration Program", "UChicago", "2026-01", "2026-03", "winter 2026."},
+	{"program", "Succeeding in the Entrepreneurial Workplace", "UChicago, advanced cohort", "2026-01", "2026-03", "winter 2026."},
+	{"program", "Berlin & Frankfurt STEM & Startups Trek", "UChicago", "2025-12", "2025-12", "a week of German startups and research institutes."},
+	{"program", "Google Data Analytics Professional Certificate", "Coursera", "2025-06", "", "in progress."},
+	// honors
+	{"honor", "Odyssey Scholar · First Phoenix Scholar · QuestBridge Scholar", "UChicago", "2024-09", "", "first-generation, low-income scholarships; QuestBridge National College Match, December 2023."},
+	{"honor", "Financial Markets Scholar · TEBL Scholar", "UChicago", "2024-09", "", "with the cohorts above."},
+	{"honor", "AP Scholar · ARISTA National Honor Society · Principal's Honor Roll · Regents Mastery", "Queens High School for the Sciences at York College", "2020-09", "2024-06", "4.00 GPA, Advanced Regents Diploma."},
+	// high school
+	{"school", "Queens Youth Volunteering Community", "founding member and volunteer", "2021-11", "2024-06", "helped grow the organisation to 300+ members."},
+	{"school", "QHSS Model United Nations", "secretary and delegate", "2021-09", "2024-06", "competitive conference team."},
+	{"school", "NYPD PSA 9", "communications assistant", "2023-07", "2023-08", "planned and attended community outreach events."},
+	{"school", "Ivy Road Prep", "teaching assistant", "2022-07", "2022-11", "200+ hours of teaching assistance."},
+	// education
+	{"education", "The University of Chicago", "B.S. computer science + computational and applied mathematics", "2024-09", "2028-06", "expected June 2028. Coursework: mathematical foundations of ML, abstract linear algebra, analysis in Rⁿ, systems programming."},
+	{"education", "Queens High School for the Sciences at York College", "Advanced Regents Diploma", "2020-09", "2024-06", "Flushing, Queens; 4.00."},
 }
 
 type Command struct{ Name, Desc string }
 
 var Commands = []Command{
 	{"/now", "what is running"},
+	{"/experience", "the whole log, like git log"},
 	{"/about", "who andy is"},
 	{"/projects", "read the work"},
 	{"/contact", "email, github, linkedin"},
