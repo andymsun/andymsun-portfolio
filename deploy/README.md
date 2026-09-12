@@ -27,6 +27,13 @@ If that key is ever lost: `hcloud server enable-rescue andymsun-ssh --ssh-key <k
 append the key to `/mnt/root/.ssh/authorized_keys`, `umount /mnt`,
 `hcloud server disable-rescue`, reboot. About two minutes of downtime.
 
+## feedback and the owner key
+
+`/inbox` inside the portfolio works when the visitor's ssh key matches
+`/opt/portfolio/sshfolio/.ssh/owner.pub` (this Mac's key). The log itself is
+`/opt/portfolio/sshfolio/.ssh/feedback.log`; the visit counter is `.ssh/visits`.
+Both live in the mounted `.ssh` volume, so rebuilds keep them.
+
 ## updating the portfolio
 
 The rewritten agent went live on 2026-09-12. It runs from `/opt/portfolio/sshfolio`

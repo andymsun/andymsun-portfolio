@@ -89,6 +89,7 @@ var Commands = []Command{
 	{"/doctor", "diagnostics"},
 	{"/login", "there is no login"},
 	{"/feedback", "rate the session"},
+	{"/inbox", "what visitors said (owner)"},
 	{"/help", "this list"},
 	{"/model", "which andy is this"},
 	{"/cost", "what this session cost"},

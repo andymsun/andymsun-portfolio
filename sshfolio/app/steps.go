@@ -154,6 +154,11 @@ func (m *Model) handle(text string) []step {
 		return []step{think(900), raw("login")}
 	case "/feedback":
 		return []step{step{kind: stAsk}}
+	case "/inbox":
+		if !m.sess.Owner {
+			return []step{say("Owner only. Feedback is real and goes to a file Andy reads; connect with his key to see it here.")}
+		}
+		return []step{tool("Read", feedbackFile, "feedback log"), raw("inbox")}
 	case "/contact":
 		return []step{think(500), tool("Read", "contact.md", "Read 4 lines"), raw("contact")}
 	case "/web":

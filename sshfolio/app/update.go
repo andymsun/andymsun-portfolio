@@ -79,7 +79,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.ask = false
 				m.live = ""
 				m.transcript = append(m.transcript, m.renderAsk()+"\n"+m.st.Dim.Render("> "+k))
-				m.queue = append(feedbackReply(k), m.queue...)
+				if k == "0" {
+					m.queue = append(feedbackReply(k), m.queue...)
+				} else {
+					m.pendingRating = k
+					m.awaitComment = true
+					m.queue = append([]step{sayPlain("Anything to add? Type it and press Enter, or Enter alone to skip. Andy reads these.")}, m.queue...)
+				}
 			}
 			return m, nil
 		}
@@ -106,6 +112,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		items := m.menuItems()
 		switch msg.Type {
 		case tea.KeyEnter:
+			if m.awaitComment && !m.running() { // the optional comment after a rating
+				comment := strings.TrimSpace(m.in.Value())
+				m.in.SetValue("")
+				m.awaitComment = false
+				m.writeFeedback(m.pendingRating, comment)
+				if comment != "" {
+					m.transcript = append(m.transcript, m.renderUser(comment))
+				}
+				m.queue = append(m.queue, feedbackReply(m.pendingRating)...)
+				m.pendingRating = ""
+				return m, nil
+			}
 			if len(items) > 0 && items[m.menuSel].Name != m.in.Value() {
 				m.in.SetValue(items[m.menuSel].Name)
 				m.in.CursorEnd()

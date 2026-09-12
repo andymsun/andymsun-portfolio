@@ -27,6 +27,8 @@ type Model struct {
 	cups          int
 	effort        string
 	ask           bool
+	pendingRating string // set after a rating, while we wait for an optional comment
+	awaitComment  bool
 	cmdCount      int
 	tabs          []tabState
 	active        int

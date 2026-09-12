@@ -19,6 +19,7 @@ type Session struct {
 	User, Addr, Term string
 	Cols, Rows       int
 	Visitor          int64
+	Owner            bool // connected with Andy's own key
 }
 
 var (

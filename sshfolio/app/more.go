@@ -88,11 +88,11 @@ func (m *Model) renderAsk() string {
 func feedbackReply(rating string) []step {
 	switch rating {
 	case "1":
-		return []step{sayAs("Noted. Logged to /dev/null with the others. Andy reads the ones that come by email: andy@andymsun.com.", "clay")}
+		return []step{sayAs("Noted, and logged for real. Andy reads these. If it is fixable, it will be.", "clay")}
 	case "2":
-		return []step{say("Fine is honest. The ssh version is the same; the web one has more pixels.")}
+		return []step{say("Fine is honest. Logged. The web version has more pixels if that helps.")}
 	case "3":
-		return []step{sayAs("Thanks. That goes on the fridge.", "ok")}
+		return []step{sayAs("Thanks. Logged, and that one goes on the fridge.", "ok")}
 	}
 	return []step{sayPlain("Dismissed.")}
 }
@@ -138,7 +138,12 @@ func (m *Model) renderMore(kind string) (string, bool) {
 			dim("mcp       ") + st.Fg.Render("4 connected, 2 not") + "\n" +
 			dim("tabs      ") + st.Fg.Render(fmt.Sprintf("%d", len(m.tabs))) + "\n" +
 			dim("uptime    ") + st.Fg.Render(humanDuration(time.Since(serverStart))) + "\n" +
-			dim("visitor   ") + st.Fg.Render(fmt.Sprintf("#%d", m.sess.Visitor)), true
+			dim("visitor   ") + st.Fg.Render(fmt.Sprintf("#%d", m.sess.Visitor)) + func() string {
+			if m.sess.Owner {
+				return dim(" · ") + st.Ok.Render("owner key")
+			}
+			return ""
+		}(), true
 	case "doctor":
 		rows := []string{
 			ok + dim(" coffee: 2 cups, warm"),

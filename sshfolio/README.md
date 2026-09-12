@@ -34,7 +34,8 @@ with the project cards), then hands over the prompt. `esc` skips the intro.
 | `/agents` `/mcp` `/skills` `/skill <name>` `/status` `/doctor` `/login` | the roster, connected servers, skills, account and session, diagnostics, a login that isn't |
 | `/effort low|medium|high|max` | scales thinking time; `max` is ultrathink and shows in the spinner |
 | `/tab new|next|prev|close|N`, `Ctrl-T` `Ctrl-N` `Ctrl-P` | tabs, each with its own transcript and skin; strip in the header |
-| `/feedback`, or every fifth command | "How is andy code doing this session? 1: Bad 2: Fine 3: Good 0: Dismiss" |
+| `/feedback`, or every fifth command | "How is andy code doing this session? 1: Bad 2: Fine 3: Good 0: Dismiss", then an optional comment. Real: each answer is a JSON line in `.ssh/feedback.log` |
+| `/inbox` | the feedback log, newest first. Owner only: the server compares the visitor's ssh key with `.ssh/owner.pub` |
 | `/agent `, `/effort `, `/tab `, `/skill ` then Tab | argument completion; a bare command shows a dim `<a|b|c>` hint |
 | `Ctrl-L` | clear |
 | ninety seconds of silence | it checks on you once |
@@ -54,6 +55,7 @@ app/content.go   everything the agent knows: about, /now, projects, verbs, comma
 app/persona.go   the three skins (claude with the cup, codex, agy) and the cup frames
 app/eggs.go      fake shell, animations (brew, rally, matrix, confetti), fortunes, neofetch, visitor counter
 app/more.go      argument completion, effort, subagents, feedback prompt, mcp/skills/status/doctor/login, tabs
+app/feedback.go  the feedback log (write, read, /inbox)
 app/steps.go     command handlers; each returns a list of steps (think, say, tool, card…)
 app/update.go    bubbletea update loop, key handling, step playback
 app/view.go      rendering: header, transcript viewport, menu, prompt box, status
@@ -65,6 +67,21 @@ ascii-gen/       older script that turns a photo into text art; not used by the 
 
 Content lives in `app/content.go` and is duplicated in `app.js` on the web.
 Change both.
+
+## feedback
+
+Ratings and comments are written to `.ssh/feedback.log` on the server, one JSON
+line each (time, visitor number, ssh user, address, skin, rating, comment,
+session length, command count). Read them either way:
+
+```bash
+ssh ssh.andymsun.com          # from a machine whose key is in .ssh/owner.pub, then /inbox
+ssh andy-vps cat /opt/portfolio/sshfolio/.ssh/feedback.log
+```
+
+Auth is deliberately open: any key is accepted and keyless clients fall through
+to keyboard-interactive, which also succeeds. The key is only used to recognise
+the owner.
 
 ## deploy
 

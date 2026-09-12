@@ -91,7 +91,9 @@ Round three keeps the agent and rebuilds the frame around nine borrowed details
 - Tabs: `Ctrl-T`, `Ctrl-N`, `Ctrl-P`, `/tab …`. Each tab keeps its own
   transcript, skin, cups, and effort; the header shows a strip when there are two.
 - Every fifth command asks for a rating (1 Bad, 2 Fine, 3 Good, 0 Dismiss), like
-  the real one does; `/feedback` asks on demand.
+  the real one does; `/feedback` asks on demand. It is real: rating plus an
+  optional comment go to `.ssh/feedback.log`, and `/inbox` shows them to whoever
+  connects with the owner key.
 - Argument completion after a space (`/agent co` → `/agent codex`) and a dim
   `<claude|codex|agy>` hint after a bare command.
 - The visitor counter was seeded at 3,532 on 2026-09-12 to account for the

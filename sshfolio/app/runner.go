@@ -18,6 +18,7 @@ import (
 	"github.com/charmbracelet/wish/activeterm"
 	"github.com/charmbracelet/wish/bubbletea"
 	"github.com/charmbracelet/wish/logging"
+	gossh "golang.org/x/crypto/ssh"
 )
 
 var programOptions = []tea.ProgramOption{tea.WithAltScreen(), tea.WithMouseCellMotion()}
@@ -38,16 +39,39 @@ func sshHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	r := bubbletea.MakeRenderer(s)
 	pty, _, _ := s.Pty()
 	sess := Session{User: s.User(), Addr: s.RemoteAddr().String(), Term: pty.Term, Cols: pty.Window.Width, Rows: pty.Window.Height, Visitor: countVisit()}
+	if k := s.PublicKey(); k != nil && ownerKey != nil && ssh.KeysEqual(k, ownerKey) {
+		sess.Owner = true
+	}
 	m := NewModel(r, pty.Window.Width, pty.Window.Height, sess)
 	return m, programOptions
+}
+
+// ownerKey is Andy's public key, read from .ssh/owner.pub if present.
+var ownerKey ssh.PublicKey
+
+func loadOwnerKey() {
+	b, err := os.ReadFile(".ssh/owner.pub")
+	if err != nil {
+		return
+	}
+	if k, _, _, _, err := gossh.ParseAuthorizedKey(b); err == nil {
+		ownerKey = k
+		log.Info("owner key loaded", "fingerprint", gossh.FingerprintSHA256(k))
+	}
 }
 
 // RunSSHTUI serves the agent over ssh on HOST:PORT.
 func RunSSHTUI(host, port string) {
 	loadVisits()
+	loadOwnerKey()
 	server, err := wish.NewServer(
 		wish.WithAddress(net.JoinHostPort(host, port)),
 		wish.WithHostKeyPath(".ssh/id_ed25519"),
+		// Anyone may connect: keys are accepted (and remembered, so /inbox can
+		// recognise Andy's), and clients without a key fall through to
+		// keyboard-interactive, which also always succeeds.
+		wish.WithPublicKeyAuth(func(ssh.Context, ssh.PublicKey) bool { return true }),
+		wish.WithKeyboardInteractiveAuth(func(ssh.Context, gossh.KeyboardInteractiveChallenge) bool { return true }),
 		wish.WithMiddleware(
 			bubbletea.Middleware(sshHandler),
 			activeterm.Middleware(),

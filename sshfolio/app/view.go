@@ -261,6 +261,9 @@ func (m *Model) renderRaw(kind string) string {
 	if out, ok := m.renderMore(kind); ok {
 		return out
 	}
+	if kind == "inbox" {
+		return m.renderInbox()
+	}
 	switch kind {
 	case "conn":
 		return st.Dim.Render("$ ssh ssh.andymsun.com") + "\n" +
