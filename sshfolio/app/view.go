@@ -4,10 +4,14 @@ import (
 	"fmt"
 	"strings"
 
+	"time"
+
 	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/reflow/wordwrap"
 )
+
+const welcomeMark = "\x00welcome" // replaced at render time so the cup can steam
 
 // live holds the block currently being animated (spinner, streaming text).
 // It is a field on Model but kept here with the rendering code.
@@ -46,7 +50,13 @@ func (m *Model) layout() {
 }
 
 func (m *Model) content() string {
-	parts := append([]string{}, m.transcript...)
+	parts := make([]string, 0, len(m.transcript)+1)
+	for _, t := range m.transcript {
+		if t == welcomeMark {
+			t = m.renderWelcome(time.Now())
+		}
+		parts = append(parts, t)
+	}
 	if m.live != "" {
 		parts = append(parts, m.live)
 	}
@@ -69,7 +79,7 @@ func (m Model) View() string {
 	var b strings.Builder
 
 	// header
-	left := " " + st.Clay.Render("✻") + " " + st.Bold.Render("andy@ssh.andymsun.com") + st.Dimmer.Render(": ~")
+	left := " " + st.Clay.Render(m.p.Star) + " " + st.Bold.Render(m.p.Title)
 	right := m.renderRuler() + "  " + st.Dim.Render("andymsun.com") + " "
 	gap := m.width - lipgloss.Width(left) - lipgloss.Width(right)
 	if gap < 1 {
@@ -146,31 +156,46 @@ func (m *Model) renderUser(text string) string {
 }
 
 func (m *Model) renderAssist(text, style string, streaming bool) string {
-	dot := m.st.Fg.Render("⏺")
-	switch style {
-	case "ok":
-		dot = m.st.Ok.Render("⏺")
-	case "clay":
-		dot = m.st.Clay.Render("⏺")
-	}
 	if streaming {
 		text += "▌"
+	}
+	if m.p.Bullet == "" { // codex: a dim label line, no bullet
+		return m.st.Dim.Render(m.p.Label) + "\n" + wrap(m.st.Fg.Render(text), m.textWidth())
+	}
+	dot := m.st.Fg.Render(m.p.Bullet)
+	switch style {
+	case "ok":
+		dot = m.st.Ok.Render(m.p.Bullet)
+	case "clay":
+		dot = m.st.Clay.Render(m.p.Bullet)
 	}
 	return hang(dot+" ", m.st.Fg.Render(text), m.textWidth())
 }
 
 func (m *Model) renderSpinner(frame int, verb string, secs, tokens int) string {
-	g := m.st.Clay.Render(Glyphs[frame%len(Glyphs)])
-	return g + " " + m.st.Fg.Render(verb+"…") + " " + m.st.Dim.Render(fmt.Sprintf("(%ds · ↑ %d tokens · esc to interrupt)", secs, tokens))
+	g := m.st.Clay.Render(m.p.Glyphs[frame%len(m.p.Glyphs)])
+	if m.p.Key != "codex" {
+		verb += "…"
+	}
+	return g + " " + m.st.Fg.Render(verb) + " " + m.st.Dim.Render(m.p.SpinnerMeta(secs, tokens))
+}
+
+func (m *Model) toolLabel(fn, arg string) string {
+	name, rest := m.p.ToolCall(fn, arg)
+	if rest == "" { // claude style: Read(file)
+		i := strings.Index(name, "(")
+		return m.st.Bold.Render(name[:i]) + "(" + m.st.Dim.Render(name[i+1:len(name)-1]) + ")"
+	}
+	return m.st.Bold.Render(name) + " " + m.st.Dim.Render(rest)
 }
 
 func (m *Model) renderToolPending(fn, arg string) string {
-	return m.st.Dim.Render("⏺") + " " + m.st.Bold.Render(fn) + "(" + m.st.Dim.Render(arg) + ")"
+	return m.st.Dim.Render(m.p.ToolDot) + " " + m.toolLabel(fn, arg)
 }
 
 func (m *Model) renderTool(fn, arg, res string) string {
-	return m.st.Ok.Render("⏺") + " " + m.st.Bold.Render(fn) + "(" + m.st.Dim.Render(arg) + ")\n" +
-		"  " + m.st.Dimmer.Render("⎿") + "  " + m.st.Dim.Render(res)
+	return m.st.Ok.Render(m.p.ToolDot) + " " + m.toolLabel(fn, arg) + "\n" +
+		"  " + m.st.Dimmer.Render(m.p.ResMark) + " " + m.st.Dim.Render(res)
 }
 
 func (m *Model) renderCard(p *Project) string {
@@ -219,11 +244,7 @@ func (m *Model) renderRaw(kind string) string {
 		}
 		return b.String()
 	case "welcome":
-		body := st.Clay.Render("✻") + " Welcome to " + st.Bold.Render("andy code") + "!\n\n" +
-			st.Dim.Render("  /help for help, /now for what is running") + "\n\n" +
-			st.Dim.Render("  cwd: ~/andymsun") + "\n" +
-			st.Dim.Render("  model: andy-3 (third year) · context: 2 cups")
-		return st.Welcome.Render(body)
+		return welcomeMark
 	case "help":
 		var b strings.Builder
 		for i, c := range Commands {
@@ -262,4 +283,33 @@ func (m *Model) renderRuler() string {
 		}
 	}
 	return b.String()
+}
+
+// renderWelcome draws the welcome box for the current persona. The cup steams.
+func (m *Model) renderWelcome(now time.Time) string {
+	st := m.st
+	switch m.p.Key {
+	case "codex":
+		body := st.Clay.Render(">_") + " " + st.Bold.Render("andy codex") + st.Dim.Render(" (v0.3.0)") + "\n\n" +
+			st.Dim.Render("model:     ") + st.Fg.Render("andy-5-codex") + "\n" +
+			st.Dim.Render("directory: ") + st.Fg.Render("~/andymsun")
+		return st.Welcome.BorderForeground(st.DimmerColor).Render(body)
+	case "agy":
+		body := gradient(m.r, "A N T I G R A V I T Y", "#4285f4", "#9b72cb", "#d96570") + "  " + st.Dim.Render("agent mode · andy-2.5-pro") + "\n\n" +
+			st.Dim.Render("Tips for getting started:") + "\n" +
+			st.Dim.Render("1.") + st.Fg.Render(" Ask about Andy, read his projects, or run /now.") + "\n" +
+			st.Dim.Render("2.") + st.Fg.Render(" Be specific; he is.") + "\n" +
+			st.Dim.Render("3.") + " " + st.Clay.Render("/help") + st.Fg.Render(" for more information.")
+		return st.Welcome.BorderForeground(lipgloss.Color("#4285f4")).Render(body)
+	}
+	frame := cupFrame(now)
+	cup := st.Dim.Render(frame[0])
+	for _, l := range frame[1:] {
+		cup += "\n" + st.Clay.Render(l)
+	}
+	text := st.Clay.Render("✻") + " Welcome to " + st.Bold.Render("andy code") + "!\n\n" +
+		st.Dim.Render("/help for help, /now for what is running") + "\n\n" +
+		st.Dim.Render("cwd: ~/andymsun") + "\n" +
+		st.Dim.Render("model: andy-3 (third year) · context: 2 cups")
+	return st.Welcome.Render(lipgloss.JoinHorizontal(lipgloss.Center, cup, "  ", text))
 }

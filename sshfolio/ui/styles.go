@@ -12,8 +12,8 @@ type Styles struct {
 
 // NewStyles builds styles against a renderer, so colours are negotiated per
 // ssh session instead of against the server's stdout.
-func NewStyles(r *lipgloss.Renderer) *Styles {
-	clay := lipgloss.Color("#d97757")
+func NewStyles(r *lipgloss.Renderer, accent, ok lipgloss.Color) *Styles {
+	clay := accent
 	dimmer := lipgloss.Color("#5a554d")
 	s := &Styles{ClayColor: clay, DimmerColor: dimmer}
 	s.Fg = r.NewStyle().Foreground(lipgloss.Color("#e9e4da"))
@@ -21,7 +21,7 @@ func NewStyles(r *lipgloss.Renderer) *Styles {
 	s.Dim = r.NewStyle().Foreground(lipgloss.Color("#8a847a"))
 	s.Dimmer = r.NewStyle().Foreground(dimmer)
 	s.Clay = r.NewStyle().Foreground(clay)
-	s.Ok = r.NewStyle().Foreground(lipgloss.Color("#7fb069"))
+	s.Ok = r.NewStyle().Foreground(ok)
 	s.Box = r.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(clay).Padding(0, 1)
 	s.Card = r.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(dimmer).BorderLeftForeground(clay).Padding(0, 1)
 	s.Welcome = r.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(clay).Padding(0, 1)

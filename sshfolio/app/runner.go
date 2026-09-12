@@ -10,8 +10,6 @@ import (
 	"syscall"
 	"time"
 
-	"sshfolio/ui"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
@@ -26,7 +24,7 @@ var programOptions = []tea.ProgramOption{tea.WithAltScreen(), tea.WithMouseCellM
 
 // RunTUI runs the agent in the current terminal.
 func RunTUI() {
-	m := NewModel(ui.NewStyles(lipgloss.DefaultRenderer()), 0, 0)
+	m := NewModel(lipgloss.DefaultRenderer(), 0, 0)
 	if _, err := tea.NewProgram(m, programOptions...).Run(); err != nil {
 		fmt.Println("error:", err)
 		os.Exit(1)
@@ -38,7 +36,7 @@ func RunTUI() {
 func sshHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	r := bubbletea.MakeRenderer(s)
 	pty, _, _ := s.Pty()
-	m := NewModel(ui.NewStyles(r), pty.Window.Width, pty.Window.Height)
+	m := NewModel(r, pty.Window.Width, pty.Window.Height)
 	return m, programOptions
 }
 

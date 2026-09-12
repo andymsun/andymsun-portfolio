@@ -63,11 +63,55 @@
     ['/lights', 'turn them off'],
     ['/help', 'this list'],
     ['/theme', 'light / dark'],
+    ['/agent', 'claude · codex · agy'],
     ['/model', 'which andy is this'],
     ['/cost', 'what this session cost'],
     ['/clear', 'clear the screen'],
     ['/exit', 'you cannot'],
   ];
+
+  // ---------------------------------------------------------------- personas
+  // Three skins for the same agent: claude (default, with the cup), codex, agy (antigravity).
+  const CUP = [
+    ['   ) ) )    ', ' ▗▟█████▙▖  ', ' ▐███████▌▙ ', ' ▝▜█████▛▘▛ ', '  ▀▀▀▀▀▀▀   '],
+    ['   ( ( (    ', ' ▗▟█████▙▖  ', ' ▐███████▌▙ ', ' ▝▜█████▛▘▛ ', '  ▀▀▀▀▀▀▀   '],
+  ];
+  const PERSONAS = {
+    claude: {
+      name: 'andy code', star: '✻', title: 'andy@ssh.andymsun.com: ~', model: 'andy-3 (third year)',
+      prompt: '>', placeholder: 'Try "/projects", "why ssh?", or "/lights"',
+      verbs: VERBS, glyphs: GLYPHS,
+      spinner: (verb, s, tok) => `${verb}… <span class="meta">(${s}s · ↑ ${tok} tokens · esc to interrupt)</span>`,
+      tool: (fn, arg) => `<span class="fn">${esc(fn)}</span>(<span class="arg">${esc(arg)}</span>)`,
+      welcome: () => `<div class="welcome cup"><pre class="mascot" aria-hidden="true"><span class="steam a">${CUP[0][0]}</span><span class="steam b">${CUP[1][0]}</span>\n${CUP[0].slice(1).join('\n')}</pre><pre class="wtext"><span class="star">✻</span> Welcome to <b>andy code</b>!\n\n<span class="dim">/help for help, /now for what is running</span>\n\n<span class="dim">cwd: ~/andymsun</span>\n<span class="dim">model: andy-3 (third year) · context: 2 cups</span></pre></div>`,
+    },
+    codex: {
+      name: 'andy codex', star: '>_', title: 'andy codex — ~/andymsun', model: 'andy-5-codex',
+      prompt: '›', placeholder: 'Ask andy codex to do anything',
+      verbs: ['Working'], glyphs: ['•'],
+      spinner: (verb, s) => `${verb} <span class="meta">(${s}s • esc to interrupt)</span>`,
+      tool: (fn, arg) => `<span class="fn">${fn === 'Bash' ? 'Ran' : 'Read'}</span> <span class="arg">${esc(arg)}</span>`,
+      welcome: () => `<div class="welcome box"><pre class="wtext"><span class="star">&gt;_</span> <b>andy codex</b> <span class="dim">(v0.3.0)</span>\n\n<span class="dim">model:     </span>andy-5-codex\n<span class="dim">directory: </span>~/andymsun</pre></div>`,
+    },
+    agy: {
+      name: 'antigravity', star: '✦', title: 'antigravity — ~/andymsun', model: 'andy-2.5-pro',
+      prompt: '>', placeholder: 'Type your message or @path/to/file',
+      verbs: ['Reticulating splines', 'Warming up the flux capacitor', 'Consulting the coffee', 'Untangling the shuttlecocks', 'Asking Andy nicely', 'Defragmenting the semester', 'Polishing the pixels'],
+      glyphs: ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'],
+      spinner: (verb, s) => `${verb}… <span class="meta">(esc to cancel, ${s}s)</span>`,
+      tool: (fn, arg) => `<span class="fn">${fn === 'Bash' ? 'Shell' : 'ReadFile'}</span> <span class="arg">${esc(arg)}</span>`,
+      welcome: () => `<div class="welcome agy"><pre class="wtext"><span class="grad">A N T I G R A V I T Y</span>  <span class="dim">agent mode · andy-2.5-pro</span>\n\n<span class="dim">Tips for getting started:</span>\n<span class="dim">1.</span> Ask about Andy, read his projects, or run /now.\n<span class="dim">2.</span> Be specific; he is.\n<span class="dim">3.</span> <span class="k">/help</span> for more information.</pre></div>`,
+    },
+  };
+  let P = PERSONAS.claude;
+  function applyPersona(key, quiet) {
+    P = PERSONAS[key] || PERSONAS.claude;
+    document.getElementById('term').dataset.agent = key;
+    $('#bar-title').textContent = P.title;
+    $('.box .gt').textContent = P.prompt;
+    if (!booting) input.placeholder = P.placeholder;
+    try { localStorage.setItem('agent', key); } catch (e) {}
+  }
 
   // ---------------------------------------------------------------- render
   function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
@@ -100,20 +144,19 @@
   let spinning = false, skipping = false;
   async function think(ms) {
     const n = add(el('p', 'spin'));
-    const verb = VERBS[Math.floor(Math.random() * VERBS.length)];
+    const verb = P.verbs[Math.floor(Math.random() * P.verbs.length)];
     let lastStep = -1, tokens = 0;
-    n.innerHTML = `<span class="glyph"></span><span class="verb"></span> <span class="meta"></span>`;
-    const glyph = n.querySelector('.glyph'), meta = n.querySelector('.meta');
-    n.querySelector('.verb').textContent = verb + '…';
+    n.innerHTML = `<span class="glyph"></span><span class="verb"></span>`;
+    const glyph = n.querySelector('.glyph'), vb = n.querySelector('.verb');
     if (reduced) { n.remove(); return; }
     spinning = true;
     await ticker((t) => {
-      const step = Math.floor(t / 110);
+      const step = Math.floor(t / (P === PERSONAS.agy ? 80 : 110));
       if (step !== lastStep) {
         lastStep = step;
-        glyph.textContent = GLYPHS[step % GLYPHS.length];
+        glyph.textContent = P.glyphs[step % P.glyphs.length];
         tokens += Math.floor(Math.random() * 40);
-        meta.textContent = `(${Math.floor(t / 1000)}s · ↑ ${tokens} tokens · esc to interrupt)`;
+        vb.innerHTML = P.spinner(verb, Math.floor(t / 1000), tokens);
       }
       return t >= ms || skipping;
     });
@@ -122,7 +165,7 @@
   }
   async function tool(fn, arg, result, after) {
     const n = add(el('div', 'tool'));
-    const call = el('p', 'call pending', `<span class="fn">${esc(fn)}</span>(<span class="arg">${esc(arg)}</span>)`);
+    const call = el('p', 'call pending', P.tool(fn, arg));
     n.appendChild(call);
     await sleep(skipping ? 0 : 260 + Math.random() * 300);
     call.classList.remove('pending');
@@ -181,9 +224,7 @@
     return f;
   }
 
-  function welcome() {
-    add(el('div', 'welcome', `<span class="star">✻</span> Welcome to <b>andy code</b>!\n\n  <span class="dim">/help for help, /now for what is running</span>\n\n  <span class="dim">cwd: ~/andymsun</span>\n  <span class="dim">model: andy-3 (third year) · context: 2 cups</span>`));
-  }
+  function welcome() { add(el('div', 'welcome-wrap', P.welcome())); }
   function psTable() {
     const t = el('div', 'ps');
     t.innerHTML = `<div class="h">PID   STATUS     TAG        PROCESS</div>` + NOW.map((r) => {
@@ -244,7 +285,14 @@
       try { localStorage.setItem('theme', next); } catch (e) {}
       await say(`Page theme: ${next}. The window stays dark; it is a terminal.`);
     },
-    async '/model'() { await say('andy-3 (third year). Context window: two cups of coffee. Knowledge cutoff: whenever he last slept.'); },
+    async '/model'() { await say(`${P.model}. Context window: two cups of coffee. Knowledge cutoff: whenever he last slept.`); },
+    async '/agent'(arg) {
+      if (!PERSONAS[arg]) { await say(`Skins for the same agent: claude (the cup), codex, agy. Try "/agent codex". You are on ${Object.keys(PERSONAS).find((k) => PERSONAS[k] === P)}.`); return; }
+      applyPersona(arg);
+      log.innerHTML = '';
+      welcome();
+      await say(`Now dressed as ${P.name}. Same Andy underneath.`);
+    },
     async '/cost'() {
       const secs = Math.floor((performance.now() - T0) / 1000);
       await say(`Session: ${secs}s wall time, ≈ ${(secs / 900 + 1).toFixed(1)} coffees, $0.00. Andy is a student; this runs on a €5 VPS.`);
@@ -282,9 +330,9 @@
     text = text.trim(); if (!text) return;
     user(text);
     lock(true);
-    const cmd = text.split(/\s+/)[0].toLowerCase();
+    const parts = text.split(/\s+/), cmd = parts[0].toLowerCase(), arg = (parts[1] || '').toLowerCase();
     try {
-      if (HANDLERS[cmd]) await HANDLERS[cmd]();
+      if (HANDLERS[cmd]) await HANDLERS[cmd](arg);
       else if (text.startsWith('/')) await say(`Unknown command: ${text}. /help lists the real ones.`);
       else await chat(text);
     } finally { lock(false); }
@@ -374,6 +422,11 @@
   // ---------------------------------------------------------------- boot
   const T0 = performance.now();
   let booting = true;
+  (function pickPersona() {
+    const q = (location.search.match(/[?&]agent=(\w+)/) || [])[1];
+    let saved = null; try { saved = localStorage.getItem('agent'); } catch (e) {}
+    applyPersona(PERSONAS[q] ? q : (PERSONAS[saved] ? saved : 'claude'), true);
+  })();
   async function typeIntoPrompt(text) {
     input.placeholder = ''; input.value = '';
     if (reduced) { input.value = text; await sleep(0); input.value = ''; return; }
@@ -404,7 +457,7 @@
     await say('That is the current state. The prompt is yours: /projects reads the work, / lists everything, or ask me something.', 'ok');
     document.removeEventListener('keydown', skipOnKey);
     skipping = false; booting = false;
-    input.placeholder = 'Try "/projects", "why ssh?", or "/lights"';
+    input.placeholder = P.placeholder;
     statusR.innerHTML = `the real one: <a href="#ssh">${SSH}</a>`;
     lock(false);
   }

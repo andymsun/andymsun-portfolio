@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type tickMsg time.Time
@@ -20,6 +21,8 @@ func tick() tea.Cmd {
 
 type Model struct {
 	st            *ui.Styles
+	r             *lipgloss.Renderer
+	p             Persona
 	width, height int
 	ready         bool
 
@@ -46,12 +49,14 @@ type Model struct {
 	started  time.Time
 }
 
-func NewModel(st *ui.Styles, w, h int) Model {
+func NewModel(r *lipgloss.Renderer, w, h int) Model {
+	p := Personas["claude"]
+	st := ui.NewStyles(r, p.Accent, p.Ok)
 	in := textinput.New()
 	in.Prompt = ""
 	in.CharLimit = 200
 	in.Cursor.Style = st.Clay
-	m := Model{st: st, width: w, height: h, in: in, booting: true, started: time.Now(), histIdx: -1}
+	m := Model{st: st, r: r, p: p, width: w, height: h, in: in, booting: true, started: time.Now(), histIdx: -1}
 	m.queue = bootSteps()
 	if w > 0 && h > 0 { // over ssh the size comes from the pty, not a WindowSizeMsg
 		m.ready = true
@@ -65,3 +70,12 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) uptime() time.Duration { return time.Since(m.started) }
+
+// setPersona re-skins the session: new styles, new welcome, same Andy.
+func (m *Model) setPersona(key string) {
+	m.p = Personas[key]
+	m.st = ui.NewStyles(m.r, m.p.Accent, m.p.Ok)
+	m.in.Cursor.Style = m.st.Clay
+	m.in.Placeholder = m.p.Placeholder
+	m.transcript = nil
+}

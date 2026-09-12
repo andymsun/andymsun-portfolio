@@ -202,7 +202,7 @@ func (m *Model) stepTick() (done bool, quit bool) {
 			m.live = ""
 			return true, false
 		}
-		frame := ms / 110
+		frame := ms / int(m.p.SpinEvery.Milliseconds())
 		m.tokens += (ms*7 + 13) % 41 / 3
 		m.live = m.renderSpinner(frame, m.curVerb, ms/1000, m.tokens)
 		return false, false
@@ -252,7 +252,7 @@ func (m *Model) stepTick() (done bool, quit bool) {
 	case stBootDone:
 		m.booting = false
 		m.skip = false
-		m.in.Placeholder = "Try \"/about\", \"why ssh?\", or \"/exit\""
+		m.in.Placeholder = m.p.Placeholder
 		m.in.Focus()
 		return true, false
 	case stQuit:

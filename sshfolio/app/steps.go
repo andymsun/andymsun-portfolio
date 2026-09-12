@@ -79,8 +79,18 @@ func (m *Model) handle(text string) []step {
 		return []step{think(500), tool("Read", "contact.md", "Read 4 lines"), raw("contact")}
 	case "/web":
 		return []step{think(500), tool("Bash", "open https://andymsun.com", "cannot open a browser from in here. it is the same agent with more pixels:"), raw("web")}
+	case "/agent":
+		arg := ""
+		if f := strings.Fields(text); len(f) > 1 {
+			arg = strings.ToLower(f[1])
+		}
+		if _, ok := Personas[arg]; !ok {
+			return []step{say("Skins for the same agent: claude (the cup), codex, agy. Try \"/agent codex\". You are on " + m.p.Key + ".")}
+		}
+		m.setPersona(arg)
+		return []step{raw("welcome"), say("Now dressed as " + m.p.Name + ". Same Andy underneath.")}
 	case "/model":
-		return []step{say("andy-3 (third year). Context window: two cups of coffee. Knowledge cutoff: whenever he last slept.")}
+		return []step{say(m.p.Model + ". Context window: two cups of coffee. Knowledge cutoff: whenever he last slept.")}
 	case "/cost":
 		secs := int(m.uptime().Seconds())
 		return []step{say(fmt.Sprintf("Session: %ds wall time, ≈ %.1f coffees, $0.00. Andy is a student; this runs on a €5 VPS.", secs, float64(secs)/900+1))}

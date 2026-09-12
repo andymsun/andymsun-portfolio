@@ -71,6 +71,7 @@ var Commands = []Command{
 	{"/projects", "read the work"},
 	{"/contact", "email, github, linkedin"},
 	{"/web", "the one with pixels"},
+	{"/agent", "claude · codex · agy"},
 	{"/help", "this list"},
 	{"/model", "which andy is this"},
 	{"/cost", "what this session cost"},

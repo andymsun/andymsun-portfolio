@@ -24,7 +24,8 @@ with the project cards), then hands over the prompt. `esc` skips the intro.
 | input | does |
 |---|---|
 | `/` | opens the command menu; `↑` `↓` pick, `tab` or `enter` complete |
-| `/about` `/projects` `/contact` `/web` `/help` `/model` `/cost` `/clear` `/exit` | the commands |
+| `/now` `/about` `/projects` `/contact` `/web` `/help` `/model` `/cost` `/clear` `/exit` | the commands |
+| `/agent claude` `/agent codex` `/agent agy` | reskin the session: the cup, the `>_` box, or the gradient wordmark |
 | `?` on an empty prompt | `/help` |
 | anything else | a keyword-matched reply (try `why ssh?`, `coffee`, `hire`) |
 | `esc` | interrupt whatever is streaming |
@@ -37,7 +38,8 @@ Mouse wheel scrolls the transcript.
 
 ```
 main.go          reads .env, picks local or ssh mode
-app/content.go   everything the agent knows: about, projects, verbs, commands
+app/content.go   everything the agent knows: about, /now, projects, verbs, commands
+app/persona.go   the three skins (claude with the cup, codex, agy) and the cup frames
 app/steps.go     command handlers; each returns a list of steps (think, say, tool, card…)
 app/update.go    bubbletea update loop, key handling, step playback
 app/view.go      rendering: header, transcript viewport, menu, prompt box, status

@@ -56,6 +56,17 @@ Round three keeps the agent and rebuilds the frame around nine borrowed details
   slider, a run button, results audited as they land (ciechanow.ski).
 - Everything from round two stays: slash menu, `?`, history, `/exit`, `/cost`.
 
+**Skins and the cup**
+
+- Claude Code's welcome box has a small block-character mascot; ours is a
+  coffee cup in the same half-block style, steam alternating every 700 ms, on
+  both web and ssh.
+- `/agent claude|codex|agy` reskins the whole session: welcome box, prompt
+  glyph, bullets, tool labels, spinner, palette, model name. Codex is the
+  `>_` box, `›` prompt, monochrome, "Working". Agy (Antigravity) is the
+  gradient wordmark, `✦` bullets, braille spinner, blue. `?agent=` on the web
+  picks one for a link. Same Andy underneath.
+
 **Terminal** (`sshfolio/`)
 
 - Same additions where a terminal can carry them: connection banner, hostname
