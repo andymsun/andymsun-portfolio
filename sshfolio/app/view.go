@@ -84,6 +84,9 @@ func (m Model) View() string {
 		left = " " + gradient(m.r, m.p.Star+" "+m.p.Title, "#f87171", "#facc15", "#7fb069", "#7aa2f7", "#9b72cb")
 	}
 	right := m.renderRuler() + "  " + st.Dim.Render("andymsun.com") + " "
+	if tabs := m.renderTabs(); tabs != "" {
+		right = tabs + "  " + right
+	}
 	gap := m.width - lipgloss.Width(left) - lipgloss.Width(right)
 	if gap < 1 {
 		gap = 1
@@ -98,7 +101,11 @@ func (m Model) View() string {
 	if items := m.menuItems(); len(items) > 0 {
 		b.WriteString("\n")
 		for i, c := range items {
-			name := c.Name + strings.Repeat(" ", 12-len(c.Name))
+			pad := 16 - len([]rune(c.Name))
+			if pad < 1 {
+				pad = 1
+			}
+			name := c.Name + strings.Repeat(" ", pad)
 			if i == m.menuSel {
 				b.WriteString("   " + st.Clay.Render(name) + st.Fg.Render(c.Desc) + "\n")
 			} else {
@@ -114,7 +121,14 @@ func (m Model) View() string {
 	} else {
 		box = box.BorderForeground(st.ClayColor)
 	}
-	b.WriteString(box.Width(m.width-4).Render(st.Dim.Render("> ")+m.in.View()) + "\n")
+	// a dim argument hint after a bare command that takes one, e.g. /agent <claude|codex|agy>
+	inView := m.in.View()
+	if v := m.in.Value(); !m.running() && !strings.Contains(v, " ") && argHint(v) != "" {
+		in := m.in
+		in.Width = lipgloss.Width(v) + 1
+		inView = in.View() + st.Dimmer.Render(argHint(v))
+	}
+	b.WriteString(box.Width(m.width-4).Render(st.Dim.Render(m.p.Prompt+" ")+inView) + "\n")
 
 	// status line
 	l := " " + st.Dimmer.Render("? for shortcuts")
@@ -125,6 +139,8 @@ func (m Model) View() string {
 	switch {
 	case m.status != "":
 		r = st.Clay.Render(m.status)
+	case m.ask:
+		r = st.Dimmer.Render("0–3 to answer")
 	case m.booting:
 		r = st.Dimmer.Render("esc to skip")
 	case m.running():
@@ -186,7 +202,11 @@ func (m *Model) renderSpinner(frame int, verb string, secs, tokens int) string {
 	if m.p.Key != "codex" {
 		verb += "…"
 	}
-	return g + " " + m.st.Fg.Render(verb) + " " + m.st.Dim.Render(m.p.SpinnerMeta(secs, tokens))
+	meta := m.p.SpinnerMeta(secs, tokens)
+	if m.effort != "medium" {
+		meta += m.st.Dimmer.Render(" · effort: " + m.effort)
+	}
+	return g + " " + m.st.Fg.Render(verb) + " " + m.st.Dim.Render(meta)
 }
 
 func (m *Model) toolLabel(fn, arg string) string {
@@ -238,6 +258,9 @@ func (m *Model) renderRaw(kind string) string {
 	if out, ok := m.renderEgg(kind); ok {
 		return out
 	}
+	if out, ok := m.renderMore(kind); ok {
+		return out
+	}
 	switch kind {
 	case "conn":
 		return st.Dim.Render("$ ssh ssh.andymsun.com") + "\n" +
@@ -263,7 +286,11 @@ func (m *Model) renderRaw(kind string) string {
 			if i > 0 {
 				b.WriteString("\n")
 			}
-			b.WriteString("  " + st.Clay.Render(c.Name+strings.Repeat(" ", 12-len(c.Name))) + st.Dim.Render(c.Desc))
+			pad := 12 - len([]rune(c.Name))
+			if pad < 1 {
+				pad = 1
+			}
+			b.WriteString("  " + st.Clay.Render(c.Name+strings.Repeat(" ", pad)) + st.Dim.Render(c.Desc))
 		}
 		return b.String()
 	case "contact":

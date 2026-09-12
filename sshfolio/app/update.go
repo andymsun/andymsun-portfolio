@@ -54,12 +54,33 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.transcript = nil
 			m.queue = append(m.queue, raw("welcome"))
 			return m, nil
+		case tea.KeyCtrlT:
+			if !m.booting {
+				m.newTab()
+			}
+			return m, nil
+		case tea.KeyCtrlN:
+			m.switchTab((m.active + 1) % len(m.tabs))
+			return m, nil
+		case tea.KeyCtrlP:
+			m.switchTab((m.active - 1 + len(m.tabs)) % len(m.tabs))
+			return m, nil
 		case tea.KeyEsc:
 			if m.running() {
 				m.skip = true
 				return m, nil
 			}
 			m.in.SetValue("")
+			return m, nil
+		}
+		if m.ask { // the feedback prompt owns the keys until answered
+			k := msg.String()
+			if k == "0" || k == "1" || k == "2" || k == "3" {
+				m.ask = false
+				m.live = ""
+				m.transcript = append(m.transcript, m.renderAsk()+"\n"+m.st.Dim.Render("> "+k))
+				m.queue = append(feedbackReply(k), m.queue...)
+			}
 			return m, nil
 		}
 		m.lastKey = time.Now()
@@ -162,16 +183,32 @@ func (m *Model) submit(text string) {
 	m.menuSel = 0
 	m.transcript = append(m.transcript, m.renderUser(text))
 	m.queue = append(m.queue, m.handle(text)...)
+	m.cmdCount++
+	if m.cmdCount%5 == 0 { // like the real one: an occasional rating prompt
+		m.queue = append(m.queue, step{kind: stAsk})
+	}
 	m.scrollBottom()
 }
 
 // menuItems returns the slash commands matching the prompt, or nil.
 func (m *Model) menuItems() []Command {
 	v := m.in.Value()
-	if !strings.HasPrefix(v, "/") || strings.Contains(v, " ") || m.booting {
+	if !strings.HasPrefix(v, "/") || m.booting {
 		return nil
 	}
 	var out []Command
+	if i := strings.Index(v, " "); i > 0 { // argument completion: "/agent co" -> "/agent codex"
+		cmd, rest := v[:i], strings.TrimLeft(v[i:], " ")
+		for _, o := range ArgOptions[cmd] {
+			if strings.HasPrefix(o.Name, rest) {
+				out = append(out, Command{cmd + " " + o.Name, o.Desc})
+			}
+		}
+		if m.menuSel >= len(out) {
+			m.menuSel = 0
+		}
+		return out
+	}
 	for _, c := range Commands {
 		if strings.HasPrefix(c.Name, v) {
 			out = append(out, c)
@@ -227,12 +264,19 @@ func (m *Model) stepTick() (done bool, quit bool) {
 	ms := int(el.Milliseconds())
 	switch s.kind {
 	case stThink:
-		if ms >= s.ms || m.skip {
+		total := int(float64(s.ms) * effortFactor[m.effort])
+		if m.effort == "max" && !strings.HasPrefix(m.curVerb, "Ultrathinking") {
+			m.curVerb = "Ultrathinking about " + strings.ToLower(m.curVerb)
+		}
+		if ms >= total || m.skip {
 			m.live = ""
 			return true, false
 		}
 		frame := ms / int(m.p.SpinEvery.Milliseconds())
 		m.tokens += (ms*7 + 13) % 41 / 3
+		if m.effort == "max" {
+			m.tokens += 97
+		}
 		m.live = m.renderSpinner(frame, m.curVerb, ms/1000, m.tokens)
 		return false, false
 	case stSay:
@@ -293,6 +337,31 @@ func (m *Model) stepTick() (done bool, quit bool) {
 			return true, false
 		}
 		m.live = m.renderAnim(s.text, ms, s.ms)
+		return false, false
+	case stAgents:
+		last := 0
+		for _, a := range s.agents {
+			if a.ms > last {
+				last = a.ms
+			}
+		}
+		if ms >= last+200 || m.skip {
+			m.live = ""
+			m.transcript = append(m.transcript, m.renderAgents(s.agents, ms, true))
+			return true, false
+		}
+		m.live = m.renderAgents(s.agents, ms, false)
+		return false, false
+	case stAsk:
+		if !m.ask && ms < 50 { // just arrived
+			m.ask = true
+		}
+		if !m.ask { // answered by a key
+			m.live = ""
+			return true, false
+		}
+		m.live = m.renderAsk()
+		m.in.Blur()
 		return false, false
 	}
 	return true, false

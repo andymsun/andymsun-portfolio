@@ -81,6 +81,22 @@ Round three keeps the agent and rebuilds the frame around nine borrowed details
   `/matrix` rains, the Konami code drops confetti and turns the header into a
   rainbow. `Ctrl-L` clears. Ninety seconds of silence gets one nudge.
 
+**More of the real thing** (`sshfolio/app/more.go`)
+
+- `/projects` spawns five parallel `Task(Explore …)` subagents with their own
+  spinners before the cards. `/agents` is the roster.
+- `/mcp`, `/skills` and `/skill <name>`, `/status`, `/doctor`, `/login`: the
+  rest of the CLI's furniture, all in character.
+- `/effort low|medium|high|max` scales thinking time; max is ultrathink.
+- Tabs: `Ctrl-T`, `Ctrl-N`, `Ctrl-P`, `/tab …`. Each tab keeps its own
+  transcript, skin, cups, and effort; the header shows a strip when there are two.
+- Every fifth command asks for a rating (1 Bad, 2 Fine, 3 Good, 0 Dismiss), like
+  the real one does; `/feedback` asks on demand.
+- Argument completion after a space (`/agent co` → `/agent codex`) and a dim
+  `<claude|codex|agy>` hint after a bare command.
+- The visitor counter was seeded at 3,532 on 2026-09-12 to account for the
+  months before it existed; it counts honestly from there.
+
 **Terminal** (`sshfolio/`)
 
 - Same additions where a terminal can carry them: connection banner, hostname

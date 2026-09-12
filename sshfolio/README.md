@@ -30,6 +30,12 @@ with the project cards), then hands over the prompt. `esc` skips the intro.
 | `/coffee` `/badminton` `/matrix` `/fortune` | brew a cup (adds a cup to your context), one rally, three seconds of rain, a small truth |
 | `ls` `cat about.md` `pwd` `cd` `sudo …` `rm -rf /` `vim` `git status` `top` `ping` `neofetch` `man andy` `date` `echo` `exit` | it is not a shell, but it answers like one |
 | `↑↑↓↓←→←→BA` or `/party` | rainbow header, confetti, unhinged spinner verbs; again to stop |
+| `/projects` | now spawns five `Task(Explore …)` subagents in parallel before the cards |
+| `/agents` `/mcp` `/skills` `/skill <name>` `/status` `/doctor` `/login` | the roster, connected servers, skills, account and session, diagnostics, a login that isn't |
+| `/effort low|medium|high|max` | scales thinking time; `max` is ultrathink and shows in the spinner |
+| `/tab new|next|prev|close|N`, `Ctrl-T` `Ctrl-N` `Ctrl-P` | tabs, each with its own transcript and skin; strip in the header |
+| `/feedback`, or every fifth command | "How is andy code doing this session? 1: Bad 2: Fine 3: Good 0: Dismiss" |
+| `/agent `, `/effort `, `/tab `, `/skill ` then Tab | argument completion; a bare command shows a dim `<a|b|c>` hint |
 | `Ctrl-L` | clear |
 | ninety seconds of silence | it checks on you once |
 | `?` on an empty prompt | `/help` |
@@ -47,6 +53,7 @@ main.go          reads .env, picks local or ssh mode
 app/content.go   everything the agent knows: about, /now, projects, verbs, commands
 app/persona.go   the three skins (claude with the cup, codex, agy) and the cup frames
 app/eggs.go      fake shell, animations (brew, rally, matrix, confetti), fortunes, neofetch, visitor counter
+app/more.go      argument completion, effort, subagents, feedback prompt, mcp/skills/status/doctor/login, tabs
 app/steps.go     command handlers; each returns a list of steps (think, say, tool, card…)
 app/update.go    bubbletea update loop, key handling, step playback
 app/view.go      rendering: header, transcript viewport, menu, prompt box, status

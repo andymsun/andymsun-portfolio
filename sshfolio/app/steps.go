@@ -21,6 +21,8 @@ const (
 	stBootDone                 // hand the prompt to the user
 	stQuit                     // leave
 	stAnim                     // an animation in the live slot for ms
+	stAgents                   // parallel subagents, then done
+	stAsk                      // the feedback prompt; done when answered
 )
 
 type step struct {
@@ -31,6 +33,7 @@ type step struct {
 	cps          int
 	fn, arg, res string
 	proj         *Project
+	agents       []subagent
 }
 
 func think(ms int) step             { return step{kind: stThink, ms: ms} }
@@ -70,12 +73,87 @@ func (m *Model) handle(text string) []step {
 		}
 		return append(s, say("For what he is doing right now, /now."))
 	case "/projects":
-		s := []step{think(1100), say("Reading the project files.")}
+		names := make([]string, len(Projects))
+		for i, p := range Projects {
+			names[i] = strings.ToLower(p.Name)
+		}
+		s := []step{think(600), say("Spawning five Explore subagents, one per project."), agents(names...)}
 		for i := range Projects {
 			p := &Projects[i]
 			s = append(s, tool("Read", p.File, fmt.Sprintf("Read %d lines", p.Lines)), card(p))
 		}
 		return append(s, sayAs("Five entries. Lawvics and Rivendell are the loud ones; sshfolio is the one you are inside of.", "ok"))
+	case "/agents":
+		return []step{raw("agents")}
+	case "/mcp":
+		return []step{think(400), raw("mcp")}
+	case "/skills":
+		return []step{raw("skills")}
+	case "/skill":
+		name := ""
+		if f := strings.Fields(text); len(f) > 1 {
+			name = strings.ToLower(f[1])
+		}
+		switch name {
+		case "speedcubing":
+			return []step{tool("Skill", "speedcubing", "loaded"), say("3x3, CFOP, sub-20 on a good day. The cube is the only thing on his desk that gets solved on schedule.")}
+		case "mandarin":
+			return []step{tool("Skill", "mandarin", "loaded"), say("Native. Flushing does that. 你好, and no, this program does not speak it beyond this line.")}
+		case "typing":
+			return []step{tool("Skill", "typing", "loaded"), say("Fast, and on a tap-dance keyboard layout of his own, because a normal one was not an interesting enough problem.")}
+		case "photography":
+			return []step{tool("Skill", "photography", "loaded"), say("Film when there is time, phone when there is not. Mostly courts, coffee, and the 7 train.")}
+		case "badminton":
+			return m.handle("/badminton")
+		case "caffeine":
+			return m.handle("/coffee")
+		}
+		return []step{say("Which one? /skills lists them, or /skill <name>.")}
+	case "/effort":
+		lvl := ""
+		if f := strings.Fields(text); len(f) > 1 {
+			lvl = strings.ToLower(f[1])
+		}
+		if _, ok := effortFactor[lvl]; !ok {
+			return []step{say("Effort is " + m.effort + ". Levels: low, medium, high, max. Max is called ultrathink and is not faster.")}
+		}
+		m.effort = lvl
+		msg := map[string]string{"low": "Effort: low. Short answers, short spinners.", "medium": "Effort: medium. The default.", "high": "Effort: high. Longer spinners, same Andy.", "max": "Effort: max. Ultrathink engaged. The token counter will now be ridiculous."}[lvl]
+		return []step{think(500), say(msg)}
+	case "/tab":
+		arg := ""
+		if f := strings.Fields(text); len(f) > 1 {
+			arg = strings.ToLower(f[1])
+		}
+		switch arg {
+		case "new":
+			m.newTab()
+			return nil
+		case "next":
+			m.switchTab((m.active + 1) % len(m.tabs))
+			return nil
+		case "prev":
+			m.switchTab((m.active - 1 + len(m.tabs)) % len(m.tabs))
+			return nil
+		case "close":
+			if !m.closeTab() {
+				return []step{sayPlain("That is the last tab. Ctrl-C twice leaves.")}
+			}
+			return nil
+		}
+		if n := atoiSafe(arg); n >= 1 && n <= len(m.tabs) {
+			m.switchTab(n - 1)
+			return nil
+		}
+		return []step{say(fmt.Sprintf("%d tab(s). /tab new, next, prev, close, or a number. Ctrl-T, Ctrl-N, Ctrl-P do the same.", len(m.tabs)))}
+	case "/status":
+		return []step{raw("status")}
+	case "/doctor":
+		return []step{think(700), raw("doctor")}
+	case "/login":
+		return []step{think(900), raw("login")}
+	case "/feedback":
+		return []step{step{kind: stAsk}}
 	case "/contact":
 		return []step{think(500), tool("Read", "contact.md", "Read 4 lines"), raw("contact")}
 	case "/web":
@@ -171,4 +249,18 @@ func (m *Model) partySteps() []step {
 	}
 	m.party = true
 	return []step{anim("confetti", 2200), sayAs("↑↑↓↓←→←→BA. Andy mode. The header is a rainbow now and the spinner has lost its mind. /party turns it off.", "clay")}
+}
+
+func atoiSafe(s string) int {
+	n := 0
+	for _, c := range s {
+		if c < '0' || c > '9' {
+			return -1
+		}
+		n = n*10 + int(c-'0')
+	}
+	if s == "" {
+		return -1
+	}
+	return n
 }
