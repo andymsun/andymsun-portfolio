@@ -54,17 +54,17 @@ var Glyphs = []string{"·", "✢", "✳", "✶", "✻", "✽", "✻", "✶", "�
 type Proc struct{ PID, Status, Tag, What, Note string }
 
 var Now = []Proc{
-	{"0214", "running", "job", "KindEd", "software engineering intern · Django Channels, WebSockets, Redis · 2026 –"},
-	{"0301", "running", "research", "CUNY CSI", "undergraduate researcher · Span-Aware Mixture of Agents · 2026 –"},
+	{"0214", "running", "job", "KindEd", "SWE intern · Django Channels, WebSockets, Redis · 2026 –"},
+	{"0301", "running", "research", "CUNY CSI", "researcher · Span-Aware Mixture of Agents · 2026 –"},
 	{"0188", "running", "contract", "Scale AI", "prompt engineer · red-teaming pre-release LLMs · 2025 –"},
-	{"0333", "running", "cohort", "Financial Markets", "three-year quant finance program, Booth coursework · 2025 –"},
-	{"0090", "daily", "life", "badminton", "logistics officer, UChicago club · every open gym · 2025 –"},
+	{"0333", "running", "cohort", "Financial Markets", "3-year quant finance cohort, Booth coursework · 2025 –"},
+	{"0090", "daily", "life", "badminton", "logistics officer · every open gym · 2025 –"},
 	{"0546", "active", "oss", "sshfolio", "this program · 2026"},
 	{"0402", "active", "side", "pSiren", "take a song apart, rebuild it · 2025 –"},
 	{"0410", "active", "cert", "Google Data Analytics", "in progress · 2025 –"},
-	{"0290", "stopped", "job", "TipTop Technologies", "software engineering intern (Metcalf) · summer 2026"},
-	{"0250", "stopped", "job", "LawBandit", "software engineering intern · spring 2026"},
-	{"0116", "stopped", "job", "CareLumi", "software engineering intern · fall 2025"},
+	{"0290", "stopped", "job", "TipTop Technologies", "SWE intern (Metcalf) · summer 2026"},
+	{"0250", "stopped", "job", "LawBandit", "SWE intern · spring 2026"},
+	{"0116", "stopped", "job", "CareLumi", "SWE intern · fall 2025"},
 }
 
 // Experience is the full log: every job, research post, cohort, program,

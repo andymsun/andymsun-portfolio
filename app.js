@@ -20,17 +20,17 @@
   ];
   // /now, as a process table. pid is arbitrary but stable; status is honest.
   const NOW = [
-    { pid: '0214', st: 'running', tag: 'job', what: 'KindEd', note: 'software engineering intern · Django Channels, WebSockets, Redis · 2026 –' },
-    { pid: '0301', st: 'running', tag: 'research', what: 'CUNY CSI', note: 'undergraduate researcher · Span-Aware Mixture of Agents · 2026 –' },
+    { pid: '0214', st: 'running', tag: 'job', what: 'KindEd', note: 'SWE intern · Django Channels, WebSockets, Redis · 2026 –' },
+    { pid: '0301', st: 'running', tag: 'research', what: 'CUNY CSI', note: 'researcher · Span-Aware Mixture of Agents · 2026 –' },
     { pid: '0188', st: 'running', tag: 'contract', what: 'Scale AI', note: 'prompt engineer · red-teaming pre-release LLMs · 2025 –' },
-    { pid: '0333', st: 'running', tag: 'cohort', what: 'Financial Markets', note: 'three-year quant finance program, Booth coursework · 2025 –' },
-    { pid: '0090', st: 'daily', tag: 'life', what: 'badminton', note: 'logistics officer, UChicago club · every open gym · 2025 –' },
+    { pid: '0333', st: 'running', tag: 'cohort', what: 'Financial Markets', note: '3-year quant finance cohort, Booth coursework · 2025 –' },
+    { pid: '0090', st: 'daily', tag: 'life', what: 'badminton', note: 'logistics officer · every open gym · 2025 –' },
     { pid: '0546', st: 'active', tag: 'oss', what: 'sshfolio', note: 'this program · 2026' },
     { pid: '0402', st: 'active', tag: 'side', what: 'pSiren', note: 'take a song apart, rebuild it · 2025 –' },
     { pid: '0410', st: 'active', tag: 'cert', what: 'Google Data Analytics', note: 'in progress · 2025 –' },
-    { pid: '0290', st: 'stopped', tag: 'job', what: 'TipTop Technologies', note: 'software engineering intern (Metcalf) · summer 2026' },
-    { pid: '0250', st: 'stopped', tag: 'job', what: 'LawBandit', note: 'software engineering intern · spring 2026' },
-    { pid: '0116', st: 'stopped', tag: 'job', what: 'CareLumi', note: 'software engineering intern · fall 2025' },
+    { pid: '0290', st: 'stopped', tag: 'job', what: 'TipTop Technologies', note: 'SWE intern (Metcalf) · summer 2026' },
+    { pid: '0250', st: 'stopped', tag: 'job', what: 'LawBandit', note: 'SWE intern · spring 2026' },
+    { pid: '0116', st: 'stopped', tag: 'job', what: 'CareLumi', note: 'SWE intern · fall 2025' },
   ];
   // /experience: every job, research post, cohort, program, honor, and high-school role. end '' = present.
   const EXPERIENCE = [
