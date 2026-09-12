@@ -11,39 +11,72 @@ var About = []string{
 }
 
 type Project struct {
-	File  string
-	Lines int
-	Name  string
-	Year  string
-	Blurb string
-	Body  string
-	Stack []string
-	Links [][2]string
+	File   string
+	Lines  int
+	Name   string
+	Year   string
+	Status string // shipped, active, wip, paused, abandoned, done
+	Blurb  string
+	Body   string
+	Stack  []string
+	Links  [][2]string
 }
 
 var Projects = []Project{
-	{File: "projects/lawvics.md", Lines: 31, Name: "Lawvics", Year: "2026",
+	{File: "projects/lawvics.md", Lines: 31, Name: "Lawvics", Year: "2026", Status: "shipped",
 		Blurb: "One legal question, answered across all 50 states.",
 		Body:  "Built in under 48 hours; finalist at the UChicago Vibe Coding Hackathon. One agent turns a question into fifty jurisdiction-specific searches and runs them in five batches. A second agent audits every result: schema checks, citation format, and a flag for statutes that may have been repealed. A D3 map colors each state as its answer lands.",
 		Stack: []string{"Next.js 16", "React 19", "TypeScript", "Vercel AI SDK", "Zod", "Zustand", "D3"},
 		Links: [][2]string{{"source", "github.com/andymsun/lawvics"}, {"demo", "lawvics.vercel.app"}}},
-	{File: "projects/rivendell.md", Lines: 22, Name: "Rivendell", Year: "2026",
+	{File: "projects/rivendell.md", Lines: 22, Name: "Rivendell", Year: "2026", Status: "shipped",
 		Blurb: "A live 3D map of everything moving around the planet.",
 		Body:  "8,000+ satellites, 6,000+ flights, and 500+ vessels drawn on Google's photorealistic 3D tiles, fed from several live sources at once. The hard parts were on the client: thousands of moving objects at 60 fps and a scene that stays readable at every zoom level.",
 		Stack: []string{"Next.js", "TypeScript", "React", "Three.js", "Google 3D Tiles"}},
-	{File: "projects/sshfolio.md", Lines: 27, Name: "sshfolio", Year: "2026",
+	{File: "projects/sshfolio.md", Lines: 27, Name: "sshfolio", Year: "2026", Status: "active",
 		Blurb: "This program. You are inside it.",
 		Body:  "A Go SSH server that gives every connection a program instead of a shell: this prompt, these slash commands, this spinner. No account, nothing to install, Ctrl-C twice to leave. Runs on a small VPS whose real sshd was moved off port 22 so visitors get the app. andymsun.com is the same thing with more pixels.",
 		Stack: []string{"Go", "bubbletea", "wish", "lipgloss"},
 		Links: [][2]string{{"source", "github.com/andymsun/andymsun-portfolio"}, {"web", "andymsun.com"}}},
-	{File: "projects/psiren.md", Lines: 24, Name: "pSiren", Year: "2025 –",
+	{File: "projects/psiren.md", Lines: 24, Name: "pSiren", Year: "2025 –", Status: "wip",
 		Blurb: "Take a finished song apart and rebuild it with different voices.",
 		Body:  "A music workspace for one person who wants the reach of a band. Separates a recording into vocal, instruments, and room, converts the lead with a voice model, and remixes over the original accompaniment, on an Apple Silicon laptop. In progress: per-instrument separation and instrument swaps that keep the notes and change the timbre.",
 		Stack: []string{"Python", "PyTorch (MPS)", "Mel-Band Roformer", "RVC"}},
-	{File: "projects/badminton.md", Lines: 12, Name: "UChicago Badminton", Year: "2025 –",
+	{File: "projects/badminton.md", Lines: 12, Name: "UChicago Badminton", Year: "2025 –", Status: "active",
 		Blurb: "Club website and a live play board for open gym.",
 		Body:  "Logistics officer for a 100+ member club: dues, registrations, suppliers, a regional tournament, and the board that shows who is on which court. The improvements come from being at every open gym and watching where people get stuck.",
 		Stack: []string{"a website", "a whiteboard, digitized"}},
+	{File: "projects/spore-in-space.md", Lines: 19, Name: "Spore in Space", Year: "2026", Status: "shipped",
+		Blurb: "A browser roguelite about moss spores surviving 283 days outside the ISS.",
+		Body:  "Final project for a biology course: a small roguelite that dramatises a 2025 iScience study of moss spores exposed on the outside of the space station, with an in-game 'About the science' panel that cites the paper.",
+		Stack: []string{"TypeScript", "Canvas", "one iScience paper"}},
+	{File: "projects/imc-prosperity.md", Lines: 16, Name: "IMC Prosperity 4", Year: "2026", Status: "done",
+		Blurb: "Algorithmic trading competition: a local backtester and round-by-round strategies.",
+		Body:  "Built a local backtesting environment and market-making and mean-reversion strategies in Python for IMC's Prosperity 4, April 2026.",
+		Stack: []string{"Python", "NumPy", "Pandas"}},
+	{File: "projects/cupboard-companion.md", Lines: 18, Name: "Cupboard Companion", Year: "2026", Status: "shipped",
+		Blurb: "A pantry, grocery, and meal-plan hub that recognises what is in the photo.",
+		Body:  "Recognises items and meals from photos, deducts stock as you cook, saves recipes, and places delivery orders. Built for the AI Integration Program, winter 2026.",
+		Stack: []string{"Next.js", "TypeScript", "a vision model"}},
+	{File: "projects/sophisticated-style.md", Lines: 21, Name: "sophisticated.style", Year: "2026", Status: "paused",
+		Blurb: "A design-contract framework for AI-generated interfaces.",
+		Body:  "A multi-page concept canvas and a DESIGN.md compiler: tune density, type scale, and radius visually, and it emits a markdown design contract an agent can follow. Paused while the idea settles.",
+		Stack: []string{"TypeScript", "React", "a compiler for taste"}},
+	{File: "projects/spatial-creator-suite.md", Lines: 14, Name: "Spatial Creator Suite", Year: "2026", Status: "paused",
+		Blurb: "A two-module spatial creation app for XREAL One Pro, specified but not built.",
+		Body:  "An offline 3D audio mixing stage and a floating photo darkroom sharing one gesture engine, designed for the XREAL One Pro. Shelved at the design stage; the spec is the artefact.",
+		Stack: []string{"design", "XREAL", "a gesture engine on paper"}},
+	{File: "projects/tapdance.md", Lines: 17, Name: "TapDance", Year: "2025 –", Status: "wip",
+		Blurb: "A typing-test site with ten-plus custom test modes, inspired by monkeytype.",
+		Body:  "A highly customisable suite of typing tests, started as a static practice site (55 commits) and growing into TapDance. Andy types fast on his own layout, so the tests had to be stranger than the usual.",
+		Stack: []string{"TypeScript", "static site", "a keyboard layout of his own"}},
+	{File: "projects/betelgeuse.md", Lines: 13, Name: "Betelgeuse", Year: "2026", Status: "abandoned",
+		Blurb: "A modular native web browser. It did not survive the quarter.",
+		Body:  "A native Slint and Dioxus UI layer that skipped JavaScript DOM rendering for the browser chrome. Abandoned in March 2026, which is the honest word; the idea was bigger than the term.",
+		Stack: []string{"Rust", "Slint", "Dioxus"}},
+	{File: "projects/sprout.md", Lines: 11, Name: "Sprout", Year: "2023 – 2024", Status: "done",
+		Blurb: "A business plan for a localized tutoring startup, written in high school.",
+		Body:  "Executive summary, products, operations, marketing, and projections for a tutoring startup, co-written with a five-person high-school team.",
+		Stack: []string{"a plan", "a team of five"}},
 }
 
 var Verbs = []string{"Caffeinating", "Percolating", "Not sleeping", "Reticulating", "Pondering", "Compiling", "Mulling", "Brewing", "Vibing", "Herding statutes", "Smashing", "Noodling", "Marinating", "Cogitating", "Clearing the court", "Simmering", "Shucking", "Debugging life", "Transmuting", "Honking"}
@@ -108,37 +141,42 @@ var Experiences = []Experience{
 	{"education", "Queens High School for the Sciences at York College", "Advanced Regents Diploma", "2020-09", "2024-06", "Flushing, Queens; 4.00."},
 }
 
-type Command struct{ Name, Desc string }
+type Command struct{ Name, Desc, Group string }
+
+// Groups keep /help and the slash menu readable as the list grows.
+var Groups = []string{"andy", "session", "tools", "fun", "server"}
 
 var Commands = []Command{
-	{"/now", "what is running"},
-	{"/experience", "the whole log, like git log"},
-	{"/about", "who andy is"},
-	{"/projects", "read the work"},
-	{"/contact", "email, github, linkedin"},
-	{"/web", "the one with pixels"},
-	{"/agent", "claude · codex · agy"},
-	{"/whoami", "what the server sees"},
-	{"/uptime", "how long this has been up"},
-	{"/context", "how full the cups are"},
-	{"/coffee", "brew one"},
-	{"/fortune", "a small truth"},
-	{"/badminton", "one rally"},
-	{"/matrix", "you know"},
-	{"/agents", "the roster"},
-	{"/mcp", "connected servers"},
-	{"/skills", "what he can do"},
-	{"/skill", "run one"},
-	{"/effort", "low · medium · high · max"},
-	{"/tab", "new · next · prev · close"},
-	{"/status", "account and session"},
-	{"/doctor", "diagnostics"},
-	{"/login", "there is no login"},
-	{"/feedback", "rate the session"},
-	{"/inbox", "what visitors said (owner)"},
-	{"/help", "this list"},
-	{"/model", "which andy is this"},
-	{"/cost", "what this session cost"},
-	{"/clear", "clear the screen"},
-	{"/exit", "leave"},
+	{"/now", "what is running", "andy"},
+	{"/projects", "pick one, or all", "andy"},
+	{"/experience", "everything, like git log", "andy"},
+	{"/about", "who andy is", "andy"},
+	{"/contact", "email, github, linkedin", "andy"},
+	{"/web", "the one with pixels", "andy"},
+	{"/agent", "claude · codex · agy", "session"},
+	{"/model", "which andy is this", "session"},
+	{"/effort", "low · medium · high · max", "session"},
+	{"/config", "settings, cycled in place", "session"},
+	{"/tab", "tabs", "session"},
+	{"/status", "account and session", "session"},
+	{"/cost", "what this session cost", "session"},
+	{"/clear", "clear the screen", "session"},
+	{"/exit", "leave", "session"},
+	{"/agents", "the roster", "tools"},
+	{"/mcp", "connected servers", "tools"},
+	{"/skills", "what he can do", "tools"},
+	{"/skill", "run one", "tools"},
+	{"/doctor", "diagnostics", "tools"},
+	{"/login", "there is no login", "tools"},
+	{"/feedback", "rate the session", "tools"},
+	{"/inbox", "what visitors said (owner)", "tools"},
+	{"/help", "this list", "tools"},
+	{"/coffee", "brew one", "fun"},
+	{"/badminton", "one rally", "fun"},
+	{"/matrix", "you know", "fun"},
+	{"/fortune", "a small truth", "fun"},
+	{"/party", "you know that too", "fun"},
+	{"/whoami", "what the server sees", "server"},
+	{"/uptime", "how long this has been up", "server"},
+	{"/context", "how full the cups are", "server"},
 }

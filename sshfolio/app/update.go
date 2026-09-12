@@ -66,11 +66,52 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.switchTab((m.active - 1 + len(m.tabs)) % len(m.tabs))
 			return m, nil
 		case tea.KeyEsc:
+			if m.pick != nil { // close the picker, nothing else
+				m.pick = nil
+				m.live = ""
+				return m, nil
+			}
+			if m.ask { // esc dismisses the rating prompt
+				m.ask = false
+				m.live = ""
+				m.transcript = append(m.transcript, m.st.Dim.Render("(rating dismissed)"))
+				return m, nil
+			}
 			if m.running() {
 				m.skip = true
 				return m, nil
 			}
 			m.in.SetValue("")
+			return m, nil
+		}
+		if m.pick != nil { // a picker owns the keys until closed
+			p := m.pick
+			k := msg.String()
+			switch {
+			case k == "up" || k == "k" || k == "shift+tab":
+				p.Sel = (p.Sel - 1 + len(p.Items)) % len(p.Items)
+			case k == "down" || k == "j" || k == "tab":
+				p.Sel = (p.Sel + 1) % len(p.Items)
+			case k == "esc" || k == "q":
+				m.pick = nil
+			case k == "enter" || k == " ":
+				it := p.Items[p.Sel]
+				if it.Cycle != nil {
+					it.Cycle(&m)
+					if p.Rebuild != nil {
+						p.Items = p.Rebuild(&m)
+					}
+				} else if it.Run != nil {
+					m.pick = nil
+					m.live = ""
+					m.transcript = append(m.transcript, m.st.Dim.Render("› "+it.Label))
+					if steps := it.Run(&m); steps != nil {
+						m.queue = append(steps, m.queue...)
+					}
+				}
+			case len(k) == 1 && k[0] >= '1' && k[0] <= '9' && int(k[0]-'1') < len(p.Items):
+				p.Sel = int(k[0] - '1')
+			}
 			return m, nil
 		}
 		if m.ask { // the feedback prompt owns the keys until answered
@@ -219,7 +260,7 @@ func (m *Model) menuItems() []Command {
 		cmd, rest := v[:i], strings.TrimLeft(v[i:], " ")
 		for _, o := range ArgOptions[cmd] {
 			if strings.HasPrefix(o.Name, rest) {
-				out = append(out, Command{cmd + " " + o.Name, o.Desc})
+				out = append(out, Command{cmd + " " + o.Name, o.Desc, ""})
 			}
 		}
 		if m.menuSel >= len(out) {
@@ -369,6 +410,17 @@ func (m *Model) stepTick() (done bool, quit bool) {
 			return true, false
 		}
 		m.live = m.renderAgents(s.agents, ms, false)
+		return false, false
+	case stPick:
+		if m.pick == nil && ms < 50 { // just arrived
+			m.pick = s.pick
+			m.in.Blur()
+		}
+		if m.pick == nil { // closed
+			m.live = ""
+			return true, false
+		}
+		m.live = m.renderPicker(m.pick)
 		return false, false
 	case stAsk:
 		if !m.ask && ms < 50 { // just arrived

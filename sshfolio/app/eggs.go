@@ -414,7 +414,7 @@ func (m *Model) renderExperience() string {
 			}
 		}
 	}
-	b.WriteString(st.Dimmer.Render(fmt.Sprintf("(%d entries · LawBandit dates are from the résumé bank and may be a year off · /now for what is running)", len(Experiences))))
+	b.WriteString(st.Dimmer.Render(fmt.Sprintf("(%d entries · /now for what is running · /projects for the work)", len(Experiences))))
 	return b.String()
 }
 

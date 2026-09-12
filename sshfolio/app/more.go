@@ -13,10 +13,10 @@ import (
 
 // ArgOptions are the completions offered after a command and a space.
 var ArgOptions = map[string][]Command{
-	"/agent":  {{"claude", "the cup"}, {"codex", ">_ and a › prompt"}, {"agy", "antigravity, gradient wordmark"}},
-	"/effort": {{"low", "quick answers"}, {"medium", "the default"}, {"high", "thinks longer"}, {"max", "ultrathink"}},
-	"/tab":    {{"new", "open a tab"}, {"next", "switch forward"}, {"prev", "switch back"}, {"close", "close this tab"}},
-	"/skill":  {{"speedcubing", "sub-20, most days"}, {"mandarin", "native"}, {"typing", "fast, tap-dance layout"}, {"photography", "film and phone"}, {"badminton", "every open gym"}, {"caffeine", "load-bearing"}},
+	"/agent":  {{"claude", "the cup", ""}, {"codex", ">_ and a › prompt", ""}, {"agy", "antigravity, gradient wordmark", ""}},
+	"/effort": {{"low", "quick answers", ""}, {"medium", "the default", ""}, {"high", "thinks longer", ""}, {"max", "ultrathink", ""}},
+	"/tab":    {{"new", "open a tab", ""}, {"next", "switch forward", ""}, {"prev", "switch back", ""}, {"close", "close this tab", ""}},
+	"/skill":  {{"speedcubing", "sub-20, most days", ""}, {"mandarin", "native", ""}, {"typing", "fast, tap-dance layout", ""}, {"photography", "film and phone", ""}, {"badminton", "every open gym", ""}, {"caffeine", "load-bearing", ""}},
 }
 
 // argHint is the dim placeholder shown after a bare command that takes arguments.

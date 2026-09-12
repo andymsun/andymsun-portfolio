@@ -7,6 +7,7 @@ type Styles struct {
 	ClayColor, DimmerColor lipgloss.Color
 
 	Fg, Bold, Dim, Dimmer, Clay, Ok lipgloss.Style
+	Green, Yellow, Red              lipgloss.Style
 	Box, Card, Welcome              lipgloss.Style
 }
 
@@ -22,6 +23,9 @@ func NewStyles(r *lipgloss.Renderer, accent, ok lipgloss.Color) *Styles {
 	s.Dimmer = r.NewStyle().Foreground(dimmer)
 	s.Clay = r.NewStyle().Foreground(clay)
 	s.Ok = r.NewStyle().Foreground(ok)
+	s.Green = r.NewStyle().Foreground(lipgloss.Color("#7fb069"))
+	s.Yellow = r.NewStyle().Foreground(lipgloss.Color("#e3b341"))
+	s.Red = r.NewStyle().Foreground(lipgloss.Color("#f87171"))
 	s.Box = r.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(clay).Padding(0, 1)
 	s.Card = r.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(dimmer).BorderLeftForeground(clay).Padding(0, 1)
 	s.Welcome = r.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(clay).Padding(0, 1)

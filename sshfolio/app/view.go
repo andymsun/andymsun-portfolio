@@ -97,10 +97,25 @@ func (m Model) View() string {
 	// transcript
 	b.WriteString(m.vp.View() + "\n")
 
-	// slash menu
+	// slash menu: a window of eight rows around the selection
 	if items := m.menuItems(); len(items) > 0 {
 		b.WriteString("\n")
-		for i, c := range items {
+		start := 0
+		if len(items) > 8 && m.menuSel > 3 {
+			start = m.menuSel - 3
+			if start > len(items)-8 {
+				start = len(items) - 8
+			}
+		}
+		end := start + 8
+		if end > len(items) {
+			end = len(items)
+		}
+		if len(items) > 8 {
+			b.WriteString("   " + st.Dimmer.Render(fmt.Sprintf("↑↓ · %d of %d · keep typing to filter", m.menuSel+1, len(items))) + "\n")
+		}
+		for i := start; i < end; i++ {
+			c := items[i]
 			pad := 16 - len([]rune(c.Name))
 			if pad < 1 {
 				pad = 1
@@ -139,6 +154,8 @@ func (m Model) View() string {
 	switch {
 	case m.status != "":
 		r = st.Clay.Render(m.status)
+	case m.pick != nil:
+		r = st.Dimmer.Render("↑↓ enter esc")
 	case m.ask:
 		r = st.Dimmer.Render("0–3 to answer")
 	case m.booting:
@@ -147,6 +164,9 @@ func (m Model) View() string {
 		r = st.Dimmer.Render("esc to interrupt")
 	default:
 		r = st.Dimmer.Render("the real thing is on the web too: andymsun.com")
+	}
+	if m.quietStatus && m.pick == nil && !m.ask {
+		r = ""
 	}
 	gap = m.width - lipgloss.Width(l) - lipgloss.Width(r) - 1
 	if gap < 1 {
@@ -236,10 +256,14 @@ func (m *Model) renderCard(p *Project) string {
 	title := m.st.Bold.Render(p.Name)
 	year := m.st.Dim.Render(p.Year)
 	gap := w - lipgloss.Width(title) - lipgloss.Width(year)
+	_ = gap
 	if gap < 1 {
 		gap = 1
 	}
 	b.WriteString(title + strings.Repeat(" ", gap) + year + "\n")
+	if p.Status != "" {
+		b.WriteString(m.dotStyle(statusDot(p.Status)) + " " + m.st.Dim.Render(p.Status) + "\n")
+	}
 	b.WriteString(m.st.Clay.Render(wrap(p.Blurb, w)) + "\n\n")
 	b.WriteString(m.st.Fg.Render(wrap(p.Body, w)))
 	b.WriteString("\n\n" + m.st.Dim.Render(wrap(strings.Join(p.Stack, " · "), w)))
@@ -287,18 +311,29 @@ func (m *Model) renderRaw(kind string) string {
 	case "welcome":
 		return welcomeMark
 	case "help":
-		var b strings.Builder
-		for i, c := range Commands {
-			if i > 0 {
-				b.WriteString("\n")
+		// grouped, two columns of groups so it does not scroll off the screen
+		var cols []string
+		for _, g := range Groups {
+			var b strings.Builder
+			b.WriteString(st.Fg.Render(g) + "\n")
+			for _, c := range Commands {
+				if c.Group != g {
+					continue
+				}
+				pad := 12 - len([]rune(c.Name))
+				if pad < 1 {
+					pad = 1
+				}
+				b.WriteString(st.Clay.Render(c.Name+strings.Repeat(" ", pad)) + st.Dim.Render(c.Desc) + "\n")
 			}
-			pad := 12 - len([]rune(c.Name))
-			if pad < 1 {
-				pad = 1
-			}
-			b.WriteString("  " + st.Clay.Render(c.Name+strings.Repeat(" ", pad)) + st.Dim.Render(c.Desc))
+			cols = append(cols, strings.TrimRight(b.String(), "\n"))
 		}
-		return b.String()
+		if m.width < 100 {
+			return strings.Join(cols, "\n\n")
+		}
+		left := lipgloss.JoinVertical(lipgloss.Left, cols[0], "", cols[3], "", cols[4])
+		right := lipgloss.JoinVertical(lipgloss.Left, cols[1], "", cols[2])
+		return lipgloss.JoinHorizontal(lipgloss.Top, left, "      ", right)
 	case "contact":
 		return hang(st.Fg.Render("⏺")+" ",
 			st.Dim.Render("email    ")+st.Fg.Render("andy@andymsun.com")+"\n"+

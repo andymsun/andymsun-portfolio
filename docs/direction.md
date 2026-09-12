@@ -99,6 +99,14 @@ Round three keeps the agent and rebuilds the frame around nine borrowed details
   connects with the owner key.
 - Argument completion after a space (`/agent co` → `/agent codex`) and a dim
   `<claude|codex|agy>` hint after a bare command.
+- Clutter control: `/help` is grouped into five categories and laid out in two
+  columns; the slash menu shows a window of eight rows with "x of N"; `/projects`
+  opens a picker instead of dumping fourteen cards. The picker is the same tiny
+  menu the real CLI uses for `/model` and `/config`, and it backs `/agent`,
+  `/model`, `/effort`, `/tab`, `/skill`, and `/config` here.
+- Project status has a colour, everywhere a project appears: green shipped or
+  active, yellow in progress or paused, red abandoned. Fourteen projects now,
+  including Betelgeuse (red) and the paused design work (yellow).
 - The visitor counter was seeded at 3,532 on 2026-09-12 to account for the
   months before it existed; it counts honestly from there.
 

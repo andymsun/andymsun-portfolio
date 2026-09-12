@@ -23,6 +23,7 @@ const (
 	stAnim                     // an animation in the live slot for ms
 	stAgents                   // parallel subagents, then done
 	stAsk                      // the feedback prompt; done when answered
+	stPick                     // a picker menu; done when closed
 )
 
 type step struct {
@@ -34,6 +35,7 @@ type step struct {
 	fn, arg, res string
 	proj         *Project
 	agents       []subagent
+	pick         *picker
 }
 
 func think(ms int) step             { return step{kind: stThink, ms: ms} }
@@ -63,7 +65,7 @@ func (m *Model) handle(text string) []step {
 	cmd := strings.ToLower(strings.Fields(text + " ")[0])
 	switch cmd {
 	case "/help", "?":
-		return []step{say("Things I can do:"), raw("help"), say("Or just ask something. I only know about Andy, so keep it on topic.")}
+		return []step{raw("help"), sayPlain("Or just ask something. I only know about Andy. Type / and keep typing to filter the menu.")}
 	case "/now":
 		return []step{think(500), tool("Bash", "ps -o pid,stat,tag,cmd", fmt.Sprintf("%d processes", len(Now))), raw("now")}
 	case "/experience", "/history", "/cv":
@@ -75,16 +77,34 @@ func (m *Model) handle(text string) []step {
 		}
 		return append(s, say("For what he is doing right now, /now."))
 	case "/projects":
-		names := make([]string, len(Projects))
-		for i, p := range Projects {
-			names[i] = strings.ToLower(p.Name)
+		arg := ""
+		if f := strings.Fields(text); len(f) > 1 {
+			arg = strings.ToLower(strings.Join(f[1:], " "))
 		}
-		s := []step{think(600), say("Spawning five Explore subagents, one per project."), agents(names...)}
-		for i := range Projects {
-			p := &Projects[i]
-			s = append(s, tool("Read", p.File, fmt.Sprintf("Read %d lines", p.Lines)), card(p))
+		if arg == "all" {
+			names := make([]string, len(Projects))
+			for i, p := range Projects {
+				names[i] = strings.ToLower(p.Name)
+			}
+			s := []step{think(600), say(fmt.Sprintf("Spawning %d Explore subagents, one per project.", len(Projects))), agents(names...)}
+			for i := range Projects {
+				p := &Projects[i]
+				s = append(s, tool("Read", p.File, fmt.Sprintf("Read %d lines", p.Lines)), card(p))
+			}
+			return append(s, sayAs("All of them. Green shipped, yellow in progress, red abandoned; the abandoned one stays in the list on purpose.", "ok"))
 		}
-		return append(s, sayAs("Five entries. Lawvics and Rivendell are the loud ones; sshfolio is the one you are inside of.", "ok"))
+		if arg != "" {
+			for i := range Projects {
+				p := &Projects[i]
+				if strings.Contains(strings.ToLower(p.Name), arg) {
+					return []step{tool("Read", p.File, fmt.Sprintf("Read %d lines", p.Lines)), card(p)}
+				}
+			}
+			return []step{say("No project called " + arg + ". /projects opens the list.")}
+		}
+		return []step{pickStep(m.projectPicker())}
+	case "/config":
+		return []step{pickStep(m.configPicker())}
 	case "/agents":
 		return []step{raw("agents")}
 	case "/mcp":
@@ -110,14 +130,14 @@ func (m *Model) handle(text string) []step {
 		case "caffeine":
 			return m.handle("/coffee")
 		}
-		return []step{say("Which one? /skills lists them, or /skill <name>.")}
+		return []step{pickStep(m.skillPicker())}
 	case "/effort":
 		lvl := ""
 		if f := strings.Fields(text); len(f) > 1 {
 			lvl = strings.ToLower(f[1])
 		}
 		if _, ok := effortFactor[lvl]; !ok {
-			return []step{say("Effort is " + m.effort + ". Levels: low, medium, high, max. Max is called ultrathink and is not faster.")}
+			return []step{pickStep(m.effortPicker())}
 		}
 		m.effort = lvl
 		msg := map[string]string{"low": "Effort: low. Short answers, short spinners.", "medium": "Effort: medium. The default.", "high": "Effort: high. Longer spinners, same Andy.", "max": "Effort: max. Ultrathink engaged. The token counter will now be ridiculous."}[lvl]
@@ -147,7 +167,7 @@ func (m *Model) handle(text string) []step {
 			m.switchTab(n - 1)
 			return nil
 		}
-		return []step{say(fmt.Sprintf("%d tab(s). /tab new, next, prev, close, or a number. Ctrl-T, Ctrl-N, Ctrl-P do the same.", len(m.tabs)))}
+		return []step{pickStep(m.tabPicker())}
 	case "/status":
 		return []step{raw("status")}
 	case "/doctor":
@@ -171,7 +191,7 @@ func (m *Model) handle(text string) []step {
 			arg = strings.ToLower(f[1])
 		}
 		if _, ok := Personas[arg]; !ok {
-			return []step{say("Skins for the same agent: claude (the cup), codex, agy. Try \"/agent codex\". You are on " + m.p.Key + ".")}
+			return []step{pickStep(m.agentPicker())}
 		}
 		m.setPersona(arg)
 		return []step{raw("welcome"), say("Now dressed as " + m.p.Name + ". Same Andy underneath.")}
@@ -195,7 +215,7 @@ func (m *Model) handle(text string) []step {
 	case "/party":
 		return m.partySteps()
 	case "/model":
-		return []step{say(m.p.Model + ". Context window: two cups of coffee. Knowledge cutoff: whenever he last slept.")}
+		return []step{pickStep(m.modelPicker())}
 	case "/cost":
 		secs := int(m.uptime().Seconds())
 		return []step{say(fmt.Sprintf("Session: %ds wall time, ≈ %.1f coffees, $0.00. Andy is a student; this runs on a €5 VPS.", secs, float64(secs)/900+1))}

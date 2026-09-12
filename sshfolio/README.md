@@ -30,7 +30,8 @@ with the project cards), then hands over the prompt. `esc` skips the intro.
 | `/coffee` `/badminton` `/matrix` `/fortune` | brew a cup (adds a cup to your context), one rally, three seconds of rain, a small truth |
 | `ls` `cat about.md` `pwd` `cd` `sudo …` `rm -rf /` `vim` `git status` `top` `ping` `neofetch` `man andy` `date` `echo` `exit` | it is not a shell, but it answers like one |
 | `↑↑↓↓←→←→BA` or `/party` | rainbow header, confetti, unhinged spinner verbs; again to stop |
-| `/projects` | now spawns five `Task(Explore …)` subagents in parallel before the cards |
+| `/projects` | opens a picker (↑↓, enter, esc, digits): fourteen projects with a status dot, green shipped or active, yellow in progress or paused, red abandoned. `/projects <name>` opens one; `/projects all` spawns a subagent per project and reads every file |
+| `/config` `/model`, and `/agent` `/effort` `/tab` `/skill` with no argument | the same tiny menu; `/config` rows cycle in place (skin, effort, party, status hints, cups) |
 | `/agents` `/mcp` `/skills` `/skill <name>` `/status` `/doctor` `/login` | the roster, connected servers, skills, account and session, diagnostics, a login that isn't |
 | `/effort low|medium|high|max` | scales thinking time; `max` is ultrathink and shows in the spinner |
 | `/tab new|next|prev|close|N`, `Ctrl-T` `Ctrl-N` `Ctrl-P` | tabs, each with its own transcript and skin; strip in the header |
@@ -55,6 +56,7 @@ app/content.go   everything the agent knows: about, /now, projects, verbs, comma
 app/persona.go   the three skins (claude with the cup, codex, agy) and the cup frames
 app/eggs.go      fake shell, animations (brew, rally, matrix, confetti), fortunes, neofetch, visitor counter
 app/more.go      argument completion, effort, subagents, feedback prompt, mcp/skills/status/doctor/login, tabs
+app/picker.go    the tiny menu: project, agent, model, effort, skill, tab, and config pickers
 app/feedback.go  the feedback log (write, read, /inbox)
 app/steps.go     command handlers; each returns a list of steps (think, say, tool, card…)
 app/update.go    bubbletea update loop, key handling, step playback

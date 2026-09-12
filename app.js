@@ -75,47 +75,83 @@
     ]],
   ];
   const PROJECTS = [
-    { file: 'projects/lawvics.md', lines: 31, name: 'Lawvics', year: '2026', figure: 'swarm',
+    { file: 'projects/lawvics.md', lines: 31, name: 'Lawvics', year: '2026', status: 'shipped', figure: 'swarm',
       blurb: 'One legal question, answered across all 50 states.',
       body: 'Built in under 48 hours; finalist at the UChicago Vibe Coding Hackathon. One agent turns a question into fifty jurisdiction-specific searches and runs them in five batches. A second agent audits every result: schema checks, citation format, and a flag for statutes that may have been repealed. A D3 map colors each state as its answer lands.',
       stack: 'Next.js 16 · React 19 · TypeScript · Vercel AI SDK · Zod · Zustand · D3',
       links: [['source', 'https://github.com/andymsun/lawvics'], ['demo', 'https://lawvics.vercel.app']] },
-    { file: 'projects/rivendell.md', lines: 22, name: 'Rivendell', year: '2026',
+    { file: 'projects/rivendell.md', lines: 22, name: 'Rivendell', year: '2026', status: 'shipped',
       blurb: 'A live 3D map of everything moving around the planet.',
       body: '8,000+ satellites, 6,000+ flights, and 500+ vessels drawn on Google’s photorealistic 3D tiles, fed from several live sources at once. The hard parts were on the client: thousands of moving objects at 60 fps and a scene that stays readable at every zoom level.',
       stack: 'Next.js · TypeScript · React · Three.js · Google 3D Tiles', links: [] },
-    { file: 'projects/sshfolio.md', lines: 27, name: 'sshfolio', year: '2026',
+    { file: 'projects/sshfolio.md', lines: 27, name: 'sshfolio', year: '2026', status: 'active',
       blurb: 'This agent, but real, and over ssh.',
       body: 'A Go SSH server that gives every connection a program instead of a shell: the same prompt, the same slash commands, the same spinner. No account, nothing to install, Ctrl-C twice to leave. Runs on a small VPS whose real sshd was moved off port 22 so visitors get the app.',
       stack: 'Go · bubbletea · wish · lipgloss',
       links: [['source', 'https://github.com/andymsun/andymsun-portfolio'], ['connect', '#ssh']] },
-    { file: 'projects/psiren.md', lines: 24, name: 'pSiren', year: '2025 –',
+    { file: 'projects/psiren.md', lines: 24, name: 'pSiren', year: '2025 –', status: 'wip',
       blurb: 'Take a finished song apart and rebuild it with different voices.',
       body: 'A music workspace for one person who wants the reach of a band. Separates a recording into vocal, instruments, and room, converts the lead with a voice model, and remixes over the original accompaniment, on an Apple Silicon laptop. In progress: per-instrument separation and instrument swaps that keep the notes and change the timbre.',
       stack: 'Python · PyTorch (MPS) · Mel-Band Roformer · RVC', links: [] },
-    { file: 'projects/badminton.md', lines: 12, name: 'UChicago Badminton', year: '2025 –',
+    { file: 'projects/badminton.md', lines: 12, name: 'UChicago Badminton', year: '2025 –', status: 'active',
       blurb: 'Club website and a live play board for open gym.',
       body: 'Logistics officer for a 100+ member club: dues, registrations, suppliers, a regional tournament, and the board that shows who is on which court. The improvements come from being at every open gym and watching where people get stuck.',
       stack: 'a website · a whiteboard, digitized', links: [] },
+    { file: 'projects/spore-in-space.md', lines: 19, name: 'Spore in Space', year: '2026', status: 'shipped',
+      blurb: 'A browser roguelite about moss spores surviving 283 days outside the ISS.',
+      body: 'Final project for a biology course: a small roguelite that dramatises a 2025 iScience study of moss spores exposed on the outside of the space station, with an in-game “About the science” panel that cites the paper.',
+      stack: 'TypeScript · Canvas · one iScience paper', links: [] },
+    { file: 'projects/imc-prosperity.md', lines: 16, name: 'IMC Prosperity 4', year: '2026', status: 'done',
+      blurb: 'Algorithmic trading competition: a local backtester and round-by-round strategies.',
+      body: 'Built a local backtesting environment and market-making and mean-reversion strategies in Python for IMC’s Prosperity 4, April 2026.',
+      stack: 'Python · NumPy · Pandas', links: [] },
+    { file: 'projects/cupboard-companion.md', lines: 18, name: 'Cupboard Companion', year: '2026', status: 'shipped',
+      blurb: 'A pantry, grocery, and meal-plan hub that recognises what is in the photo.',
+      body: 'Recognises items and meals from photos, deducts stock as you cook, saves recipes, and places delivery orders. Built for the AI Integration Program, winter 2026.',
+      stack: 'Next.js · TypeScript · a vision model', links: [] },
+    { file: 'projects/sophisticated-style.md', lines: 21, name: 'sophisticated.style', year: '2026', status: 'paused',
+      blurb: 'A design-contract framework for AI-generated interfaces.',
+      body: 'A multi-page concept canvas and a DESIGN.md compiler: tune density, type scale, and radius visually, and it emits a markdown design contract an agent can follow. Paused while the idea settles.',
+      stack: 'TypeScript · React · a compiler for taste', links: [] },
+    { file: 'projects/spatial-creator-suite.md', lines: 14, name: 'Spatial Creator Suite', year: '2026', status: 'paused',
+      blurb: 'A two-module spatial creation app for XREAL One Pro, specified but not built.',
+      body: 'An offline 3D audio mixing stage and a floating photo darkroom sharing one gesture engine, designed for the XREAL One Pro. Shelved at the design stage; the spec is the artefact.',
+      stack: 'design · XREAL · a gesture engine on paper', links: [] },
+    { file: 'projects/tapdance.md', lines: 17, name: 'TapDance', year: '2025 –', status: 'wip',
+      blurb: 'A typing-test site with ten-plus custom test modes, inspired by monkeytype.',
+      body: 'A highly customisable suite of typing tests, started as a static practice site (55 commits) and growing into TapDance. Andy types fast on his own layout, so the tests had to be stranger than the usual.',
+      stack: 'TypeScript · static site · a keyboard layout of his own', links: [] },
+    { file: 'projects/betelgeuse.md', lines: 13, name: 'Betelgeuse', year: '2026', status: 'abandoned',
+      blurb: 'A modular native web browser. It did not survive the quarter.',
+      body: 'A native Slint and Dioxus UI layer that skipped JavaScript DOM rendering for the browser chrome. Abandoned in March 2026, which is the honest word; the idea was bigger than the term.',
+      stack: 'Rust · Slint · Dioxus', links: [] },
+    { file: 'projects/sprout.md', lines: 11, name: 'Sprout', year: '2023 – 2024', status: 'done',
+      blurb: 'A business plan for a localized tutoring startup, written in high school.',
+      body: 'Executive summary, products, operations, marketing, and projections for a tutoring startup, co-written with a five-person high-school team.',
+      stack: 'a plan · a team of five', links: [] },
   ];
+  const DOT = { shipped: 'green', active: 'green', done: 'green', wip: 'yellow', paused: 'yellow', abandoned: 'red' };
   const VERBS = ['Caffeinating', 'Percolating', 'Not sleeping', 'Reticulating', 'Pondering', 'Compiling', 'Mulling', 'Brewing', 'Vibing', 'Herding statutes', 'Smashing', 'Noodling', 'Marinating', 'Cogitating', 'Clearing the court', 'Simmering', 'Shucking', 'Debugging life', 'Transmuting', 'Honking'];
   const GLYPHS = ['·', '✢', '✳', '✶', '✻', '✽', '✻', '✶', '✳', '✢'];
   const COMMANDS = [
-    ['/now', 'what is running'],
-    ['/experience', 'the whole log, like git log'],
-    ['/about', 'who andy is'],
-    ['/projects', 'read the work'],
-    ['/contact', 'email, github, linkedin'],
-    ['/ssh', 'the real one'],
-    ['/lights', 'turn them off'],
-    ['/help', 'this list'],
-    ['/theme', 'light / dark'],
-    ['/agent', 'claude · codex · agy'],
-    ['/model', 'which andy is this'],
-    ['/cost', 'what this session cost'],
-    ['/clear', 'clear the screen'],
-    ['/exit', 'you cannot'],
+    ['/now', 'what is running', 'andy'],
+    ['/projects', 'pick one, or all', 'andy'],
+    ['/experience', 'everything, like git log', 'andy'],
+    ['/about', 'who andy is', 'andy'],
+    ['/contact', 'email, github, linkedin', 'andy'],
+    ['/ssh', 'the real one', 'andy'],
+    ['/agent', 'claude · codex · agy', 'session'],
+    ['/model', 'which andy is this', 'session'],
+    ['/config', 'settings, cycled in place', 'session'],
+    ['/theme', 'page: light / dark', 'session'],
+    ['/cost', 'what this session cost', 'session'],
+    ['/clear', 'clear the screen', 'session'],
+    ['/exit', 'you cannot', 'session'],
+    ['/lights', 'turn them off', 'fun'],
+    ['/help', 'this list', 'tools'],
   ];
+  const GROUPS = ['andy', 'session', 'tools', 'fun'];
+  const ARGS = { '/agent': ['claude', 'codex', 'agy'] };
 
   // ---------------------------------------------------------------- personas
   // Three skins for the same agent: claude (default, with the cup), codex, agy (antigravity).
@@ -225,6 +261,7 @@
   function card(p) {
     const c = el('article', 'card');
     c.innerHTML = `<h3>${esc(p.name)}<span class="year">${esc(p.year)}</span></h3>
+      ${p.status ? `<p class="status"><i class="dot ${DOT[p.status]}"></i>${p.status}</p>` : ''}
       <p class="blurb">${esc(p.blurb)}</p>
       <p>${esc(p.body)}</p>
       <p class="stack">${esc(p.stack)}</p>
@@ -289,14 +326,59 @@
     return t;
   }
 
+  // ---------------------------------------------------------------- picker: the tiny menu
+  let activePick = null;
+  function picker(title, hint, items, opts) {
+    // items: {label, desc, dot, run(): steps | cycle()}; resolves when closed
+    return new Promise((resolve) => {
+      const box = add(el('div', 'pick'));
+      const pk = { items, sel: 0, box, resolve, rebuild: opts && opts.rebuild };
+      activePick = pk;
+      input.disabled = true;
+      pk.render = () => {
+        if (pk.rebuild) pk.items = pk.rebuild();
+        box.innerHTML = `<p class="t">${esc(title)} <span class="h">${esc(hint || '')}</span></p>` +
+          pk.items.map((it, i) => `<p class="row ${i === pk.sel ? 'sel' : ''}" data-i="${i}"><span class="n">${i === pk.sel ? '›' : i < 9 ? (i + 1) + '.' : ' '}</span><i class="dot ${it.dot || 'none'}"></i><span class="l">${esc(it.label)}</span><span class="d">${esc(it.desc || '')}</span></p>`).join('') +
+          `<p class="h">↑↓ · enter · esc · or click</p>`;
+        scrollDown();
+      };
+      pk.choose = async () => {
+        const it = pk.items[pk.sel];
+        if (it.cycle) { it.cycle(); pk.render(); return; }
+        pk.close();
+        add(el('p', 'msg user', '› ' + esc(it.label)));
+        if (it.run) await it.run();
+      };
+      pk.close = () => { activePick = null; box.classList.add('closed'); input.disabled = false; input.focus(); resolve(); };
+      box.addEventListener('click', (e) => { const r = e.target.closest('.row'); if (r) { pk.sel = Number(r.dataset.i); pk.render(); pk.choose(); } });
+      pk.render();
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (!activePick) return;
+    const pk = activePick, n = pk.items.length;
+    if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'Tab') { e.preventDefault(); pk.sel = (pk.sel + 1) % n; pk.render(); }
+    else if (e.key === 'ArrowUp' || e.key === 'k') { e.preventDefault(); pk.sel = (pk.sel - 1 + n) % n; pk.render(); }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pk.choose(); }
+    else if (e.key === 'Escape' || e.key === 'q') { e.preventDefault(); pk.close(); }
+    else if (/^[1-9]$/.test(e.key) && Number(e.key) <= n) { pk.sel = Number(e.key) - 1; pk.render(); }
+  }, true);
+  async function openProject(p) { await tool('Read', p.file, `Read ${p.lines} lines`, card(p)); }
+  const skinItems = (asModel) => ['claude', 'codex', 'agy'].map((k) => ({
+    label: asModel ? PERSONAS[k].model : PERSONAS[k].name, desc: asModel ? PERSONAS[k].name : PERSONAS[k].model, dot: P === PERSONAS[k] ? 'green' : 'dim',
+    run: () => HANDLERS['/agent'](k) }));
+
   // ---------------------------------------------------------------- commands
   const HANDLERS = {
     async '/help'() {
-      await say('Things I can do:');
-      const t = el('div', 'help-table');
-      for (const [k, d] of COMMANDS) { t.appendChild(el('span', 'k', esc(k))); t.appendChild(el('span', 'd', esc(d))); }
+      const t = el('div', 'help-groups');
+      for (const g of GROUPS) {
+        const col = el('div', 'grp', `<p class="g">${g}</p>`);
+        for (const [k, d, gg] of COMMANDS) if (gg === g) col.appendChild(el('p', '', `<span class="k">${esc(k)}</span><span class="d">${esc(d)}</span>`));
+        t.appendChild(col);
+      }
       add(t);
-      await say('Or just ask something. I only know about Andy, so keep it on topic.');
+      add(el('p', 'msg plain', 'Or just ask something. I only know about Andy. Type / and keep typing to filter the menu.'));
     },
     async '/now'() {
       await think(500);
@@ -314,11 +396,30 @@
       for (const p of ABOUT) await say(p);
       await say('For what he is doing right now, /now.');
     },
-    async '/projects'() {
-      await think(1100);
-      await say('Reading the project files.');
-      for (const p of PROJECTS) await tool('Read', p.file, `Read ${p.lines} lines`, card(p));
-      await say('Five entries. The Lawvics one has a figure you can run.', 'ok');
+    async '/projects'(arg) {
+      if (arg === 'all') {
+        await think(900);
+        await say(`Reading all ${PROJECTS.length} project files.`);
+        for (const p of PROJECTS) await openProject(p);
+        await say('All of them. Green shipped, yellow in progress, red abandoned; the abandoned one stays on purpose.', 'ok');
+        return;
+      }
+      if (arg) {
+        const p = PROJECTS.find((x) => x.name.toLowerCase().includes(arg));
+        if (p) { await openProject(p); return; }
+        await say(`No project called ${arg}. /projects opens the list.`); return;
+      }
+      await picker('Projects', 'green shipped · yellow in progress or paused · red abandoned',
+        PROJECTS.map((p) => ({ label: p.name, desc: `${p.year} · ${p.blurb}`, dot: DOT[p.status], run: () => openProject(p) }))
+          .concat([{ label: 'all of them', desc: 'read every file', dot: 'none', run: () => HANDLERS['/projects']('all') }]));
+    },
+    async '/model'() { await picker('Model', 'one Andy, three model names', skinItems(true)); },
+    async '/config'() {
+      await picker('Config', 'enter cycles a value', [], { rebuild: () => [
+        { label: 'skin', desc: P.name, dot: 'green', cycle: () => applyPersona({ claude: 'codex', codex: 'agy', agy: 'claude' }[document.getElementById('term').dataset.agent]) },
+        { label: 'page theme', desc: root.dataset.theme || 'system', dot: 'green', cycle: () => { const n = root.dataset.theme === 'dark' ? 'light' : 'dark'; root.dataset.theme = n; try { localStorage.setItem('theme', n); } catch (e) {} } },
+        { label: 'lights', desc: document.body.classList.contains('lights-out') ? 'off' : 'on', dot: document.body.classList.contains('lights-out') ? 'dim' : 'green', cycle: () => (document.body.classList.contains('lights-out') ? lightsOn() : lightsOff()) },
+      ] });
     },
     async '/contact'() {
       await think(500);
@@ -346,9 +447,8 @@
       try { localStorage.setItem('theme', next); } catch (e) {}
       await say(`Page theme: ${next}. The window stays dark; it is a terminal.`);
     },
-    async '/model'() { await say(`${P.model}. Context window: two cups of coffee. Knowledge cutoff: whenever he last slept.`); },
     async '/agent'(arg) {
-      if (!PERSONAS[arg]) { await say(`Skins for the same agent: claude (the cup), codex, agy. Try "/agent codex". You are on ${Object.keys(PERSONAS).find((k) => PERSONAS[k] === P)}.`); return; }
+      if (!PERSONAS[arg]) { await picker('Agent skin', 'same Andy underneath', skinItems(false)); return; }
       applyPersona(arg);
       log.innerHTML = '';
       welcome();
@@ -431,19 +531,30 @@
   let sel = 0;
   function renderMenu() {
     const v = input.value;
-    if (!v.startsWith('/') || v.includes(' ')) { menu.hidden = true; return; }
-    const items = COMMANDS.filter(([k]) => k.startsWith(v));
+    if (!v.startsWith('/')) { menu.hidden = true; return; }
+    let items;
+    const sp = v.indexOf(' ');
+    if (sp > 0) { // argument completion: "/agent co" -> "/agent codex"
+      const cmd = v.slice(0, sp), rest = v.slice(sp + 1).trimStart();
+      items = (ARGS[cmd] || []).filter((a) => a.startsWith(rest)).map((a) => [cmd + ' ' + a, '']);
+    } else items = COMMANDS.filter(([k]) => k.startsWith(v));
     if (!items.length) { menu.hidden = true; return; }
     sel = Math.min(sel, items.length - 1);
-    menu.innerHTML = items.map(([k, d], i) => `<li role="option" class="${i === sel ? 'sel' : ''}" data-k="${k}"><span class="k">${k}</span><span>${d}</span></li>`).join('');
+    let start = 0;
+    if (items.length > 8 && sel > 3) start = Math.min(sel - 3, items.length - 8);
+    const shown = items.slice(start, start + 8);
+    menu.innerHTML = (items.length > 8 ? `<li class="more">↑↓ · ${sel + 1} of ${items.length} · keep typing to filter</li>` : '') +
+      shown.map(([k, d], j) => { const i = start + j; return `<li role="option" class="${i === sel ? 'sel' : ''}" data-k="${k}"><span class="k">${k}</span><span>${d}</span></li>`; }).join('');
     menu.hidden = false;
   }
-  menu.addEventListener('click', (e) => { const li = e.target.closest('li'); if (li) { input.value = li.dataset.k; menu.hidden = true; form.requestSubmit(); } });
+  menu.addEventListener('click', (e) => { const li = e.target.closest('li[data-k]'); if (li) { input.value = li.dataset.k; menu.hidden = true; form.requestSubmit(); } });
   input.addEventListener('input', () => { sel = 0; renderMenu(); });
   const history = []; let hi = -1;
   input.addEventListener('keydown', (e) => {
     if (!menu.hidden) {
-      const n = menu.children.length, pick = menu.children[sel].dataset.k;
+      const rows = Array.from(menu.querySelectorAll('li[data-k]')), all = input.value.indexOf(' ') > 0 ? null : COMMANDS.filter(([k]) => k.startsWith(input.value));
+      const n = all ? all.length : (ARGS[input.value.slice(0, input.value.indexOf(' '))] || []).filter((a) => a.startsWith(input.value.slice(input.value.indexOf(' ') + 1).trimStart())).length;
+      const pick = all ? all[sel][0] : (rows.find((r) => r.classList.contains('sel')) || rows[0]).dataset.k;
       if (e.key === 'ArrowDown') { e.preventDefault(); sel = (sel + 1) % n; renderMenu(); return; }
       if (e.key === 'ArrowUp') { e.preventDefault(); sel = (sel - 1 + n) % n; renderMenu(); return; }
       if (e.key === 'Tab') { e.preventDefault(); input.value = pick; menu.hidden = true; return; }

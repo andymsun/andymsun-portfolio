@@ -28,6 +28,8 @@ type Model struct {
 	effort        string
 	ask           bool
 	pendingRating string // set after a rating, while we wait for an optional comment
+	pick          *picker
+	quietStatus   bool
 	awaitComment  bool
 	cmdCount      int
 	tabs          []tabState
