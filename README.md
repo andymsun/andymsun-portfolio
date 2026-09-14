@@ -2,12 +2,13 @@
 
 A portfolio that pretends to be a coding agent. It only knows about Andy.
 
-- **Web**: `index.html`, `style.css`, `app.js` in the repo root. A fake terminal
-  session that boots, asks itself who Andy is, reads the project files, and
-  then hands you the prompt. Slash commands, a completion menu, a spinner with
-  silly verbs, cards that unfold out of `Read()` calls, and a character grid
-  behind it that reacts to the mouse. No framework, no build step; Vercel serves
-  it as static files. `?fast` in the URL skips the animations.
+- **Web**: `index.html`, `style.css`, `app.js` in the repo root. An ordinary
+  scrollable page with a nav, sections, filter buttons, and expandable cards:
+  nothing is hidden behind a command, and every word is in the markup, so it
+  reads fine with JavaScript off. The terminal sits in the hero as a *demo*
+  that plays itself and can be typed into; its commands scroll the real page
+  rather than replacing it. No framework, no build step; Vercel serves it as
+  static files. `?fast` in the URL skips the animations.
 - **Terminal**: `sshfolio/`, the same agent in Go, served over ssh. Runs on a
   small Hetzner VPS on port 22, so `ssh ssh.andymsun.com` is the whole install.
 
@@ -24,13 +25,14 @@ PORT=2323 go run .                       # or serve it, then: ssh -p 2323 localh
 
 ## edit content
 
-The agent's knowledge is a couple of arrays, written twice:
+Content lives in two places and has to be changed in both:
 
-- `app.js` (web): `ABOUT`, `PROJECTS`, `VERBS`, `COMMANDS`, and the replies in `chat()`.
-- `sshfolio/app/content.go` and `steps.go` (terminal): the same names.
+- **Web**: the markup in `index.html` (Now list, project cards, experience
+  timeline, about, contact). `app.js` only holds the short demo script.
+- **Terminal**: `sshfolio/app/content.go` and `steps.go`.
 
-Change both. Merging them into one JSON file both sides read is the first item
-in `docs/direction.md`.
+Merging them into one source both sides read is the first item in
+`docs/direction.md`.
 
 ## deploy
 

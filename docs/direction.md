@@ -22,6 +22,38 @@ same behaviour. The Claude Code homage is deliberate and named as such; the
 prompt box, the `⏺` bullets, the `⎿` results, the verbs, and the `Ctrl-C again`
 line are all lifted. Nothing else is.
 
+## the split: one portfolio, two audiences
+
+Rounds two and three made the website *be* the terminal. That was fun and it
+was wrong: a visitor had to learn commands before they saw any work. Round four
+separates the jobs.
+
+**The website is a website.** A sticky nav, five sections, and every word in the
+markup:
+
+- **Hero**: one sentence about what Andy does, two about where he is now, the
+  `ssh` command with a copy button, and the terminal beside it as a *demo* that
+  plays itself. The demo is typeable, and its commands (`/projects`,
+  `/experience`, `/now`) scroll the real page instead of replacing it, so the
+  toy and the page never disagree.
+- **Now**: ten rows, status dot, role, one line, dates.
+- **Work**: fourteen cards in a grid, filtered by ordinary buttons (All,
+  Shipped, In progress, Abandoned), each expanding with `<details>`. The Lawvics
+  card holds the interactive swarm figure.
+- **Experience**: a timeline. Jobs, research, and education are open; the older
+  groups are collapsed behind labelled disclosures.
+- **About** and **Contact**: prose, a facts table, and links.
+- Footer: what it runs on, a colophon, and the marquee.
+
+Everything is readable with JavaScript off, by scrolling, on a phone. Nothing
+requires a keyboard. The traffic-light easter eggs, the coffee cup, the status
+colours, and the visitor marquee all survive.
+
+**The ssh program stays exactly as it was**: pickers, subagents, skins, effort
+levels, tabs, `/mcp`, `/skills`, the fake shell, the animations, the feedback
+log. That is where the learning curve belongs, because the people who type
+`ssh ssh.andymsun.com` are asking for one.
+
 ## what changed (round three)
 
 Round two was a full-screen glassy terminal with a pointer-reactive dot field,

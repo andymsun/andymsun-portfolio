@@ -4,12 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Andy Sun</title>
-  <meta name="description" content="Andy Sun. CS and applied math at UChicago. This site is a terminal agent that only knows about Andy; the real one is ssh ssh.andymsun.com." />
+  <meta name="description" content="Andy Sun. Computer science and applied math at the University of Chicago. Interfaces, terminals, and evaluation work. Also reachable at ssh ssh.andymsun.com." />
   <meta name="color-scheme" content="light dark" />
   <meta name="theme-color" content="#efeeea" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#131312" media="(prefers-color-scheme: dark)" />
   <meta property="og:title" content="Andy Sun" />
-  <meta property="og:description" content="andy@ssh.andymsun.com: a portfolio you can ssh into." />
+  <meta property="og:description" content="CS and applied math at UChicago. Interfaces you can ssh into." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://andymsun.com/" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23121211'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='monospace' font-size='20' fill='%23d97757'%3E%E2%9C%BB%3C/text%3E%3C/svg%3E" />
@@ -22,48 +22,430 @@
   </script>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
+
   <header class="top">
-    <p class="name">Andy Sun</p>
-    <p class="line">I study computer science and applied math at UChicago and build interfaces. This one you can ssh into.</p>
-    <p class="links"><a href="https://github.com/andymsun">github</a> <a href="https://linkedin.com/in/andymsun">linkedin</a> <a href="mailto:andy@andymsun.com">email</a></p>
+    <a class="brand" href="#top">Andy Sun</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#now">Now</a>
+      <a href="#work">Work</a>
+      <a href="#experience">Experience</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch between light and dark">
+      <span class="theme-icon" aria-hidden="true"></span>
+    </button>
   </header>
 
-  <main>
-    <section class="term" id="term" aria-label="andy code, a terminal session">
-      <header class="bar">
-        <span class="dots" aria-hidden="true">
-          <span class="dot dot-red" id="dot-red"></span>
-          <span class="dot dot-yellow"></span>
-          <span class="dot dot-green"></span>
-        </span>
-        <span class="bar-title" id="bar-title">andy@ssh.andymsun.com: ~</span>
-        <span class="ruler" id="ruler" aria-hidden="true" title="where you are in the transcript"><span class="rect"></span><span class="ticks"></span></span>
-      </header>
+  <main id="main">
+    <!-- ── hero ──────────────────────────────────────────────────── -->
+    <section class="hero" id="top">
+      <div class="hero-text">
+        <h1>I build interfaces you can&nbsp;<span class="hl">ssh</span>&nbsp;into.</h1>
+        <p class="lede">
+          I'm a third-year at the University of Chicago studying computer science and
+          computational &amp; applied mathematics. I work on human–computer interaction:
+          making capable systems usable by people who didn't build them.
+        </p>
+        <p class="lede">
+          Right now that's real-time portals at <strong>KindEd</strong>, multi-agent research
+          at <strong>CUNY College of Staten Island</strong>, and red-teaming pre-release
+          models at <strong>Scale AI</strong>.
+        </p>
 
-      <div class="log" id="log" role="log" aria-live="polite" aria-relevant="additions"></div>
+        <div class="cta-row">
+          <div class="ssh-cta">
+            <code><span class="p">$</span> ssh ssh.andymsun.com</code>
+            <button type="button" id="copy-ssh" class="copy">Copy</button>
+          </div>
+          <a class="btn-link" href="#work">See the work ↓</a>
+        </div>
+        <p class="fine">That command opens this same portfolio as a real terminal program. It's optional. Everything is on this page too.</p>
+      </div>
 
-      <form class="composer" id="composer" autocomplete="off">
-        <ul class="menu" id="menu" hidden role="listbox" aria-label="commands"></ul>
-        <label class="box" for="in">
-          <span class="gt" aria-hidden="true">&gt;</span>
-          <input id="in" type="text" spellcheck="false" autocapitalize="off" autocorrect="off" placeholder="" aria-label="prompt" disabled />
-        </label>
-        <footer class="status">
-          <span id="status-left">? for shortcuts</span>
-          <span id="status-mid"></span>
-          <span id="status-right">connecting…</span>
-        </footer>
-      </form>
+      <!-- the terminal is a demo here, not the navigation -->
+      <figure class="demo" aria-labelledby="demo-cap">
+        <div class="demo-bar">
+          <span class="dots" aria-hidden="true">
+            <span class="dot dot-red" id="dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </span>
+          <span class="demo-title">andy@ssh.andymsun.com: ~</span>
+          <button type="button" class="demo-replay" id="demo-replay" title="Play again">↻</button>
+        </div>
+        <div class="demo-body" id="demo-body">
+          <pre class="demo-line dim">$ ssh ssh.andymsun.com
+Connected to ssh.andymsun.com (178.156.231.94), port 22.</pre>
+          <div class="welcome">
+            <pre class="cup" aria-hidden="true"><span class="steam-a">   ) ) )    </span><span class="steam-b">   ( ( (    </span>
+ ▗▟█████▙▖
+ ▐███████▌▙
+ ▝▜█████▛▘▛
+  ▀▀▀▀▀▀▀   </pre>
+            <pre class="wtext"><span class="star">✻</span> Welcome to <b>andy code</b>!
+
+<span class="dim">/help for help, /now for what is running</span>
+
+<span class="dim">model: andy-3 (third year) · context: 2 cups</span></pre>
+          </div>
+          <div id="demo-play"></div>
+        </div>
+        <figcaption id="demo-cap">The terminal version, running itself. <button type="button" class="linkish" id="demo-type">Type in it →</button></figcaption>
+      </figure>
+    </section>
+
+    <!-- ── now ───────────────────────────────────────────────────── -->
+    <section id="now" class="band">
+      <div class="sec-head">
+        <h2>Now</h2>
+        <p class="sec-note">What's running, what's finished. <span class="legend"><i class="dot-s green"></i>active <i class="dot-s dim"></i>finished</span></p>
+      </div>
+
+      <ul class="proc">
+        <li><i class="dot-s green"></i><span class="tag">job</span><span class="what"><strong>KindEd</strong> — software engineering intern</span><span class="note">Real-time collaboration on Django Channels, WebSockets, and Redis.</span><span class="when">2026 –</span></li>
+        <li><i class="dot-s green"></i><span class="tag">research</span><span class="what"><strong>CUNY College of Staten Island</strong> — undergraduate researcher</span><span class="note">Span-Aware Mixture of Agents, on H200 and A100 GPUs.</span><span class="when">2026 –</span></li>
+        <li><i class="dot-s green"></i><span class="tag">contract</span><span class="what"><strong>Scale AI</strong> — prompt engineer</span><span class="note">Red-teaming pre-release language models; 50+ critical failures catalogued.</span><span class="when">2025 –</span></li>
+        <li><i class="dot-s green"></i><span class="tag">cohort</span><span class="what"><strong>Financial Markets Program</strong> — selected member</span><span class="note">Three-year quantitative finance program, coursework at Chicago Booth.</span><span class="when">2025 –</span></li>
+        <li><i class="dot-s green"></i><span class="tag">club</span><span class="what"><strong>UChicago Badminton</strong> — logistics officer</span><span class="note">100+ members, an annual regional tournament, and the live play board.</span><span class="when">2025 –</span></li>
+        <li><i class="dot-s green"></i><span class="tag">side</span><span class="what"><strong>sshfolio</strong> — this portfolio, as a program</span><span class="note">A Go SSH server that hands every visitor a terminal app instead of a shell.</span><span class="when">2026</span></li>
+        <li><i class="dot-s yellow"></i><span class="tag">side</span><span class="what"><strong>pSiren</strong> — music workspace</span><span class="note">Take a finished song apart and rebuild it with different voices.</span><span class="when">2025 –</span></li>
+        <li><i class="dot-s dim"></i><span class="tag">job</span><span class="what"><strong>TipTop Technologies</strong> — software engineering intern</span><span class="note">iOS Live Activities and a themed design system, via the UChicago Metcalf program.</span><span class="when">Summer 2026</span></li>
+        <li><i class="dot-s dim"></i><span class="tag">job</span><span class="what"><strong>LawBandit</strong> — software engineering intern</span><span class="note">25+ modular UI components standardising a legal AI front end.</span><span class="when">Spring 2026</span></li>
+        <li><i class="dot-s dim"></i><span class="tag">job</span><span class="what"><strong>CareLumi</strong> — software engineering intern</span><span class="note">Fine-tuned clinical documentation models; the AWS stack behind customer pilots.</span><span class="when">Fall 2025</span></li>
+      </ul>
+    </section>
+
+    <!-- ── work ──────────────────────────────────────────────────── -->
+    <section id="work">
+      <div class="sec-head">
+        <h2>Work</h2>
+        <p class="sec-note">Fourteen things I've built. Click any card to read more.</p>
+      </div>
+
+      <div class="filters" role="group" aria-label="Filter projects by status">
+        <button type="button" class="f on" data-filter="all">All <span class="c">14</span></button>
+        <button type="button" class="f" data-filter="green"><i class="dot-s green"></i>Shipped <span class="c">8</span></button>
+        <button type="button" class="f" data-filter="yellow"><i class="dot-s yellow"></i>In progress <span class="c">5</span></button>
+        <button type="button" class="f" data-filter="red"><i class="dot-s red"></i>Abandoned <span class="c">1</span></button>
+      </div>
+
+      <div class="grid" id="grid">
+
+        <details class="card" data-status="green" data-featured="1">
+          <summary>
+            <span class="status"><i class="dot-s green"></i>Shipped</span>
+            <h3>Lawvics</h3>
+            <p class="blurb">One legal question, answered across all 50 states.</p>
+            <span class="year">2026</span>
+          </summary>
+          <div class="body">
+            <p>Built in under 48 hours; finalist at the UChicago Vibe Coding Hackathon. One agent turns a question into fifty jurisdiction-specific searches and runs them in five batches. A second agent audits every result: schema checks, citation format, and a flag for statutes that may have been repealed. A map colors each state as its answer lands.</p>
+
+            <figure class="fig">
+              <figcaption>Try it: fifty jurisdictions, searched in batches, audited as they land.</figcaption>
+              <div class="swarm" aria-hidden="true"></div>
+              <div class="fig-ctl">
+                <button type="button" class="run">Run the swarm</button>
+                <label>Batches <input type="range" min="1" max="10" value="5" step="1" /><b class="bn">5</b></label>
+                <span class="tally">verified 0 · flagged 0</span>
+              </div>
+            </figure>
+
+            <p class="stack">Next.js 16 · React 19 · TypeScript · Vercel AI SDK · Zod · Zustand · D3</p>
+            <p class="links"><a href="https://github.com/andymsun/lawvics" target="_blank" rel="noopener">Source</a> <a href="https://lawvics.vercel.app" target="_blank" rel="noopener">Demo</a></p>
+          </div>
+        </details>
+
+        <details class="card" data-status="green" data-featured="1">
+          <summary>
+            <span class="status"><i class="dot-s green"></i>Shipped</span>
+            <h3>Rivendell</h3>
+            <p class="blurb">A live 3D map of everything moving around the planet.</p>
+            <span class="year">2026</span>
+          </summary>
+          <div class="body">
+            <p>8,000+ satellites, 6,000+ flights, and 500+ vessels drawn on Google's photorealistic 3D tiles, fed from OpenSky, CelesTrak, ADS-B Exchange, and AIS at once. The hard parts were on the client: thousands of moving objects at 60 fps, and a scene that stays readable at every zoom level.</p>
+            <p class="stack">Next.js · TypeScript · React · Three.js · Google 3D Tiles</p>
+          </div>
+        </details>
+
+        <details class="card" data-status="green" data-featured="1">
+          <summary>
+            <span class="status"><i class="dot-s green"></i>Active</span>
+            <h3>sshfolio</h3>
+            <p class="blurb">This portfolio, as a program you ssh into.</p>
+            <span class="year">2026</span>
+          </summary>
+          <div class="body">
+            <p>A Go SSH server that gives every connection a terminal program instead of a shell: a prompt, slash commands, subagents, a coffee-cup mascot, and three swappable skins. No account, nothing to install. It's the thing playing in the demo at the top of this page.</p>
+            <p class="stack">Go · bubbletea · wish · lipgloss · a €5 VPS</p>
+            <p class="links"><a href="https://github.com/andymsun/andymsun-portfolio" target="_blank" rel="noopener">Source</a> <button type="button" class="linkish copy-inline">Copy the ssh command</button></p>
+          </div>
+        </details>
+
+        <details class="card" data-status="yellow">
+          <summary>
+            <span class="status"><i class="dot-s yellow"></i>In progress</span>
+            <h3>pSiren</h3>
+            <p class="blurb">Take a finished song apart and rebuild it with different voices.</p>
+            <span class="year">2025 –</span>
+          </summary>
+          <div class="body">
+            <p>A music workspace for one person who wants the reach of a band. It separates a recording into vocal, instruments, and room, converts the lead with a voice model, and remixes over the original accompaniment, all on an Apple Silicon laptop. Next: per-instrument separation and instrument swaps that keep the notes and change the timbre.</p>
+            <p class="stack">Python · PyTorch (MPS) · Mel-Band Roformer · RVC</p>
+          </div>
+        </details>
+
+        <details class="card" data-status="green">
+          <summary>
+            <span class="status"><i class="dot-s green"></i>Shipped</span>
+            <h3>Spore in Space</h3>
+            <p class="blurb">A browser roguelite about moss spores surviving 283 days outside the ISS.</p>
+            <span class="year">2026</span>
+          </summary>
+          <div class="body">
+            <p>A biology final project that turned into a real game: a small roguelite dramatising a 2025 <em>iScience</em> study of moss spores exposed on the outside of the space station, with an in-game panel that cites the paper it came from.</p>
+            <p class="stack">TypeScript · Canvas · one iScience paper</p>
+          </div>
+        </details>
+
+        <details class="card" data-status="green">
+          <summary>
+            <span class="status"><i class="dot-s green"></i>Shipped</span>
+            <h3>Cupboard Companion</h3>
+            <p class="blurb">A pantry and meal-plan hub that recognises what's in the photo.</p>
+            <span class="year">2026</span>
+          </summary>
+          <div class="body">
+            <p>Point a camera at a shelf or a plate: it identifies items and meals, deducts stock as you cook, saves recipes, and places delivery orders. Built for UChicago's AI Integration Program.</p>
+            <p class="stack">Next.js · TypeScript · a vision model</p>
+          </div>
+        </details>
+
+        <details class="card" data-status="green">
+          <summary>
+            <span class="status"><i class="dot-s green"></i>Done</span>
+            <h3>IMC Prosperity 4</h3>
+            <p class="blurb">Algorithmic trading competition: a local backtester and round-by-round strategies.</p>
+            <span class="year">2026</span>
+          </summary>
+          <div class="body">
+            <p>Built a local backtesting environment, then market-making and mean-reversion strategies round by round for IMC's Prosperity 4 in April 2026.</p>
+            <p class="stack">Python · NumPy · Pandas</p>
+          </div>
+        </details>
+
+        <details class="card" data-status="yellow">
+          <summary>
+            <span class="status"><i class="dot-s yellow"></i>In progress</span>
+            <h3>TapDance</h3>
+            <p class="blurb">A typing-test site with ten-plus modes, for people who take typing seriously.</p>
+            <span class="year">2025 –</span>
+          </summary>
+          <div class="body">
+            <p>Started as a static practice site and grew into a customisable suite of typing tests. I type on a tap-dance layout of my own, so the tests had to be stranger than the usual ones.</p>
+            <p class="stack">TypeScript · static site · a keyboard layout of my own</p>
+          </div>
+        </details>
+
+        <details class="card" data-status="yellow">
+          <summary>
+            <span class="status"><i class="dot-s yellow"></i>Paused</span>
+            <h3>sophisticated.style</h3>
+            <p class="blurb">A design-contract framework for AI-generated interfaces.</p>
+            <span class="year">2026</span>
+          </summary>
+          <div class="body">
+            <p>A concept canvas plus a compiler: tune density, type scale, and radius visually, and it emits a markdown design contract an agent can actually follow. Paused while the idea settles.</p>
+            <p class="stack">TypeScript · React · a compiler for taste</p>
+          </div>
+        </details>
+
+        <details class="card" data-status="yellow">
+          <summary>
+            <span class="status"><i class="dot-s yellow"></i>Paused</span>
+            <h3>Spatial Creator Suite</h3>
+            <p class="blurb">A two-module spatial creation app for XREAL One Pro, specified but not built.</p>
+            <span class="year">2026</span>
+          </summary>
+          <div class="body">
+            <p>An offline 3D audio mixing stage and a floating photo darkroom sharing one gesture engine. Shelved at the design stage, so the spec is the artefact.</p>
+            <p class="stack">design · XREAL · a gesture engine on paper</p>
+          </div>
+        </details>
+
+        <details class="card" data-status="green">
+          <summary>
+            <span class="status"><i class="dot-s green"></i>Active</span>
+            <h3>UChicago Badminton</h3>
+            <p class="blurb">Club website and a live play board for open gym.</p>
+            <span class="year">2025 –</span>
+          </summary>
+          <div class="body">
+            <p>As logistics officer for a 100+ member club: dues, registrations, suppliers, inventory, and a regional tournament. The site improvements come from being at every open gym and watching where people get stuck.</p>
+            <p class="stack">a website · a whiteboard, digitised</p>
+          </div>
+        </details>
+
+        <details class="card" data-status="green">
+          <summary>
+            <span class="status"><i class="dot-s green"></i>Done</span>
+            <h3>Sprout</h3>
+            <p class="blurb">A business plan for a localized tutoring startup, written in high school.</p>
+            <span class="year">2023 – 2024</span>
+          </summary>
+          <div class="body">
+            <p>Executive summary, products, operations, marketing, and projections, co-written with a five-person high-school team.</p>
+            <p class="stack">a plan · a team of five</p>
+          </div>
+        </details>
+
+        <details class="card" data-status="yellow">
+          <summary>
+            <span class="status"><i class="dot-s yellow"></i>In progress</span>
+            <h3>This website</h3>
+            <p class="blurb">Two front ends, one portfolio: a web page and an ssh program.</p>
+            <span class="year">2026</span>
+          </summary>
+          <div class="body">
+            <p>The page you're reading and the terminal at the top are the same portfolio told twice. The web one is plain HTML, CSS, and one small script, with no framework and no build step. The terminal one is Go, on port 22, so <code>ssh ssh.andymsun.com</code> is the whole install.</p>
+            <p class="stack">HTML · CSS · vanilla JS · Go · no build step</p>
+            <p class="links"><a href="https://github.com/andymsun/andymsun-portfolio" target="_blank" rel="noopener">Source</a></p>
+          </div>
+        </details>
+
+        <details class="card" data-status="red">
+          <summary>
+            <span class="status"><i class="dot-s red"></i>Abandoned</span>
+            <h3>Betelgeuse</h3>
+            <p class="blurb">A modular native web browser. It did not survive the quarter.</p>
+            <span class="year">2026</span>
+          </summary>
+          <div class="body">
+            <p>A native Slint and Dioxus UI layer that skipped JavaScript DOM rendering for the browser chrome. Abandoned in March 2026, which is the honest word. It stays on this list on purpose: the idea was bigger than the term was long.</p>
+            <p class="stack">Rust · Slint · Dioxus</p>
+          </div>
+        </details>
+
+      </div>
+      <p class="empty" id="empty" hidden>Nothing in that category. <button type="button" class="linkish" data-filter="all">Show all fourteen</button></p>
+    </section>
+
+    <!-- ── experience ────────────────────────────────────────────── -->
+    <section id="experience" class="band">
+      <div class="sec-head">
+        <h2>Experience</h2>
+        <p class="sec-note">Every job, research post, cohort, program, and honor, oldest groups collapsed.</p>
+      </div>
+
+      <div class="xp">
+        <h3 class="xp-h">Jobs</h3>
+        <ol class="xp-list">
+          <li><span class="xp-when">2026-06 → 2026-08</span><div><h4>TipTop Technologies <span class="role">software engineering intern (Metcalf)</span></h4><p>iOS Live Activity and Dynamic Island support through a Swift Capacitor plugin; a CSS-token theming engine (light, dark, OLED, skins) raised to WCAG AA; fixed a navigation crash by lifting session state into global context.</p></div></li>
+          <li class="on"><span class="xp-when">2026-03 → now</span><div><h4>KindEd <span class="role">software engineering intern</span></h4><p>Real-time collaboration on Django Channels, WebSockets, and Redis with conflict-safe state syncing; multi-tenant portals with role-scoped access and invite onboarding; closed a cross-tenant data leak with origin validation and object-level scoping.</p></div></li>
+          <li><span class="xp-when">2026-03 → 2026-05</span><div><h4>LawBandit <span class="role">software engineering intern</span></h4><p>A library of 25+ modular UI components standardising the front end of a legal AI adoption manual.</p></div></li>
+          <li class="on"><span class="xp-when">2025-05 → now</span><div><h4>Scale AI <span class="role">prompt engineer, contract</span></h4><p>Red-team pre-release language models, with 50+ critical failures catalogued; synthetic-data pipelines feeding fine-tuning; trained and evaluated contractors across four teams.</p></div></li>
+          <li><span class="xp-when">2025-09 → 2025-12</span><div><h4>CareLumi <span class="role">software engineering intern</span></h4><p>Fine-tuned domain models behind a multi-agent clinical documentation system; production AWS infrastructure (S3, EC2, Cognito, Neptune) for pilot deployments; real pilot data in the evaluation pipeline.</p></div></li>
+        </ol>
+
+        <h3 class="xp-h">Research</h3>
+        <ol class="xp-list">
+          <li class="on"><span class="xp-when">2026-05 → now</span><div><h4>CUNY College of Staten Island <span class="role">undergraduate researcher</span></h4><p>Span-Aware Mixture of Agents, advised by Prof. Yumei Huo and Prof. Tianxiao Zhang: layered multi-agent aggregation extended to span-level selection. I own the code, the tests, the ablations against the MoA baseline, and the literature review.</p></div></li>
+        </ol>
+
+        <details class="xp-more">
+          <summary><span>Leadership and cohorts</span> <span class="n">5</span></summary>
+          <ol class="xp-list">
+            <li class="on"><span class="xp-when">2025-07 → now</span><div><h4>Financial Markets Program <span class="role">selected cohort member</span></h4><p>Selective three-year quantitative finance program with coursework at Chicago Booth.</p></div></li>
+            <li class="on"><span class="xp-when">2025-04 → now</span><div><h4>UChicago Badminton Club <span class="role">logistics officer</span></h4><p>Dues, registrations, suppliers, inventory, and an annual regional tournament for 100+ members.</p></div></li>
+            <li><span class="xp-when">2025-05 → 2025-06</span><div><h4>Goldman Sachs <span class="role">Virtual Insight Series</span></h4><p>Four-week program on the firm's structure and career paths.</p></div></li>
+            <li><span class="xp-when">2024-12 → 2025-06</span><div><h4>Goldman Sachs <span class="role">Possibilities Summit</span></h4><p>Competitive career-development program: risk analysis, data analytics, operations.</p></div></li>
+            <li><span class="xp-when">2024-09 → 2025-05</span><div><h4>Trott Emerging Business Leaders <span class="role">selected cohort member</span></h4><p>One-year business-acumen cohort; TEBL Scholar; Google Professional Certificate grant.</p></div></li>
+          </ol>
+        </details>
+
+        <details class="xp-more">
+          <summary><span>Programs</span> <span class="n">5</span></summary>
+          <ol class="xp-list">
+            <li><span class="xp-when">2026-03</span><div><h4>San Francisco Tech &amp; AI Trek <span class="role">UChicago</span></h4><p>A week of Bay Area startups and labs.</p></div></li>
+            <li><span class="xp-when">2026-01 → 2026-03</span><div><h4>AI Integration Program <span class="role">UChicago</span></h4><p>Winter 2026; Cupboard Companion came out of it.</p></div></li>
+            <li><span class="xp-when">2026-01 → 2026-03</span><div><h4>Succeeding in the Entrepreneurial Workplace <span class="role">UChicago, advanced cohort</span></h4><p>Winter 2026.</p></div></li>
+            <li><span class="xp-when">2025-12</span><div><h4>Berlin &amp; Frankfurt STEM &amp; Startups Trek <span class="role">UChicago</span></h4><p>A week of German startups and research institutes.</p></div></li>
+            <li class="on"><span class="xp-when">2025-06 → now</span><div><h4>Google Data Analytics Professional Certificate <span class="role">Coursera</span></h4><p>In progress.</p></div></li>
+          </ol>
+        </details>
+
+        <details class="xp-more">
+          <summary><span>Honors</span> <span class="n">9</span></summary>
+          <ol class="xp-list">
+            <li class="on"><span class="xp-when">2024 → now</span><div><h4>Odyssey Scholar · First Phoenix Scholar · QuestBridge Scholar <span class="role">UChicago</span></h4><p>First-generation, low-income scholarships. QuestBridge National College Match, December 2023.</p></div></li>
+            <li class="on"><span class="xp-when">2024 → now</span><div><h4>Financial Markets Scholar · TEBL Scholar <span class="role">UChicago</span></h4><p>With the cohorts above.</p></div></li>
+            <li><span class="xp-when">2020 → 2024</span><div><h4>AP Scholar · ARISTA National Honor Society · Principal's Honor Roll · Regents Mastery <span class="role">Queens High School for the Sciences</span></h4><p>4.00 GPA, Advanced Regents Diploma.</p></div></li>
+          </ol>
+        </details>
+
+        <details class="xp-more">
+          <summary><span>High school</span> <span class="n">4</span></summary>
+          <ol class="xp-list">
+            <li><span class="xp-when">2021-11 → 2024-06</span><div><h4>Queens Youth Volunteering Community <span class="role">founding member and volunteer</span></h4><p>Helped grow the organisation to 300+ members.</p></div></li>
+            <li><span class="xp-when">2021-09 → 2024-06</span><div><h4>QHSS Model United Nations <span class="role">secretary and delegate</span></h4><p>Competitive conference team.</p></div></li>
+            <li><span class="xp-when">2023-07 → 2023-08</span><div><h4>NYPD PSA 9 <span class="role">communications assistant</span></h4><p>Planned and attended community outreach events.</p></div></li>
+            <li><span class="xp-when">2022-07 → 2022-11</span><div><h4>Ivy Road Prep <span class="role">teaching assistant</span></h4><p>200+ hours of teaching assistance.</p></div></li>
+          </ol>
+        </details>
+
+        <h3 class="xp-h">Education</h3>
+        <ol class="xp-list">
+          <li class="on"><span class="xp-when">2024-09 → 2028-06</span><div><h4>The University of Chicago <span class="role">B.S. computer science and computational &amp; applied mathematics</span></h4><p>Expected June 2028. Coursework: mathematical foundations of machine learning, abstract linear algebra, analysis in Rⁿ, systems programming.</p></div></li>
+          <li><span class="xp-when">2020-09 → 2024-06</span><div><h4>Queens High School for the Sciences at York College <span class="role">Advanced Regents Diploma</span></h4><p>Flushing, Queens. 4.00.</p></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ── about ─────────────────────────────────────────────────── -->
+    <section id="about">
+      <div class="sec-head"><h2>About</h2></div>
+      <div class="about-grid">
+        <div class="about-prose">
+          <p>I grew up in Flushing, Queens, and took the SHSAT without preparing. That worked out, and a few years later QuestBridge matched me to the University of Chicago, where I'm now a third-year studying computer science and computational &amp; applied mathematics.</p>
+          <p>The through-line in everything here is human–computer interaction: making capable systems usable by people who did not build them. In practice that's been interfaces for language models that aren't a chat box, evaluation work where the uncertainty stays visible on the page, and terminal software, which is the most constrained interface there is and therefore the most honest one to design for.</p>
+          <p>Outside that: badminton at every open gym, music production, film photography, speedcubing, and an amount of coffee that my own portfolio makes jokes about.</p>
+        </div>
+        <dl class="facts">
+          <div><dt>Languages</dt><dd>Python, TypeScript, Go, Swift, C, R</dd></div>
+          <div><dt>Web</dt><dd>React, Next.js, Node, Django, Django Channels</dd></div>
+          <div><dt>Models</dt><dd>Evaluation, red-teaming, multi-agent systems, fine-tuning</dd></div>
+          <div><dt>Infrastructure</dt><dd>AWS, GCP, Docker, Redis, Postgres, Linux</dd></div>
+          <div><dt>Spoken</dt><dd>English (fluent), Mandarin Chinese (native)</dd></div>
+          <div><dt>Graduating</dt><dd>June 2028</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- ── contact ───────────────────────────────────────────────── -->
+    <section id="contact" class="band">
+      <div class="sec-head">
+        <h2>Contact</h2>
+        <p class="sec-note">Email is fastest. I read everything.</p>
+      </div>
+      <ul class="contact">
+        <li><span class="k">Email</span><a href="mailto:andy@andymsun.com">andy@andymsun.com</a></li>
+        <li><span class="k">GitHub</span><a href="https://github.com/andymsun" target="_blank" rel="noopener">github.com/andymsun</a></li>
+        <li><span class="k">LinkedIn</span><a href="https://linkedin.com/in/andymsun" target="_blank" rel="noopener">linkedin.com/in/andymsun</a></li>
+        <li><span class="k">Terminal</span><code>ssh ssh.andymsun.com</code> <button type="button" class="linkish copy-inline">Copy</button></li>
+      </ul>
     </section>
   </main>
 
   <footer class="bottom">
-    <p class="runs">runs on <span>Go</span><span>bubbletea</span><span>wish</span><span>Hetzner CPX11</span><span>port 22</span><span>no framework</span></p>
-    <p class="colophon">The web and ssh versions are the same program with different pixels. Prompt box, ⏺ bullets, and spinner verbs are a homage to the Claude Code CLI; not affiliated. <a href="https://github.com/andymsun/andymsun-portfolio">Source.</a></p>
-    <p class="marq" aria-hidden="true"><span>★ best viewed over ssh ★ under construction since 2026 ★ you are visitor <b id="marq-n">000001</b> ★ this page has no cookies and one font ★</span></p>
+    <p class="runs">Runs on <span>Go</span><span>bubbletea</span><span>wish</span><span>Hetzner CPX11</span><span>port 22</span><span>no framework</span></p>
+    <p class="colophon">This page and the ssh program are the same portfolio, told twice. Plain HTML, CSS, and one script here; Go over there. The terminal demo's prompt box and ⏺ bullets are a homage to the Claude Code CLI; not affiliated. <a href="https://github.com/andymsun/andymsun-portfolio">Source for both.</a></p>
+    <p class="marq" aria-hidden="true"><span>★ best viewed over ssh ★ under construction since 2026 ★ you are visitor <b id="marq-n">000001</b> ★ no cookies, no tracking, one font family ★</span></p>
   </footer>
 
-  <!-- flashlight room, for /lights -->
+  <!-- flashlight room, for the yellow dot -->
   <div id="room" class="room" hidden aria-hidden="true"></div>
 
   <!-- easter-egg props for the three dots -->
@@ -74,6 +456,8 @@
   <div id="fake-cursor" class="fake-cursor" aria-hidden="true">
     <svg width="20" height="24" viewBox="0 0 20 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L1 19L5.5 14.5L9.5 22L13 20L9 12.5L15 12.5L1 1Z" fill="white" stroke="black" stroke-width="1.5" stroke-linejoin="round" /></svg>
   </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="app.js"></script>
   <script src="eggs.js"></script>
