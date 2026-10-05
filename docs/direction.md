@@ -54,6 +54,34 @@ levels, tabs, `/mcp`, `/skills`, the fake shell, the animations, the feedback
 log. That is where the learning curve belongs, because the people who type
 `ssh ssh.andymsun.com` are asking for one.
 
+## round five: the editor
+
+Round four fixed the learning curve and lost the personality. Round five keeps
+the zero-learning-curve rule and makes the frame itself the joke: the site is
+an editor with one project open, and the project is Andy.
+
+- **Explorer = nav.** Six files and a projects folder whose entries carry the
+  status dots. Clicking a file scrolls the buffer; nothing else is required.
+- **One buffer, many files.** Like a multibuffer: each section is a file with
+  a sticky header, a line-number gutter, and a hover highlight that reports
+  `Ln n` in the status bar. experience.md is "modified": the Outlier AI to
+  Scale AI rename shows as an inline diff, with a blame note on hover.
+- **Terminal panel.** A light, rounded, block-style shell (closer to Warp or
+  Ghostty than a CRT). It types `ssh ssh.andymsun.com` itself and plays a
+  preview of the Go program; `ls`, `open`, `git status`, `git log` (the
+  career as commits), and skin names work.
+- **Agent panel.** Chips for the common questions plus free text matched
+  against the page (project names, companies). Its tool calls act: Read opens
+  a file, Grep filters projects, Bash copies the ssh command. Four skins
+  restyle the transcript, spinner, and mascot.
+- **Bean.** A ring of 28 spring points drawn as one Catmull-Rom path, eyes as
+  four-point curves, ten moods. Inspired by jeremy-prt/bloub, written from
+  scratch. It tracks the cursor, looks at whatever you hover (happy at green,
+  curious at yellow, sad at red), gets dizzy on fast scrolls, falls asleep
+  after 28s, watches the fake cursor during the dot gags, and in the dark only
+  its eyes glow. Drag it and it stretches; poke it six times and it's annoyed.
+- **Command palette** on ⌘K, optional.
+
 ## what changed (round three)
 
 Round two was a full-screen glassy terminal with a pointer-reactive dot field,
