@@ -1,14 +1,14 @@
 // The agent panel. Four skins borrowed from four coding agents, one set of
 // answers written by Andy in advance. Its tool calls are real in the only
 // way that matters here: Read opens the file, Grep filters the list, Bash
-// copies the command. Bean thinks while it thinks and reads while it streams.
+// copies the command. Tonic thinks while it thinks and reads while it streams.
 (function () {
   'use strict';
 
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches || /[?&]fast\b/.test(location.search);
-  var Bean = window.Bean, Site = window.Site;
+  var Tonic = window.Tonic, Site = window.Site;
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
   function el(tag, cls, html) { var n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; }
   function ticker(fn) {
@@ -63,11 +63,11 @@
     $('#sb-skin').textContent = SKINS[key].name;
     input.placeholder = SKINS[key].place;
     repaint();
-    Bean.skin(key);
+    Tonic.skin(key);
     if (changed && !quiet) {
       add(el('p', 'm m-sys', 'switched to ' + SKINS[key].name + ' · same Andy underneath'));
-      Bean.mood('happy', 900);
-      Bean.say({ claude: 'cozy.', codex: 'terse mode.', agy: 'look, I float', opencode: 'boxy. I like it.' }[key], 1500);
+      Tonic.mood('happy', 900);
+      Tonic.say({ claude: 'little legs!', codex: '>_ beep', agy: 'look, I float', opencode: 'boxy. I like it.' }[key], 1500);
     }
   }
   $$('.skins button').forEach(function (b) { b.addEventListener('click', function () { setSkin(b.dataset.skin); }); });
@@ -83,7 +83,7 @@
 
   async function think(ms) {
     head();
-    Bean.mood('think'); Bean.ripple(true);
+    Tonic.mood('think'); Tonic.ripple(true);
     var n = add(el('p', 'm m-spin')), verb = SKINS.claude.verbs[Math.floor(Math.random() * SKINS.claude.verbs.length)];
     ms = reduced ? 0 : ms;
     await ticker(function (t) {
@@ -96,7 +96,7 @@
     });
     n.remove();
     add(el('p', 'm m-thought', 'Thought for ' + Math.max(1, Math.round(ms / 1000)) + 's'));
-    Bean.ripple(false); Bean.base('idle');
+    Tonic.ripple(false); Tonic.base('idle');
   }
 
   async function tool(fn, arg, res, act) {
@@ -113,7 +113,7 @@
     head();
     var n = add(el('div', 'm m-say', '<p></p>')), p = n.firstChild;
     var plain = html.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&');
-    Bean.mood('read');
+    Tonic.mood('read');
     var shown = 0;
     if (!reduced) {
       await ticker(function (t) {
@@ -124,8 +124,8 @@
     }
     p.innerHTML = html;
     scroll();
-    Bean.base('idle');
-    Bean.mood('happy', 700);
+    Tonic.base('idle');
+    Tonic.mood('happy', 700);
   }
 
   /* ── the answers ──────────────────────────────────────────────── */
@@ -164,9 +164,9 @@
     }],
     coffee: ['Brew a coffee', async function () {
       await think(600);
-      await tool('Bash', 'brew install coffee', '☕ 1 cup poured', function () { Bean.brew(); });
-      await reply('Brewed. Context window: 3 cups. Andy runs on roughly the same fuel.');
-      Bean.say('☕ mmm', 1600);
+      await tool('Bash', 'brew install coffee', '☕ 1 cup poured', function () { Tonic.brew(); });
+      await reply('Brewed. Andy runs on roughly the same fuel. Three of these and I start to vibrate.');
+      Tonic.say('☕ mmm', 1600);
     }]
   };
   function findIn(sel, words) {
@@ -239,8 +239,10 @@
       return reply('Python, TypeScript, Go, Swift, C, and R. React and Next.js, Django and Channels on the web side; AWS, GCP, Docker, Redis, and Postgres underneath. On the model side: evaluation, red-teaming, multi-agent systems, fine-tuning.');
     }
     if (has('badminton')) { await think(500); return reply('Every open gym. He\'s logistics officer for the UChicago club: dues, suppliers, a regional tournament, and a live board of who is on which court.'); }
-    if (has('bean', 'mascot', 'you')) { await think(400); Bean.hop(18); return reply('I\'m Bean: a ring of 28 points on springs, two eyes, and no opinions about anything except Andy. Drag me if you like.'); }
-    if (has('hello', 'hi', 'hey', 'yo', 'sup')) { await think(300); Bean.hop(14); return reply('Hi. I only know about one person. The buttons below are the quick way in.'); }
+    if (has('espresso tonic', 'tonic please', 'order')) { await think(400); Tonic.order(); return reply('One espresso tonic: ice, tonic, and a double shot poured slowly on top so it layers. Andy\'s order, and where my name comes from.'); }
+    if (has('your name', 'who are you', 'mascot', 'tonic', 'bean')) { await think(400); Tonic.hop(18); return reply('I\'m Tonic, named after Andy\'s favourite drink, an espresso tonic. Underneath: 44 points on springs, a crema layer that sloshes, and two eyes. Drag me, pet me slowly, or type “tonic” anywhere on the page.'); }
+    if (has('love you', '<3', 'cute')) { await think(300); Tonic.mood('love', 2000); Tonic.hop(16); return reply('Stop, I\'ll foam over.'); }
+    if (has('hello', 'hi', 'hey', 'yo', 'sup')) { await think(300); Tonic.hop(14); return reply('Hi. I only know about one person. The buttons below are the quick way in.'); }
     await think(600);
     return reply('I only know about Andy. Try a project by name (say, “Rivendell”), a company (“KindEd”), or one of the buttons.');
   }
@@ -277,9 +279,9 @@
   setSkin(skin, true);
   queue = queue.then(function () { return new Promise(function (r) { setTimeout(r, reduced ? 0 : 700); }); }).then(async function () {
     turnHead = null;
-    await reply('Hi, I\'m Bean. I only know about Andy. Ask with a button, type a question, or poke me.');
-    Bean.say('hi!', 1500);
-    Bean.hop(14);
+    await reply('Hi, I\'m Tonic, a shot of espresso. I only know about Andy. Ask with a button, type a question, or poke me.');
+    Tonic.say('hi!', 1500);
+    Tonic.hop(14);
   });
 
   window.Agent = { skin: setSkin, ask: function (k) { var f = FLOWS[k]; if (f) ask(f[0], f[1]); } };

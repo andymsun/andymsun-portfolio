@@ -63,3 +63,16 @@ cd portfolio/sshfolio && docker compose up -d --build
 After that, every update is `ssh andy-vps 'sudo /opt/portfolio/deploy/deploy.sh'`,
 which pulls `main`, rebuilds, and restarts. Content lives in
 `sshfolio/app/content.go` (and its twin `app.js` on the web).
+
+## the visitor count endpoint
+
+`docker-compose.yml` runs two services: the Go program (ssh on 22, and http on
+:8080 inside the compose network via `HTTP_ADDR`) and Caddy, which publishes
+80/443 and gets a Let's Encrypt certificate for `ssh.andymsun.com` by itself.
+`GET https://ssh.andymsun.com/visits` returns `{"total": n}`; `POST` counts a
+web visit. Both sides bump the same `.ssh/visits` file. Deploying needs the
+compose file and `Caddyfile` next to the sources on the box:
+
+```bash
+scp deploy/docker-compose.yml deploy/Caddyfile andy-vps:/opt/portfolio/sshfolio/
+```

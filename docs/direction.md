@@ -54,6 +54,36 @@ levels, tabs, `/mcp`, `/skills`, the fake shell, the animations, the feedback
 log. That is where the learning curve belongs, because the people who type
 `ssh ssh.andymsun.com` are asking for one.
 
+## round six: a real terminal, and Tonic
+
+- **The terminal is a shell now.** Inline prompt, block cursor, readline keys
+  (ctrl-a/e/u/k/w/c/l/d), history saved per browser, tab completion of
+  commands and paths. The filesystem is generated from the page, so the files
+  are what you are reading: `cat now.log`, `grep -i redis`, `ls -la projects`,
+  `tree`, `wc`, simple pipes. `curl ssh.andymsun.com/visits` and `ping` are
+  real requests. `ssh ssh.andymsun.com` switches to a replica of the Go
+  program until `/exit` or ctrl-d. Plus `git diff` (Outlier → Scale AI),
+  `sl`, `cowsay`, `neofetch`, `sudo`, `rm -rf`.
+- **Panes resize.** Drag the explorer, agent, and terminal dividers; double-
+  click resets; ⌘B folds the explorer. Tabs drag to reorder, and the files in
+  the buffer follow.
+- **One visitor count.** The Go server exposes `/visits` (GET reads, POST
+  counts) behind Caddy's automatic TLS; the page posts once per browser per
+  day. The ssh `#visitor` and the web marquee are the same sequence.
+- **Bean became Tonic**, after Andy's espresso tonic: a shot with a sloshing
+  crema layer. Vessels per skin: Claude Code is a clay glass with Clawd's
+  stubby legs and arms; Codex is a blue terminal robot with an antenna and
+  `>_` on its chest (after the default Codex pet); Antigravity is a floating
+  arch with orbiting dots; OpenCode is a block.
+- **Things Tonic notices**: cursor, hover status colours, fast scrolls
+  (dizzy), idle (sleeps), the time of day, returning to the tab, selecting
+  and copying text, window resizes, being petted (slow strokes) or shaken
+  (fast ones), being flung (bonks off the stage walls), double-click (spin),
+  six pokes (annoyed), theme spam, the abandoned filter, reading to the end,
+  opening every file, coffee count (jitters at 3, worse at 5), the konami
+  code (party), and typing "tonic" anywhere (becomes an espresso tonic for 20
+  seconds: tonic water, ice, bubbles, an espresso float).
+
 ## round five: the editor
 
 Round four fixed the learning curve and lost the personality. Round five keeps

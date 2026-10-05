@@ -5,5 +5,22 @@ services:
     ports:
       - "22:22"
     volumes:
-      - ./.ssh:/app/.ssh   # host key lives on the host, survives rebuilds
+      - ./.ssh:/app/.ssh   # host key and visitor count live on the host, survive rebuilds
     env_file: .env
+    environment:
+      HTTP_ADDR: ":8080"   # shared visitor count; reachable only through caddy
+
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - sshfolio
+
+volumes:
+  caddy_data:

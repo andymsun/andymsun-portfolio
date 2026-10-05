@@ -10,7 +10,7 @@
   var wait = function (ms) { return reduced ? Promise.resolve() : new Promise(function (r) { setTimeout(r, ms); }); };
   var SSH = 'ssh ssh.andymsun.com';
   var noop = function () {};
-  var Bean = window.Bean || { mood: noop, base: noop, ripple: noop, say: noop, hop: noop, brew: noop, lookAt: noop, skin: noop };
+  var Tonic = window.Tonic || { mood: noop, base: noop, ripple: noop, say: noop, hop: noop, brew: noop, lookAt: noop, skin: noop };
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
   function el(tag, cls, html) { var n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; }
 
@@ -25,7 +25,7 @@
 
   /* ── copy the ssh command ─────────────────────────────────────── */
   function copySSH(btn) {
-    Bean.mood('happy', 1200); Bean.hop(14);
+    Tonic.mood('happy', 1200); Tonic.hop(14);
     if (!navigator.clipboard) { say('Select and copy: ' + SSH); return; }
     navigator.clipboard.writeText(SSH).then(function () {
       say('Copied: ' + SSH);
@@ -47,12 +47,15 @@
   function currentTheme() {
     return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   }
+  var themeFlips = [];
   function toggleTheme() {
+    var tn = Date.now();
+    themeFlips = themeFlips.filter(function (x) { return tn - x < 3000; }); themeFlips.push(tn);
     var next = currentTheme() === 'dark' ? 'light' : 'dark';
     root.dataset.theme = next;
     try { localStorage.setItem('theme', next); } catch (e) {}
-    Bean.mood(next === 'light' ? 'angry' : 'happy', 900);
-    Bean.say(next === 'light' ? 'bright!' : 'ahh, better', 1200);
+    if (themeFlips.length >= 4) { themeFlips = []; Tonic.mood('dizzy', 1400); Tonic.say('make up your mind', 1600); }
+    else { Tonic.mood(next === 'light' ? 'angry' : 'happy', 900); Tonic.say(next === 'light' ? 'bright!' : 'ahh, better', 1200); }
     return next;
   }
   $('#theme-btn').addEventListener('click', toggleTheme);
@@ -68,7 +71,7 @@
     if (!t) return false;
     if (t.classList.contains('proj') && t.classList.contains('hide')) filter('all');
     for (var p = t; p && p !== doc; p = p.parentElement) if (p.tagName === 'DETAILS') p.open = true;
-    if (Bean.quiet) Bean.quiet(1500);
+    if (Tonic.quiet) Tonic.quiet(1500);
     t.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
     if (!t.classList.contains('buf')) flash(t);
     try { history.replaceState(null, '', '#' + id); } catch (e) {}
@@ -83,7 +86,12 @@
 
   // which file is on screen
   var titleFile = $('#title-file'), tabs = $$('.tab'), treeLinks = $$('.tree a');
+  var visited = {};
   function setActive(id, file) {
+    if (!visited[id]) {
+      visited[id] = 1;
+      if (Object.keys(visited).length === 6) { setTimeout(function () { say('Opened every file in the repo'); Tonic.mood('love', 1800); Tonic.hop(16); Tonic.say('a completionist!', 1800); }, 400); }
+    }
     tabs.forEach(function (t) { t.classList.toggle('on', t.dataset.sec === id); });
     treeLinks.forEach(function (a) { if (a.dataset.sec) a.classList.toggle('on', a.dataset.sec === id); });
     if (titleFile.textContent !== file) titleFile.textContent = file;
@@ -115,6 +123,7 @@
       if (on) shown++;
     });
     empty.hidden = shown > 0;
+    if (which === 'red') { Tonic.mood('sad', 1600); Tonic.say('we don\'t talk about betelgeuse', 1800); }
     $$('.f').forEach(function (b) { b.classList.toggle('on', b.dataset.filter === which); });
     $$('.tree-sub a').forEach(function (a) {
       var t = document.getElementById(a.getAttribute('href').slice(1));
@@ -134,14 +143,14 @@
     function start() {
       if (running) return;
       running = true; run.disabled = true;
-      Bean.mood('read'); Bean.ripple(true);
+      Tonic.mood('read'); Tonic.ripple(true);
       cells.forEach(function (c) { c.className = ''; });
       var ok = 0, sus = 0, batches = Number(range.value), per = Math.ceil(50 / batches), b = 0;
       tally.textContent = 'verified 0 · flagged 0';
       (function nextBatch() {
         if (b >= batches) {
           running = false; run.disabled = false; run.textContent = 'Run it again';
-          Bean.base('idle'); Bean.ripple(false); Bean.mood('happy', 1200); Bean.say(ok + ' verified, ' + sus + ' flagged', 2000);
+          Tonic.base('idle'); Tonic.ripple(false); Tonic.mood('happy', 1200); Tonic.say(ok + ' verified, ' + sus + ' flagged', 2000);
           return;
         }
         var batch = cells.slice(b * per, (b + 1) * per);
@@ -207,11 +216,26 @@
     sbPos.textContent = 'Ln ' + l.dataset.ln + ' · ' + (buf ? buf.dataset.file : '');
   });
 
-  /* ── visitor count (this browser only, and it says so) ───────── */
-  var visits = 1;
-  try { visits = Number(localStorage.getItem('visits') || 0) + 1; localStorage.setItem('visits', String(visits)); } catch (e) {}
-  $('#marq-n').textContent = String(visits).padStart(6, '0');
-  $('#sb-visits').textContent = 'visit ' + visits + (visits === 1 ? '' : ' from this browser');
+  /* ── visitor count: one number, shared with the ssh server ─── */
+  // The Go program on ssh.andymsun.com counts ssh sessions; this page asks it
+  // for the total and adds itself once per browser per day.
+  var API = 'https://ssh.andymsun.com/visits';
+  function showVisits(total, you) {
+    if (!total) return;
+    $('#marq-n').textContent = '#' + String(you || total).padStart(6, '0');
+    $('#sb-visits').textContent = total.toLocaleString() + ' visitors';
+  }
+  (function () {
+    var today = new Date().toDateString(), counted = null, you = 0, cached = 0;
+    try { counted = localStorage.getItem('counted'); you = Number(localStorage.getItem('you') || 0); cached = Number(localStorage.getItem('total') || 0); } catch (e) {}
+    showVisits(cached, you);
+    var post = counted !== today;
+    fetch(API, { method: post ? 'POST' : 'GET', mode: 'cors' }).then(function (r) { return r.json(); }).then(function (d) {
+      if (post && d.you) { you = d.you; try { localStorage.setItem('counted', today); localStorage.setItem('you', String(you)); } catch (e) {} }
+      try { localStorage.setItem('total', String(d.total)); } catch (e) {}
+      showVisits(d.total, you);
+    }).catch(function () { if (!cached) $('#sb-visits').textContent = 'offline'; });
+  })();
 
   /* ── the flashlight, for the yellow dot and `lights` ─────────── */
   var room = $('#room');
@@ -219,9 +243,9 @@
     document.body.classList.add('lights-out'); room.hidden = false;
     room.style.setProperty('--x', innerWidth / 2 + 'px');
     room.style.setProperty('--y', innerHeight / 2 + 'px');
-    Bean.say('who turned off the lights', 2200);
+    Tonic.say('who turned off the lights', 2200);
   }
-  function lightsOn() { if (room.hidden) return; document.body.classList.remove('lights-out'); room.hidden = true; Bean.mood('happy', 700); }
+  function lightsOn() { if (room.hidden) return; document.body.classList.remove('lights-out'); room.hidden = true; Tonic.mood('happy', 700); }
   addEventListener('pointermove', function (e) {
     if (room.hidden) return;
     room.style.setProperty('--x', e.clientX + 'px');
@@ -236,176 +260,77 @@
   fab.addEventListener('click', function () { if (document.body.classList.contains('sheet-open')) closeSheet(); else openSheet(); });
   $('#agent-close').addEventListener('click', closeSheet);
 
-  /* ══ the terminal panel ═══════════════════════════════════════════
-     A friendly shell with a handful of real-feeling commands. `ssh` plays a
-     preview of the program on port 22; everything else moves this page. */
-  var term = $('#term'), tb = $('#term-body'), tform = $('#term-form'), tin = $('#term-in'), out = null, busy = false;
-  var hist = [], hi = 0;
+  var term = $('#term');
+  function termRun(c) { term.classList.remove('closed'); return window.Term ? window.Term.run(c) : null; }
 
-  function block(cmd) {
-    var b = el('div', 'blk');
-    b.innerHTML = '<div class="blk-cmd"><span class="ps-dir">~/andymsun.com</span><span class="ps-branch">agent</span><span class="cmd">' + esc(cmd) + '</span></div>';
-    out = el('div', 'blk-out');
-    b.appendChild(out);
-    tb.appendChild(b);
-    tb.scrollTop = tb.scrollHeight;
+  /* ══ panes: drag the dividers, drag the tabs ═════════════════════
+     Sizes persist per browser. Double-click a divider to reset it, drag a
+     side pane small enough and it folds away (⌘B brings the explorer back). */
+  var ide = $('#ide'), panes = { ex: 240, ag: 368, term: 230 }, DEF = { ex: 240, ag: 368, term: 230 };
+  try { var savedP = JSON.parse(localStorage.getItem('panes') || '{}'); for (var k in savedP) if (k in panes) panes[k] = savedP[k]; } catch (e) {}
+  function applyPanes() {
+    ide.style.setProperty('--ex-w', panes.ex + 'px');
+    ide.style.setProperty('--ag-w', panes.ag + 'px');
+    ide.style.setProperty('--term-h', panes.term + 'px');
+    ide.classList.toggle('ex-hidden', panes.ex === 0);
+    queueNumbers();
   }
-  function print(html, cls) { var d = el('div', 'tl' + (cls ? ' ' + cls : ''), html); out.appendChild(d); tb.scrollTop = tb.scrollHeight; return d; }
-
-  var FILES = {
-    'readme.md': 'readme', 'readme': 'readme', 'now.log': 'now', 'now': 'now', 'projects': 'projects', 'projects/': 'projects',
-    'experience.md': 'experience', 'experience': 'experience', 'about.md': 'about', 'about': 'about', 'contact.md': 'contact', 'contact': 'contact'
-  };
-  $$('.proj').forEach(function (p) {
-    var file = $('.file', p).textContent.toLowerCase(), name = $('.name', p).textContent.trim().toLowerCase();
-    FILES[file] = p.id; FILES['projects/' + file] = p.id; FILES[name] = p.id; FILES[file.replace(/\.[a-z]+$/, '')] = p.id;
-  });
-  function resolve(arg) { return FILES[(arg || '').toLowerCase().replace(/^\.\//, '')]; }
-
-  var CUP = '<span class="steam">   ) ) )\n   ( ( (</span>\n ▗▟█████▙▖\n ▐███████▌▙\n ▝▜█████▛▘▛\n  ▀▀▀▀▀▀▀';
-
-  var CMDS = {
-    help: function () {
-      print('<div class="help">' + [
-        ['ssh ssh.andymsun.com', 'a preview of the real thing'], ['ls [projects]', 'list files'], ['open &lt;file&gt;', 'jump to a file, e.g. open lawvics'],
-        ['git status', 'what changed'], ['git log', 'the career, as commits'], ['claude · codex · agy · opencode', 'swap the agent panel'],
-        ['coffee', 'brew one'], ['lights', 'turn them off'], ['theme', 'light or dark'], ['clear', 'clear this panel']
-      ].map(function (r) { return '<span class="k">' + r[0] + '</span><span>' + r[1] + '</span>'; }).join('') + '</div>');
-    },
-    ls: function (a) {
-      if (a[0] && /^projects\/?$/.test(a[0])) {
-        print($$('.proj').map(function (p) {
-          return '<span class="ls-item"><i class="dot-s ' + p.dataset.status + '"></i>' + esc($('.file', p).textContent) + '</span>';
-        }).join(''), 'ls');
-        return;
-      }
-      print('<span class="ls-item f-md">README.md</span><span class="ls-item f-log">now.log</span><span class="ls-item f-dir">projects/</span><span class="ls-item f-md">experience.md</span><span class="ls-item f-md">about.md</span><span class="ls-item f-md">contact.md</span>', 'ls');
-    },
-    open: function (a) {
-      var id = resolve(a.join(' '));
-      if (!a.length) return print('open what? try <b>open lawvics</b>', 'dim');
-      if (!id) return print('no such file: ' + esc(a.join(' ')) + '. <b>ls</b> shows what is here.', 'err');
-      go(id); print('opened ' + esc(a.join(' ')), 'dim');
-    },
-    pwd: function () { print('/home/andy/andymsun.com'); },
-    cd: function () { print('you are already home.', 'dim'); },
-    whoami: function () { print('a visitor. andy is in README.md.'); },
-    echo: function (a) { print(esc(a.join(' '))); },
-    git: function (a) {
-      if (a[0] === 'status') {
-        print('On branch <b class="acc">agent</b>\nChanges not staged for commit:\n  <span class="m">modified:   experience.md</span>  <span class="dim">(Outlier AI → Scale AI)</span>\n\n<span class="dim">14 projects: </span><i class="dot-s green"></i> 8 shipped  <i class="dot-s yellow"></i> 5 in progress  <i class="dot-s red"></i> 1 abandoned', 'pre');
-      } else if (a[0] === 'log') {
-        print([
-          ['e41b0c2', '2026-06', 'join TipTop Technologies through Metcalf'],
-          ['9a07d1f', '2026-05', 'start research at CUNY College of Staten Island'],
-          ['c3f2a88', '2026-03', 'join KindEd and LawBandit, same month'],
-          ['71de4b0', '2026-02', 'ship Lawvics in 48 hours, finalist'],
-          ['5b9e113', '2025-09', 'join CareLumi'],
-          ['2d4c7aa', '2025-05', 'start contract work at Scale AI'],
-          ['0f1e9d3', '2024-09', 'move to Chicago'],
-          ['0000001', '2020-09', 'initial commit: Queens High School for the Sciences']
-        ].map(function (c) { return '<span class="sha">' + c[0] + '</span> <span class="dim">' + c[1] + '</span>  ' + c[2]; }).join('\n'), 'pre');
-      } else if (a[0] === 'push') {
-        print('Everything up-to-date. (Andy pushes from his own laptop.)', 'dim');
-      } else print('git ' + esc(a.join(' ')) + ': try <b>git status</b> or <b>git log</b>', 'dim');
-    },
-    ssh: async function (a) {
-      var host = (a.join(' ') || '').replace(/^[^@]*@/, '');
-      if (host && host !== 'ssh.andymsun.com' && host !== 'andymsun.com') return print('ssh: Could not resolve hostname ' + esc(host) + '. There is only one host here.', 'err');
-      print('Connecting to ssh.andymsun.com…', 'dim');
-      await wait(500);
-      print('Connected to ssh.andymsun.com (178.156.231.94), port 22.', 'dim');
-      await wait(250);
-      print('<div class="welcome"><pre class="cup" aria-hidden="true">' + CUP + '</pre><div><p><span class="star">✻</span> Welcome to <b>andy code</b></p><p class="dim">/help for help, /now for what is running</p><p class="dim">model: andy-3 (third year) · context: 2 cups</p></div></div>');
-      await wait(200);
-      print('This is a preview in your browser. The real program has slash commands, subagents, three skins, and a coffee machine. <button type="button" class="linkish" data-copy>Copy the command</button> and paste it into any terminal.', 'note');
-      Bean.mood('happy', 1200);
-    },
-    coffee: async function () {
-      Bean.brew(); Bean.mood('happy', 2000); Bean.say('☕ thank you', 1800);
-      print('brewing…', 'dim'); await wait(700);
-      print('<pre class="cup">' + CUP + '</pre>', '');
-      print('Context window: 3 cups.', 'ok');
-    },
-    lights: function () { print('lights off. click anywhere outside this panel to bring them back.', 'dim'); lightsOff(); },
-    theme: function () { print('theme: ' + toggleTheme()); },
-    clear: function () { tb.innerHTML = ''; out = null; },
-    exit: function () { print('That is the thing about websites. There is a tab for it.', 'dim'); },
-    sudo: function () { print('andy is not in the sudoers file. This incident will be reported to Bean.', 'err'); Bean.mood('angry', 1600); Bean.say('reported.', 1400); },
-    bean: function () { Bean.hop(20); Bean.mood('happy', 1000); Bean.say('hi!', 1200); print('Bean waves from the agent panel.', 'dim'); },
-    vim: function () { print('You are already in an editor. Esc :q! will not save you here.', 'dim'); },
-    rm: function () { print('rm: refusing to delete a portfolio. It took a while.', 'err'); Bean.mood('surprised', 1200); }
-  };
-  CMDS.cat = CMDS.open; CMDS.ll = CMDS.ls; CMDS.brew = CMDS.coffee; CMDS.nvim = CMDS.vim; CMDS.emacs = CMDS.vim;
-  ['claude', 'codex', 'agy', 'opencode', 'antigravity'].forEach(function (k) {
-    CMDS[k] = function () {
-      var key = k === 'antigravity' ? 'agy' : k;
-      if (window.Agent) window.Agent.skin(key);
-      print('agent panel → <b>' + ({ claude: 'Claude Code', codex: 'Codex', agy: 'Antigravity', opencode: 'OpenCode' })[key] + '</b>', 'dim');
-    };
-  });
-
-  async function run(line) {
-    line = line.trim();
-    if (!line) return;
-    busy = true;
-    hist.push(line); hi = hist.length;
-    block(line);
-    var parts = line.split(/\s+/), cmd = parts[0].toLowerCase(), args = parts.slice(1);
-    try {
-      if (CMDS[cmd]) await CMDS[cmd](args);
-      else if (cmd.charAt(0) === '/') print('Slash commands live in the real program. Here, try <b>help</b>.', 'dim');
-      else if (resolve(line)) { go(resolve(line)); print('opened ' + esc(line), 'dim'); }
-      else print('zsh: command not found: ' + esc(cmd) + '. <b>help</b> lists what works.', 'err');
-    } finally { busy = false; }
-  }
-
-  tform.addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (busy) return;
-    var v = tin.value; tin.value = '';
-    intro.cancel = true;
-    run(v);
-  });
-  tin.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowUp' && hist.length) { e.preventDefault(); hi = Math.max(0, hi - 1); tin.value = hist[hi]; }
-    else if (e.key === 'ArrowDown' && hist.length) { e.preventDefault(); hi = Math.min(hist.length, hi + 1); tin.value = hist[hi] || ''; }
-    else if (e.key === 'Tab') {
+  function savePanes() { try { localStorage.setItem('panes', JSON.stringify(panes)); } catch (e) {} }
+  function togglePane(k) { panes[k] = panes[k] ? 0 : DEF[k]; applyPanes(); savePanes(); }
+  applyPanes();
+  $$('.split').forEach(function (sp) {
+    var k = sp.dataset.split;
+    sp.addEventListener('pointerdown', function (e) {
       e.preventDefault();
-      var v = tin.value, sp = v.lastIndexOf(' ') + 1, word = v.slice(sp).toLowerCase();
-      var pool = sp === 0 ? Object.keys(CMDS) : Object.keys(FILES).filter(function (k) { return /\.|\/$/.test(k); });
-      var hits = pool.filter(function (k) { return k.indexOf(word) === 0; });
-      if (hits.length === 1) tin.value = v.slice(0, sp) + hits[0] + (sp === 0 ? ' ' : '');
-      else if (hits.length > 1) { block(v); print(hits.join('  '), 'dim'); }
-    }
-    else if (e.key === 'l' && e.ctrlKey) { e.preventDefault(); CMDS.clear(); }
+      sp.setPointerCapture(e.pointerId);
+      document.body.classList.add('resizing', k === 'term' ? 'resizing-v' : 'resizing-h');
+      var x0 = e.clientX, y0 = e.clientY, start = panes[k] || (k === 'ex' ? 0 : DEF[k]);
+      function move(ev) {
+        var v;
+        if (k === 'ex') v = start + (ev.clientX - x0);
+        else if (k === 'ag') v = start - (ev.clientX - x0);
+        else v = start - (ev.clientY - y0);
+        if (k === 'ex') v = v < 120 ? 0 : Math.min(420, v);
+        if (k === 'ag') v = Math.max(280, Math.min(560, v));
+        if (k === 'term') v = Math.max(90, Math.min(innerHeight - 220, v));
+        panes[k] = Math.round(v); applyPanes();
+      }
+      function up() {
+        sp.removeEventListener('pointermove', move); sp.removeEventListener('pointerup', up);
+        document.body.classList.remove('resizing', 'resizing-v', 'resizing-h'); savePanes();
+        if (k === 'ex' && panes.ex === 0) { say('Explorer folded. ⌘B brings it back.'); }
+      }
+      sp.addEventListener('pointermove', move); sp.addEventListener('pointerup', up);
+    });
+    sp.addEventListener('dblclick', function () { panes[k] = DEF[k]; applyPanes(); savePanes(); });
   });
-  tin.addEventListener('focus', function () { intro.cancel = true; });
-  tb.addEventListener('click', function (e) { if (!e.target.closest('button, a') && !getSelection().toString()) tin.focus(); });
+  $('#title-file').addEventListener('dblclick', function () { togglePane('ex'); });
 
-  $('#term-toggle').addEventListener('click', function () {
-    var closed = term.classList.toggle('closed');
-    this.setAttribute('aria-expanded', String(!closed));
-    this.setAttribute('aria-label', closed ? 'Expand terminal' : 'Collapse terminal');
+  // tabs reorder, and the files in the buffer follow them
+  var tabBar = $('#tabs'), dragTab = null;
+  tabBar.addEventListener('dragstart', function (e) {
+    dragTab = e.target.closest('.tab'); if (!dragTab) return;
+    dragTab.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', dragTab.dataset.sec); } catch (x) {}
   });
-
-  // the panel types its own first command once it is on screen
-  async function intro() {
-    var text = SSH;
-    for (var i = 1; i <= text.length; i++) {
-      if (intro.cancel) { tin.value = ''; return; }
-      tin.value = text.slice(0, i);
-      await wait(38 + Math.random() * 40);
-    }
-    await wait(250);
-    if (intro.cancel) { tin.value = ''; return; }
-    tin.value = '';
-    await run(text);
-  }
-  if ('IntersectionObserver' in window && !reduced) {
-    var tio = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { tio.disconnect(); setTimeout(intro, 900); } }, { threshold: 0.4 });
-    tio.observe(term);
-  } else run(SSH);
+  tabBar.addEventListener('dragover', function (e) {
+    if (!dragTab) return;
+    e.preventDefault();
+    var over = e.target.closest('.tab');
+    if (!over || over === dragTab) return;
+    var r = over.getBoundingClientRect();
+    tabBar.insertBefore(dragTab, e.clientX < r.left + r.width / 2 ? over : over.nextSibling);
+  });
+  tabBar.addEventListener('dragend', function () {
+    if (!dragTab) return;
+    dragTab.classList.remove('dragging');
+    var foot = $('.doc-foot', doc);
+    $$('.tab', tabBar).forEach(function (t) { doc.insertBefore(document.getElementById(t.dataset.sec), foot); });
+    tabs = $$('.tab');
+    Tonic.mood('curious', 900); Tonic.say('rearranging the furniture', 1400);
+    dragTab = null;
+    queueNumbers();
+  });
 
   /* ══ command palette ═════════════════════════════════════════════ */
   var pal = $('#palette'), pin = $('#pal-in'), plist = $('#pal-list'), sel = 0, shown = [];
@@ -425,8 +350,9 @@
     ['Agent: Codex', 'skin', function () { window.Agent && window.Agent.skin('codex'); }],
     ['Agent: Antigravity', 'skin', function () { window.Agent && window.Agent.skin('agy'); }],
     ['Agent: OpenCode', 'skin', function () { window.Agent && window.Agent.skin('opencode'); }],
-    ['Focus the terminal', 'command', function () { term.classList.remove('closed'); tin.focus(); }],
-    ['Brew a coffee', 'command', function () { run('coffee'); }],
+    ['Focus the terminal', 'command', function () { term.classList.remove('closed'); window.Term && window.Term.focus(); }],
+    ['Brew a coffee', 'command', function () { termRun('coffee'); }],
+    ['Order an espresso tonic', 'command', function () { Tonic.order && Tonic.order(); }],
     ['Turn the lights off', 'command', lightsOff]
   ].forEach(function (c) { ITEMS.push({ label: c[0], hint: c[1], run: c[2] }); });
 
@@ -440,7 +366,7 @@
         '<span>' + esc(it.label) + '</span><span class="pal-hint">' + esc(it.hint) + '</span></li>';
     }).join('') : '<li class="none">No matches. Try “lawvics” or “theme”.</li>';
   }
-  function openPal() { pal.hidden = false; pin.value = ''; sel = 0; renderPal(); pin.focus(); Bean.mood('curious', 900); }
+  function openPal() { pal.hidden = false; pin.value = ''; sel = 0; renderPal(); pin.focus(); Tonic.mood('curious', 900); }
   function closePal() { pal.hidden = true; }
   function choose(i) { var it = shown[i]; closePal(); if (it) it.run(); }
   $('#open-palette').addEventListener('click', openPal);
@@ -455,7 +381,8 @@
 
   addEventListener('keydown', function (e) {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); if (pal.hidden) openPal(); else closePal(); }
-    else if (e.ctrlKey && e.key === '`') { e.preventDefault(); term.classList.remove('closed'); tin.focus(); }
+    else if (e.ctrlKey && e.key === '`') { e.preventDefault(); term.classList.remove('closed'); window.Term && window.Term.focus(); }
+    else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b') { e.preventDefault(); togglePane('ex'); }
     else if (e.key === 'Escape') { closePal(); lightsOn(); closeSheet(); }
   });
 
@@ -463,6 +390,6 @@
   if (location.hash.length > 1) setTimeout(function () { go(decodeURIComponent(location.hash.slice(1))); }, 60);
 
   window.Site = { go: go, filter: filter, copySSH: copySSH, toggleTheme: toggleTheme, lightsOff: lightsOff, say: say,
-    run: function (c) { term.classList.remove('closed'); intro.cancel = true; return run(c); },
+    run: termRun,
     swarm: function () { runSwarm && runSwarm(); }, openSheet: openSheet };
 })();

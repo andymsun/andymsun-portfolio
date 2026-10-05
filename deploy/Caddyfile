@@ -1,0 +1,5 @@
+# TLS for the visitor-count endpoint the website calls. Caddy fetches and
+# renews the certificate itself; ports 80 and 443 are published by compose.
+ssh.andymsun.com {
+	reverse_proxy sshfolio:8080
+}

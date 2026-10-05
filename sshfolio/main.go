@@ -2,6 +2,7 @@
 //
 //	SSH_SERVER_ENABLED=false  run the agent in this terminal
 //	SSH_SERVER_ENABLED=true   serve it on HOST:PORT (the server uses 22)
+//	HTTP_ADDR=:8080           also serve the shared visitor count over http
 package main
 
 import (
@@ -27,6 +28,9 @@ func main() {
 	}
 	if port == "" {
 		port = "22"
+	}
+	if addr := os.Getenv("HTTP_ADDR"); addr != "" {
+		go app.RunHTTP(addr) // the website's visitor counter, behind Caddy
 	}
 	app.RunSSHTUI(host, port)
 }

@@ -28,6 +28,8 @@
   <a class="skip" href="#doc">Skip to content</a>
 
   <div class="ide" id="ide">
+    <div class="split split-ex" data-split="ex" title="Drag to resize · double-click to reset · ⌘B folds"></div>
+    <div class="split split-ag" data-split="ag" title="Drag to resize · double-click to reset"></div>
 
     <!-- ── title bar ─────────────────────────────────────────────── -->
     <header class="titlebar">
@@ -85,12 +87,12 @@
     <!-- ── editor ────────────────────────────────────────────────── -->
     <main class="editor" id="main">
       <div class="tabs" id="tabs">
-        <a href="#readme" data-sec="readme" class="tab on">README.md</a>
-        <a href="#now" data-sec="now" class="tab">now.log</a>
-        <a href="#projects" data-sec="projects" class="tab">projects/</a>
-        <a href="#experience" data-sec="experience" class="tab">experience.md <span class="mod">●</span></a>
-        <a href="#about" data-sec="about" class="tab">about.md</a>
-        <a href="#contact" data-sec="contact" class="tab">contact.md</a>
+        <a href="#readme" data-sec="readme" class="tab on" draggable="true">README.md</a>
+        <a href="#now" data-sec="now" class="tab" draggable="true">now.log</a>
+        <a href="#projects" data-sec="projects" class="tab" draggable="true">projects/</a>
+        <a href="#experience" data-sec="experience" class="tab" draggable="true">experience.md <span class="mod">●</span></a>
+        <a href="#about" data-sec="about" class="tab" draggable="true">about.md</a>
+        <a href="#contact" data-sec="contact" class="tab" draggable="true">contact.md</a>
       </div>
 
       <div class="doc" id="doc" tabindex="-1">
@@ -328,8 +330,8 @@
                   <span class="year">2026 · in progress</span>
                 </summary>
                 <div class="body">
-                  <p>The window you're in. An explorer for navigation, a buffer you scroll, a terminal that previews the ssh program, and an agent panel with a mascot that watches what you do. Plain HTML, CSS, and a few small scripts, with no framework and no build step. The terminal version is Go, on port 22.</p>
-                  <p class="stack">HTML · CSS · vanilla JS · an SVG soft body · Go · no build step</p>
+                  <p>The window you're in. An explorer for navigation, a buffer you scroll, a terminal that behaves like one, and an agent panel with Tonic, a shot of espresso that watches what you do. Plain HTML, CSS, and a few small scripts, with no framework and no build step. The terminal version is Go, on port 22.</p>
+                  <p class="stack">HTML · CSS · vanilla JS · an SVG soft body named after an espresso tonic · Go · no build step</p>
                   <p class="links"><a href="https://github.com/andymsun/andymsun-portfolio" target="_blank" rel="noopener">Source</a></p>
                 </div>
               </details>
@@ -465,22 +467,22 @@
         <footer class="doc-foot">
           <p class="runs">Runs on <span>HTML</span><span>CSS</span><span>vanilla JS</span><span>Go</span><span>Hetzner CPX11</span><span>port 22</span></p>
           <p class="colophon">An editor with one project open. The agent panel borrows the look of Claude Code, Codex, Antigravity, and OpenCode as a homage; not affiliated with any of them, and every answer in it was written by me in advance. <a href="https://github.com/andymsun/andymsun-portfolio">Source.</a></p>
-          <p class="marq" aria-hidden="true"><span>★ best viewed over ssh ★ under construction since 2026 ★ you are visitor <b id="marq-n">000001</b> ★ no cookies, no tracking ★ bean says hi ★</span></p>
+          <p class="marq" aria-hidden="true"><span>★ best viewed over ssh ★ under construction since 2026 ★ you are visitor <b id="marq-n">#——</b> (shared with the ssh server) ★ no cookies, no tracking ★ tonic says hi ★</span></p>
         </footer>
       </div>
 
-      <!-- terminal panel -->
+      <!-- terminal panel: a real-feeling shell -->
       <section class="term" id="term" aria-label="Terminal">
+        <div class="split split-term" data-split="term" title="Drag to resize · double-click to reset"></div>
         <div class="term-bar">
-          <span class="term-tab on">zsh</span>
-          <span class="term-hint">a preview of the ssh program · type <kbd>help</kbd></span>
+          <span class="term-tab on">zsh <span class="term-tab-sub" id="term-title">~/andymsun.com</span></span>
+          <span class="term-hint">click and type · <kbd>help</kbd></span>
           <button type="button" class="term-toggle" id="term-toggle" aria-label="Collapse terminal" aria-expanded="true">⌄</button>
         </div>
-        <div class="term-body" id="term-body" aria-live="polite"></div>
-        <form class="term-input" id="term-form" autocomplete="off">
-          <span class="ps"><span class="ps-dir">~/andymsun.com</span><span class="ps-branch">agent</span></span>
-          <input id="term-in" type="text" spellcheck="false" aria-label="Terminal command" placeholder="try: ssh ssh.andymsun.com" />
-        </form>
+        <div class="screen" id="screen" tabindex="-1">
+          <div id="scrollback" aria-live="polite"></div>
+          <div class="line live" id="live"><span class="prompt" id="prompt"></span><span id="typed"></span><span class="cursor" id="cursor">&nbsp;</span><span id="after"></span><input id="term-in" class="term-capture" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal input" /></div>
+        </div>
       </section>
     </main>
 
@@ -497,19 +499,26 @@
       </div>
 
       <div class="stage" id="stage">
-        <svg class="bean" id="bean" viewBox="0 0 200 170" role="img" aria-label="Bean, the mascot. Drag it or poke it.">
+        <svg class="tonic" id="tonic" viewBox="0 0 200 170" role="img" aria-label="Tonic, a shot of espresso. Drag it, pet it, poke it.">
           <defs>
-            <linearGradient id="bean-agy" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#7aa7ff" /><stop offset="1" stop-color="#9a7cf0" />
+            <linearGradient id="tonic-agy" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#6f9bff" /><stop offset="0.55" stop-color="#9b7cf2" /><stop offset="1" stop-color="#f08a7c" />
             </linearGradient>
+            <clipPath id="tonic-clip"><path class="t-clip" d="" /></clipPath>
           </defs>
-          <ellipse class="bean-shadow" cx="100" cy="151" rx="40" ry="5" />
-          <g class="bean-steam">
-            <path d="M86 34 q-7 -9 0 -18 t0 -18" /><path d="M100 30 q-7 -9 0 -18 t0 -18" /><path d="M114 34 q-7 -9 0 -18 t0 -18" />
+          <ellipse class="t-shadow" cx="100" cy="153" rx="44" ry="5" />
+          <g class="t-steam"><path d="M86 34 q-7 -9 0 -18 t0 -18" /><path d="M100 30 q-7 -9 0 -18 t0 -18" /><path d="M114 34 q-7 -9 0 -18 t0 -18" /></g>
+          <path class="t-ant" d="" />
+          <path class="t-extra" d="" />
+          <path class="t-body" d="" />
+          <g clip-path="url(#tonic-clip)">
+            <path class="t-crema" d="" /><path class="t-fizz" d="" /><path class="t-glint" d="" />
           </g>
-          <path class="bean-body" d="" />
-          <path class="bean-eye" d="" /><path class="bean-eye" d="" />
-          <text class="bean-z" x="146" y="52">z</text>
+          <path class="t-eye" d="" /><path class="t-eye" d="" />
+          <text class="t-chest" x="100" y="130" text-anchor="middle">&gt;_</text>
+          <path class="t-front" d="" />
+          <g class="t-hearts"><path d="M92 40c-3-4-9-1-6 4l6 5 6-5c3-5-3-8-6-4z" /><path d="M110 30c-2-3-7-1-5 3l5 4 5-4c2-4-3-6-5-3z" /></g>
+          <text class="t-z" x="150" y="50">z</text>
         </svg>
         <p class="bubble" id="bubble" aria-live="polite"></p>
       </div>
@@ -538,16 +547,19 @@
       <span class="sb-dots"><i class="dot-s green"></i>8 <i class="dot-s yellow"></i>5 <i class="dot-s red"></i>1</span>
       <span class="sb-sp"></span>
       <span id="sb-pos">Ln 1</span>
-      <span id="sb-visits">visit 1</span>
+      <span id="sb-visits" title="Shared with ssh ssh.andymsun.com">visitors</span>
       <span class="sb-skin" id="sb-skin">Claude Code</span>
       <span class="sb-hide">UTF-8</span>
     </footer>
   </div>
 
-  <!-- the mascot's way in on smaller screens -->
-  <button type="button" class="fab" id="fab" aria-label="Open the agent panel" aria-controls="agent">
-    <svg viewBox="0 0 200 170" class="bean bean-mini" id="bean-mini" aria-hidden="true">
-      <path class="bean-body" d="" /><path class="bean-eye" d="" /><path class="bean-eye" d="" />
+  <!-- Tonic's way in on smaller screens -->
+  <button type="button" class="fab" id="fab" aria-label="Open the agent panel and Tonic" aria-controls="agent">
+    <svg viewBox="0 0 200 170" class="tonic tonic-mini" id="tonic-mini" aria-hidden="true">
+      <defs><clipPath id="tonic-clip-mini"><path class="t-clip" d="" /></clipPath></defs>
+      <path class="t-ant" d="" /><path class="t-extra" d="" /><path class="t-body" d="" />
+      <g clip-path="url(#tonic-clip-mini)"><path class="t-crema" d="" /></g>
+      <path class="t-eye" d="" /><path class="t-eye" d="" />
     </svg>
   </button>
 
@@ -574,8 +586,9 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="bean.js"></script>
+  <script src="tonic.js"></script>
   <script src="app.js"></script>
+  <script src="term.js"></script>
   <script src="agent.js"></script>
   <script src="eggs.js"></script>
 </body>
