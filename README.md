@@ -13,8 +13,8 @@ A portfolio that pretends to be a coding agent. It only knows about Andy.
   The agent panel answers with tool calls that move the page. Tonic, the
   mascot (`tonic.js`), is a shot of espresso on springs named after an
   espresso tonic: a different vessel per agent skin, a caffeine level, and a
-  long list of reactions. `espresso.machine` is a working manual lever
-  machine for pulling it shots (see docs/direction.md). The agent panel has
+  long list of reactions. `espresso.machine` is a simulated Fellow Series 1
+  and Opus 2 (Darcy flow, extraction, shot feedback) for pulling it shots (see docs/direction.md). The agent panel has
   four skins (Claude Code, Codex, Antigravity, OpenCode). Under 760px it is an
   ordinary scrolling page and the agent opens as a sheet. Every word is in the
   markup. No framework, no build step; `?fast` skips the animations.
@@ -57,7 +57,7 @@ port 22 is taken by the portfolio, the systemd unit, and the one-line update.
 index.html style.css           web front end
 app.js                         editor: nav, panes, line numbers, filters, palette, visitor count
 coffee.js                      caffeine, spills, the sticky cursor
-machine.js                     espresso.machine, the lever machine
+machine.js                     espresso.machine: a simulated Series 1 + Opus 2
 term.js                        the terminal panel
 agent.js                       agent panel and its four skins
 tonic.js                       the mascot

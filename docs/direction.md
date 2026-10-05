@@ -54,6 +54,37 @@ levels, tabs, `/mcp`, `/skills`, the fake shell, the animations, the feedback
 log. That is where the learning curve belongs, because the people who type
 `ssh ssh.andymsun.com` are asking for one.
 
+## round eight: a real machine
+
+`espresso.machine` is now a working model of a Fellow Espresso Series 1 and an
+Opus 2 grinder, drawn from their public specs and photos (six colourways), and
+simulated rather than animated:
+
+- **Grinder**: stepless side dial on a cylinder ring; setting → particle size
+  and fines; single-dose load, ~2 g/s, a little retention.
+- **Puck prep**: a top-down basket. Drag to stir (WDT) and watch the clumps
+  even out; hold still to tamp, with a force meter and a level bubble that
+  follows your pointer. Evenness, force, and tilt set porosity and the risk of
+  a channel.
+- **Hydraulics**: 15-bar pump curve, headspace fill, puck wetting with a
+  gradual first drip, compliance, Darcy flow through a Kozeny–Carman
+  permeability, resistance falling through the shot; a pressure controller
+  chases each profile's target, capped at 9 bar. Profiles: Classic, Bloom,
+  Ramp, Turbo, Lever, Manual (the knob sets pressure live).
+- **Extraction**: two-pool dissolution scaled by temperature and roast →
+  beverage weight, TDS, extraction yield, crema colour. Tuned so 18 g at grind
+  2.0 gives ~36 g in ~29 s at ~9.7% TDS and ~19.5% EY.
+- **The machine's face**: round LCD (pressure arc on a 0–9 ring, goal tick,
+  completion arc, timer, stage), turn-and-press knob, brew/steam/water keys,
+  a portafilter you drag to lock, a scale under a double-walled glass.
+- **Feedback**: like the real one, it says how much finer or coarser to grind,
+  found by bisecting replays of your exact puck; Tonic's autopilot uses it.
+- **Telemetry**: live pressure, target, flow, and weight, with the last shot
+  ghosted behind; a shot log; optional synthesized pump, grinder, and steam
+  sound; 1×/2×/4× speed.
+- Serve by carrying the cup to Tonic, over tonic and ice, as an americano from
+  the wand, or as a flat white after steaming milk with auto-stop.
+
 ## round seven: coffee
 
 - **Tonic lost its limbs, its spin, and its hearts.** The vessels stay (clay

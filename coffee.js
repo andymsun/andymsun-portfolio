@@ -56,10 +56,11 @@
       balanced: ['perfect shot.', 'sweet. balanced. ten out of ten.', 'that is the good stuff'],
       sour: ['sour! grind finer?', 'under-extracted. it bites.'],
       bitter: ['bitter… went too long', 'over-extracted. ash.'],
-      thin: ['that was mostly water', 'watery. more coffee next time?']
+      thin: ['that was mostly water', 'watery. more coffee next time?'],
+      uneven: ['sour and bitter at once…']
     }[report.verdict] || ['gulp'];
     Tonic.mood(report.verdict === 'balanced' ? 'happy' : report.verdict === 'bitter' ? 'sad' : 'angry', 1600);
-    Tonic.say(lines[Math.floor(Math.random() * lines.length)], 2200);
+    Tonic.say(report.line || lines[Math.floor(Math.random() * lines.length)], 2200);
     Tonic.brew();
   }
 
