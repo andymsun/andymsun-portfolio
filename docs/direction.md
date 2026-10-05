@@ -54,6 +54,29 @@ levels, tabs, `/mcp`, `/skills`, the fake shell, the animations, the feedback
 log. That is where the learning curve belongs, because the people who type
 `ssh ssh.andymsun.com` are asking for one.
 
+## round seven: coffee
+
+- **Tonic lost its limbs, its spin, and its hearts.** The vessels stay (clay
+  glass, blue robot with antenna and `>_`, floating arch, block). New: it
+  leans toward a nearby cursor, flinches from one that rushes at it, and
+  circling the cursor over it stirs the crema.
+- **Caffeine.** `coffee.js` keeps a level that drains a point every 10 s and
+  persists per browser. The status bar and the stage show it (empty, fading,
+  fresh, perky, jittery). Perky and jittery make Tonic tremble; above 95 the
+  cursor drips coffee. Running empty, Tonic dozes off and asks for a shot.
+- **espresso.machine.** A manual lever machine you operate: hold to grind
+  (grind size and dose), hold to tamp (release in the 13–20 kg band), lock the
+  portafilter, then drag the lever and hold the needle near 9 bar. Flow is
+  pressure over puck resistance (grind and tamp), shot time runs at 2x, a
+  light tamp channels. The report grades it sour, balanced, bitter, or thin
+  from an estimated extraction. Serve by carrying the cup across the page to
+  Tonic (it tilts with speed and spills if you rush), or with the buttons;
+  "over tonic and ice" turns Tonic into an espresso tonic. "Let Tonic pull
+  one", the agent chip, and `coffee` in the terminal run it on autopilot.
+- **Theme spam.** Four flips in three seconds and Tonic spills a cup over the
+  switch: locked for five seconds, and touching it makes the cursor sticky
+  (a lagging pointer with a drip on it).
+
 ## round six: a real terminal, and Tonic
 
 - **The terminal is a shell now.** Inline prompt, block cursor, readline keys

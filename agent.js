@@ -162,11 +162,11 @@
       await reply('Copied. Paste it into any terminal and you get this portfolio as a program: slash commands, subagents, three skins, and a coffee machine. No account, nothing to install. The terminal panel is playing a preview.');
       Site.run('ssh ssh.andymsun.com');
     }],
-    coffee: ['Brew a coffee', async function () {
+    coffee: ['Pull Tonic a shot', async function () {
       await think(600);
-      await tool('Bash', 'brew install coffee', '☕ 1 cup poured', function () { Tonic.brew(); });
-      await reply('Brewed. Andy runs on roughly the same fuel. Three of these and I start to vibrate.');
-      Tonic.say('☕ mmm', 1600);
+      await tool('Read', 'espresso.machine', 'grind 5 · 18 g · 9 bar', function () { Site.go('machine'); });
+      await reply('Pulling one on the lever machine: 18 g in, a firm tamp, nine bar, about 36 g out. Watch the gauge. Next time try it yourself; it grades the shot.');
+      if (window.Machine) window.Machine.auto();
     }]
   };
   function findIn(sel, words) {
@@ -227,7 +227,7 @@
       return reply('A terminal is the smallest interface there is: no layout engine, no fonts, a grid of cells. Designing for one forces a decision about what matters. That\'s why the portfolio exists twice, here and on port 22.');
     }
     if (has('ssh')) return FLOWS.ssh[1]();
-    if (has('coffee', 'brew', 'latte', 'espresso')) return FLOWS.coffee[1]();
+    if (has('coffee', 'brew', 'latte', 'espresso', 'shot', 'machine', 'caffeine')) return FLOWS.coffee[1]();
     if (has('experience', 'history', 'career', 'jobs')) {
       await think(500);
       await tool('Read', 'experience.md', 'Read 31 lines', function () { Site.go('experience'); });
@@ -241,7 +241,7 @@
     if (has('badminton')) { await think(500); return reply('Every open gym. He\'s logistics officer for the UChicago club: dues, suppliers, a regional tournament, and a live board of who is on which court.'); }
     if (has('espresso tonic', 'tonic please', 'order')) { await think(400); Tonic.order(); return reply('One espresso tonic: ice, tonic, and a double shot poured slowly on top so it layers. Andy\'s order, and where my name comes from.'); }
     if (has('your name', 'who are you', 'mascot', 'tonic', 'bean')) { await think(400); Tonic.hop(18); return reply('I\'m Tonic, named after Andy\'s favourite drink, an espresso tonic. Underneath: 44 points on springs, a crema layer that sloshes, and two eyes. Drag me, pet me slowly, or type “tonic” anywhere on the page.'); }
-    if (has('love you', '<3', 'cute')) { await think(300); Tonic.mood('love', 2000); Tonic.hop(16); return reply('Stop, I\'ll foam over.'); }
+    if (has('love you', '<3', 'cute')) { await think(300); Tonic.mood('happy', 2000); Tonic.hop(16); return reply('Stop, I\'ll foam over.'); }
     if (has('hello', 'hi', 'hey', 'yo', 'sup')) { await think(300); Tonic.hop(14); return reply('Hi. I only know about one person. The buttons below are the quick way in.'); }
     await think(600);
     return reply('I only know about Andy. Try a project by name (say, “Rivendell”), a company (“KindEd”), or one of the buttons.');

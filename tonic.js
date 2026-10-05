@@ -53,10 +53,10 @@
   };
 
   var SKINS = {
-    claude:   { v: 'glass', w: 7,  h: 15, k: 0.92, lean: 0,   gap: 24, float: 0, crema: 0.26, extra: 'clawd' },
+    claude:   { v: 'glass', w: 7,  h: 15, k: 0.92, lean: 0,   gap: 24, float: 0, crema: 0.26, extra: '' },
     codex:    { v: 'robot', w: 8,  h: 12, k: 0.96, lean: 0,   gap: 24, float: 0, crema: 0.18, extra: 'robot' },
     agy:      { v: 'arch',  w: 9,  h: 18, k: 0.6,  lean: 0,   gap: 24, float: 10, crema: 0.24, extra: 'orbit' },
-    opencode: { v: 'block', w: 11, h: 11, k: 0.98, lean: 0,   gap: 26, float: 0, crema: 0.2, extra: 'feet' }
+    opencode: { v: 'block', w: 11, h: 11, k: 0.98, lean: 0,   gap: 26, float: 0, crema: 0.2, extra: '' }
   };
 
   var MOODS = {
@@ -69,8 +69,7 @@
     think:     { w: 1,    t: 0.9,  b: 0.7,  tilt: 0,   dy: -1 },
     read:      { w: 1,    t: 0.75, b: 0.75, tilt: 0,   dy: 2 },
     sleep:     { w: 1.3,  t: 0.08, b: 0.08, tilt: 0,   dy: 5 },
-    dizzy:     { w: 1.15, t: 0.9,  b: 0.9,  tilt: 0,   dy: 0 },
-    love:      { w: 1.3,  t: 0.8,  b: -0.35, tilt: 0,  dy: -2 }
+    dizzy:     { w: 1.15, t: 0.9,  b: 0.9,  tilt: 0,   dy: 0 }
   };
 
   function lerp(a, b, t) { return a + (b - a) * t; }
@@ -86,7 +85,7 @@
     this.bodyEl = q('.t-body'); this.clipEl = q('.t-clip'); this.cremaEl = q('.t-crema'); this.glint = q('.t-glint');
     this.eyeEls = svg.querySelectorAll('.t-eye'); this.shadow = q('.t-shadow'); this.steam = q('.t-steam');
     this.z = q('.t-z'); this.extra = q('.t-extra'); this.ant = q('.t-ant'); this.chest = q('.t-chest');
-    this.front = q('.t-front'); this.fizz = q('.t-fizz'); this.hearts = q('.t-hearts');
+    this.front = q('.t-front'); this.fizz = q('.t-fizz');
     this.c = { x: HOME.x, y: HOME.y, vx: 0, vy: 0 };
     this.p = []; for (var i = 0; i < N; i++) this.p.push({ x: HOME.x, y: HOME.y, vx: 0, vy: 0 });
     this.eye = { w: 8, t: 7, b: 7, tilt: 0, dy: 0, gx: 0, gy: 0 };
@@ -114,6 +113,14 @@
     var c = this.c, k = dt * 60;
     var hy = HOME.y - (reduced ? 0 : S.skin.float * (0.6 + 0.4 * Math.sin(t * 1.3))) - S.hop;
     var tx = HOME.x, ty = hy;
+    // lean a little toward the cursor when it is nearby
+    if (S.pointer && !this.drag && this.interactive) {
+      var rr = this.svg.getBoundingClientRect();
+      if (rr.width) {
+        var ddx = S.pointer.x - (rr.left + c.x / 200 * rr.width), ddy = S.pointer.y - (rr.top + c.y / 170 * rr.height);
+        if (Math.hypot(ddx, ddy) < 420) tx += clamp(ddx / 28, -7, 7);
+      }
+    }
     if (this.drag) {
       tx += clamp((this.drag.x - this.drag.x0) * 0.35, -30, 30);
       ty += clamp((this.drag.y - this.drag.y0) * 0.35, -26, 18);
@@ -171,7 +178,7 @@
     if (this.cremaEl) {
       var depth = (S.tonicMode ? 0.42 : sk.crema) * H, base = bx.minY + depth, cd = 'M' + f(bx.minX - 12) + ' ' + f(bx.minY - 20) + 'L' + f(bx.maxX + 12) + ' ' + f(bx.minY - 20);
       for (var x = bx.maxX + 12; x >= bx.minX - 12; x -= 6) {
-        var y = base + this.slosh * (x - this.cx) * 0.9 + (reduced ? 0 : Math.sin(x * 0.13 + t * 2.6) * 1.4);
+        var y = base + this.slosh * (x - this.cx) * 0.9 + (reduced ? 0 : Math.sin(x * 0.13 + t * (2.6 + S.swirl * 6)) * (1.4 + S.swirl * 4));
         cd += 'L' + f(x) + ' ' + f(y);
       }
       this.cremaEl.setAttribute('d', cd + 'Z');
@@ -197,27 +204,13 @@
     }
     if (this.steam) { this.steam.style.opacity = String(S.steam); this.steam.setAttribute('transform', 'translate(' + f(this.cx - 100) + ' ' + f(bx.minY - 48) + ')'); }
     if (this.z) { this.z.style.opacity = S.mood === 'sleep' ? String(0.5 + 0.5 * Math.sin(t * 2)) : '0'; this.z.setAttribute('x', f(bx.maxX + 6)); this.z.setAttribute('y', f(bx.minY + 4 - (t * 6 % 10))); }
-    if (this.hearts) {
-      var on = S.mood === 'love' ? 1 : 0;
-      this.hearts.style.opacity = String(on);
-      if (on) this.hearts.setAttribute('transform', 'translate(' + f(this.cx - 100) + ' ' + f(bx.minY - 30 - (t * 10 % 12)) + ')');
-    }
   };
 
   Body.prototype.drawExtras = function (t, bx, H) {
     var sk = S.skin, cx = this.cx, ex = '', ant = '';
-    var walk = (Math.abs(this.c.vx) > 0.4 || S.mood === 'happy' || S.party) && !reduced;
-    if (sk.extra === 'clawd') {
-      var legs = [-27, -13, 6, 20];
-      legs.forEach(function (lx, i) { var lift = walk ? Math.max(0, Math.sin(t * 14 + i * 1.6)) * 3 : 0; ex += rect(cx + lx, bx.maxY - 3 - lift, 7, 10); });
-      var arm = walk ? Math.sin(t * 10) * 2 : 0;
-      ex += rect(bx.minX - 6, this.cy - 2 + arm, 9, 9) + rect(bx.maxX - 3, this.cy - 2 - arm, 9, 9);
-    } else if (sk.extra === 'robot') {
+    if (sk.extra === 'robot') {
       ant = 'M' + f(cx) + ' ' + f(bx.minY + 1) + 'L' + f(cx + Math.sin(t * 3) * 2) + ' ' + f(bx.minY - 13);
       ex += rect(cx - 4 + Math.sin(t * 3) * 2, bx.minY - 19, 8, 8);
-      ex += rect(cx - 22, bx.maxY - 3, 12, 8) + rect(cx + 10, bx.maxY - 3, 12, 8);
-    } else if (sk.extra === 'feet') {
-      ex += rect(cx - 30, bx.maxY - 2, 16, 6) + rect(cx + 14, bx.maxY - 2, 16, 6);
     }
     if (this.extra) this.extra.setAttribute('d', ex);
     if (this.ant) this.ant.setAttribute('d', ant);
@@ -264,7 +257,7 @@
   /* ── shared state ──────────────────────────────────────────────── */
   var S = {
     skin: SKINS.claude, skinKey: 'claude', mood: 'idle', moodUntil: 0, base: 'idle',
-    ripple: false, hop: 0, steam: 0, wink: false, jitter: 0, party: false, tonicMode: false,
+    ripple: false, hop: 0, steam: 0, wink: false, swirl: 0, jitter: 0, party: false, tonicMode: false,
     look: null, lookUntil: 0, pointer: null, nextBlink: 2, blinkStart: -1,
     blinkAmt: function (t) {
       if (S.mood === 'sleep') return 1;
@@ -303,6 +296,7 @@
     var t = (ts - t0) / 1000;
     if (S.moodUntil && ts > S.moodUntil) { S.mood = S.base; S.moodUntil = 0; }
     S.hop *= Math.pow(0.86, dt * 60);
+    S.swirl = Math.max(0, S.swirl - dt * 0.5);
     S.steam = Math.max(S.tonicMode ? 0 : 0, S.steam - dt * 0.12);
     if (S.party && !reduced && Math.random() < 0.04) S.hop = 14;
     watchEggs();
@@ -362,6 +356,7 @@
         b.sloshV += (x < b.cx ? 1 : -1) * 0.12;
       });
     },
+    rect: function () { return big ? big.getBoundingClientRect() : null; },
     get moodName() { return S.mood; },
     get skinName() { return S.skinKey; },
     get tonicMode() { return S.tonicMode; }
@@ -380,7 +375,23 @@
   setInterval(function () {
     if (S.mood !== 'sleep' && !S.moodUntil && now() - lastActive > 28000 && S.base === 'idle') { Tonic.base('sleep'); Tonic.say('zz', 1600); }
   }, 1000);
-  addEventListener('pointermove', function (e) { S.pointer = { x: e.clientX, y: e.clientY }; active(); }, { passive: true });
+  var lastP = null, lastFlinch = 0;
+  addEventListener('pointermove', function (e) {
+    var tn = now();
+    S.pointer = { x: e.clientX, y: e.clientY }; active();
+    // a cursor rushing at Tonic makes it flinch away
+    if (big && lastP && tn - lastFlinch > 2000 && !bodies[0].drag) {
+      var r = big.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height * 0.55;
+      var d0 = Math.hypot(lastP.x - cx, lastP.y - cy), d1 = Math.hypot(e.clientX - cx, e.clientY - cy), dt = Math.max(1, tn - lastP.t);
+      if (r.width && d1 < 120 && (d0 - d1) / dt > 2.2) {
+        lastFlinch = tn;
+        bodies[0].c.vx += (e.clientX < cx ? 1 : -1) * 7; bodies[0].sloshV += (e.clientX < cx ? -1 : 1) * 0.2;
+        Tonic.mood('surprised', 600);
+        if (Math.random() < 0.4) Tonic.say(['eep', 'personal space', 'whoa'][Math.floor(Math.random() * 3)], 900);
+      }
+    }
+    lastP = { x: e.clientX, y: e.clientY, t: tn };
+  }, { passive: true });
   addEventListener('keydown', active);
   document.addEventListener('pointerleave', function () { S.pointer = null; });
 
@@ -407,7 +418,7 @@
     var el = e.target === document ? document.scrollingElement : e.target;
     if (!el || el.closest && el.closest('.agent, .term')) return;
     if (!sawBottom && el.scrollHeight > 2000 && el.scrollTop + el.clientHeight > el.scrollHeight - 40) {
-      sawBottom = true; Tonic.hop(18); Tonic.mood('love', 1600); Tonic.say('you read the whole thing', 2000);
+      sawBottom = true; Tonic.hop(18); Tonic.mood('happy', 1600); Tonic.say('you read the whole thing', 2000);
     }
     if (now() < quietUntil) { lastY = null; return; }
     var y = el.scrollTop, tn = now();
@@ -466,7 +477,7 @@
   var buf = '', keys = [], KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
   addEventListener('keydown', function (e) {
     keys.push(e.key); keys = keys.slice(-10);
-    if (keys.join() === KONAMI.join()) { keys = []; Tonic.party(7000); Tonic.mood('love', 3000); Tonic.say('↑↑↓↓←→←→ba! party.', 2600); return; }
+    if (keys.join() === KONAMI.join()) { keys = []; Tonic.party(7000); Tonic.mood('happy', 3000); Tonic.say('↑↑↓↓←→←→ba! party.', 2600); return; }
     if (/INPUT|TEXTAREA/.test(e.target.tagName) || e.metaKey || e.ctrlKey || e.key.length !== 1) return;
     buf = (buf + e.key.toLowerCase()).slice(-24);
     if (/espresso ?tonic$/.test(buf) || /tonic$/.test(buf)) { buf = ''; Tonic.order(); }
@@ -478,21 +489,11 @@
   var orderT;
   Tonic.order = function () {
     var on = Tonic.tonic(true);
-    Tonic.mood('love', 2200); Tonic.hop(20);
+    Tonic.mood('happy', 2200); Tonic.hop(20);
     Tonic.say('espresso tonic. andy\'s order.', 2600);
     clearTimeout(orderT);
     orderT = setTimeout(function () { Tonic.tonic(false); Tonic.say('back to a plain shot', 1400); }, 20000);
     return on;
-  };
-
-  // caffeine: every coffee counts, and too many show
-  var cups = 0;
-  var brew = Tonic.brew;
-  Tonic.brew = function () {
-    brew(); cups++;
-    if (cups >= 5) { Tonic.jitter(4, 9000); Tonic.say('I can hear colours', 2000); }
-    else if (cups >= 3) { Tonic.jitter(2, 6000); Tonic.say('cup ' + cups + '. vibrating slightly.', 1800); }
-    return cups;
   };
 
   // the title-bar dots fling, flatten, and stretch a fake cursor; Tonic watches it go
@@ -507,34 +508,45 @@
     wasEgg = egg;
   }
 
-  /* ── poke, pet, shake, drag, fling, spin ───────────────────────── */
+  /* ── poke, stroke, shake, stir, drag, fling ─────────────────────── */
   bodies.forEach(function (b) {
     if (!b.interactive) return;
     var svg = b.svg, clicks = [], track = [];
     function toSvg(e) { var r = svg.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * 200, y: (e.clientY - r.top) / r.height * 170 }; }
     function inside(q) { return q.x > b.box.minX - 8 && q.x < b.box.maxX + 8 && q.y > b.box.minY - 8 && q.y < b.box.maxY + 8; }
 
-    // petting: slow strokes over it; shaking: fast back-and-forth over it
-    var petTime = 0, lastMove = 0, lastX = null, dir = 0, flips = [];
+    // slow strokes make it squint happily; fast back-and-forth shakes it
+    var petTime = 0, lastMove = 0, lastX = null, dir = 0, flips = [], lastAng = null, stirAcc = 0, stirStart = 0;
     svg.addEventListener('pointermove', function (e) {
       if (b.drag) return;
       var q = toSvg(e), tn = now();
-      if (!inside(q)) { lastX = null; return; }
+      if (!inside(q)) { lastX = null; lastAng = null; return; }
       if (lastX !== null) {
         var dx = q.x - lastX, sp = Math.abs(dx) / Math.max(1, tn - lastMove);
-        if (sp < 0.25) { petTime += tn - lastMove; if (petTime > 1400) { petTime = 0; Tonic.mood('love', 1800); Tonic.say(['purr', 'that is nice', 'mmm'][Math.floor(Math.random() * 3)], 1400); } }
+        if (sp < 0.25) { petTime += tn - lastMove; if (petTime > 1400) { petTime = 0; Tonic.mood('happy', 1200); } }
         var d = Math.sign(dx);
         if (sp > 1 && d && d !== dir) { dir = d; flips.push(tn); flips = flips.filter(function (x) { return tn - x < 900; }); b.sloshV += d * 0.12; }
         if (flips.length >= 6) { flips = []; Tonic.mood('dizzy', 1600); Tonic.say('stop, I\'ll spill', 1600); Tonic.shake(10); }
       }
       lastX = q.x; lastMove = tn;
+      // circling over it stirs the crema
+      var ang = Math.atan2(q.y - b.cy, q.x - b.cx);
+      if (lastAng !== null) {
+        var da = ang - lastAng; if (da > Math.PI) da -= TAU; if (da < -Math.PI) da += TAU;
+        if (tn - stirStart > 2600) { stirAcc = 0; stirStart = tn; }
+        stirAcc += da;
+        S.swirl = Math.min(1.2, S.swirl + Math.abs(da) * 0.05);
+        if (Math.abs(stirAcc) > TAU * 2) { stirAcc = 0; stirStart = tn; b.sloshV += 0.3; Tonic.mood('dizzy', 900); Tonic.say('stirred, not shaken', 1500); }
+      }
+      lastAng = ang;
     });
+    svg.addEventListener('pointerleave', function () { lastAng = null; lastX = null; });
 
     svg.addEventListener('pointerdown', function (e) {
       var q = toSvg(e), best = 0, bd = 1e9;
       for (var i = 0; i < N; i++) { var d = Math.hypot(b.p[i].x - q.x, b.p[i].y - q.y); if (d < bd) { bd = d; best = i; } }
       if (bd > 70) return;
-      svg.setPointerCapture(e.pointerId);
+      try { svg.setPointerCapture(e.pointerId); } catch (x) {}
       b.drag = { i: best, x0: q.x, y0: q.y, x: q.x, y: q.y, moved: 0 };
       track = [{ x: q.x, y: q.y, t: now() }];
       Tonic.mood('surprised', 400);
@@ -568,10 +580,5 @@
     }
     svg.addEventListener('pointerup', release);
     svg.addEventListener('pointercancel', release);
-    svg.addEventListener('dblclick', function () {
-      svg.classList.remove('spin'); void svg.getBoundingClientRect(); svg.classList.add('spin');
-      Tonic.say('wheee', 900);
-      setTimeout(function () { svg.classList.remove('spin'); }, 800);
-    });
   });
 })();

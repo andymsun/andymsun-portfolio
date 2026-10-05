@@ -143,7 +143,7 @@
       ['ls · cd · cat · tree', 'walk the repo (it is this page)'], ['grep -i &lt;word&gt;', 'search everything Andy wrote'],
       ['open &lt;file&gt;', 'jump the editor there'], ['ssh ' + HOST, 'a replica of the real program'],
       ['curl ' + HOST + '/visits', 'the real visitor count'], ['git status · git log · git diff', 'what changed'],
-      ['claude · codex · agy · opencode', 'swap the agent skin'], ['coffee · tonic · sl · cowsay', 'and so on'],
+      ['claude · codex · agy · opencode', 'swap the agent skin'], ['coffee · coffee status · tonic · sl', 'and so on'],
       ['theme · lights · clear · history', '']
     ].map(function (r) { return '<span class="k">' + r[0] + '</span><span class="d">' + r[1] + '</span>'; }).join('') + '</div>');
     out('<span class="dim">ctrl-c interrupts · ctrl-l clears · tab completes · ↑ history</span>');
@@ -348,11 +348,15 @@
     if (times.length) plain('--- ' + HOST + ' ping statistics ---\n' + times.length + ' packets received, round-trip min/avg/max = ' + Math.min.apply(null, times).toFixed(1) + '/' + (times.reduce(function (x, y) { return x + y; }, 0) / times.length).toFixed(1) + '/' + Math.max.apply(null, times).toFixed(1) + ' ms (real, over https, from Ashburn)', 'dim');
   };
   C.coffee = C.brew = async function (a) {
-    if (/tonic/.test(a.join(' '))) return C.tonic(['--order']);
-    plain('brewing…', 'dim'); await wait(700);
-    var n = Tonic.brew();
-    out('<span class="acc">   ) ) )\n   ( ( (\n ▗▟█████▙▖\n ▐███████▌▙\n ▝▜█████▛▘▛\n  ▀▀▀▀▀▀▀</span>', 'pre');
-    plain('cup ' + n + '. ' + (n >= 5 ? 'Tonic is vibrating. maybe water next.' : 'context window: ' + (n + 2) + ' cups.'), n >= 5 ? 'c-warn' : 'ok');
+    var arg = a.join(' ');
+    if (/tonic/.test(arg)) return C.tonic(['--order']);
+    if (/status/.test(arg) || !window.Machine) {
+      var c = window.Coffee;
+      return plain('caffeine ' + Math.round(Math.min(100, c.level)) + '% · ' + c.word + ' · ' + c.shots + ' shot' + (c.shots === 1 ? '' : 's') + ' today', c.word === 'empty' ? 'err' : '');
+    }
+    plain('pulling a shot on espresso.machine: 18 g, tamp 15 kg, 9 bar…', 'dim');
+    window.Machine.auto();
+    plain('watch the editor. (coffee status shows the caffeine; open espresso.machine to pull one yourself)', 'dim');
   };
   C.make = function (a) { if (/tonic/.test(a.join(' '))) return C.tonic(['--order']); plain('make: *** No rule to make target \'' + (a[0] || '') + '\'.  Try make espresso-tonic.', 'err'); };
   C.tonic = function (a) {

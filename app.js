@@ -47,15 +47,27 @@
   function currentTheme() {
     return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   }
-  var themeFlips = [];
+  // flip it too often and Tonic spills coffee over the switch for five seconds
+  var themeFlips = [], themeLockedUntil = 0;
   function toggleTheme() {
     var tn = Date.now();
+    if (tn < themeLockedUntil) {
+      var secs = Math.ceil((themeLockedUntil - tn) / 1000);
+      if (window.Coffee) window.Coffee.sticky(3500);
+      say('It\'s covered in coffee. ' + secs + 's.');
+      Tonic.mood('angry', 900); Tonic.say('that\'s what you get', 1400);
+      return currentTheme();
+    }
     themeFlips = themeFlips.filter(function (x) { return tn - x < 3000; }); themeFlips.push(tn);
     var next = currentTheme() === 'dark' ? 'light' : 'dark';
     root.dataset.theme = next;
     try { localStorage.setItem('theme', next); } catch (e) {}
-    if (themeFlips.length >= 4) { themeFlips = []; Tonic.mood('dizzy', 1400); Tonic.say('make up your mind', 1600); }
-    else { Tonic.mood(next === 'light' ? 'angry' : 'happy', 900); Tonic.say(next === 'light' ? 'bright!' : 'ahh, better', 1200); }
+    if (themeFlips.length >= 4) {
+      themeFlips = [];
+      Tonic.mood('angry', 2400); Tonic.shake(10); Tonic.say('ENOUGH. *splash*', 2200);
+      if (window.Coffee) themeLockedUntil = window.Coffee.spill($('#theme-btn'), 5000);
+      say('Tonic spilled coffee on the theme switch');
+    } else { Tonic.mood(next === 'light' ? 'angry' : 'happy', 900); Tonic.say(next === 'light' ? 'bright!' : 'ahh, better', 1200); }
     return next;
   }
   $('#theme-btn').addEventListener('click', toggleTheme);
@@ -88,10 +100,13 @@
   var titleFile = $('#title-file'), tabs = $$('.tab'), treeLinks = $$('.tree a');
   var visited = {};
   function setActive(id, file) {
-    if (!visited[id]) {
+    // a file counts as read once it has been on screen for a couple of seconds
+    clearTimeout(setActive.dwell);
+    setActive.dwell = setTimeout(function () {
+      if (visited[id]) return;
       visited[id] = 1;
-      if (Object.keys(visited).length === 6) { setTimeout(function () { say('Opened every file in the repo'); Tonic.mood('love', 1800); Tonic.hop(16); Tonic.say('a completionist!', 1800); }, 400); }
-    }
+      if (Object.keys(visited).length === 7) { say('Read every file in the repo'); Tonic.mood('happy', 1800); Tonic.hop(16); Tonic.say('a completionist!', 1800); }
+    }, 2000);
     tabs.forEach(function (t) { t.classList.toggle('on', t.dataset.sec === id); });
     treeLinks.forEach(function (a) { if (a.dataset.sec) a.classList.toggle('on', a.dataset.sec === id); });
     if (titleFile.textContent !== file) titleFile.textContent = file;
@@ -282,7 +297,7 @@
     var k = sp.dataset.split;
     sp.addEventListener('pointerdown', function (e) {
       e.preventDefault();
-      sp.setPointerCapture(e.pointerId);
+      try { sp.setPointerCapture(e.pointerId); } catch (x) {}
       document.body.classList.add('resizing', k === 'term' ? 'resizing-v' : 'resizing-h');
       var x0 = e.clientX, y0 = e.clientY, start = panes[k] || (k === 'ex' ? 0 : DEF[k]);
       function move(ev) {
@@ -351,7 +366,8 @@
     ['Agent: Antigravity', 'skin', function () { window.Agent && window.Agent.skin('agy'); }],
     ['Agent: OpenCode', 'skin', function () { window.Agent && window.Agent.skin('opencode'); }],
     ['Focus the terminal', 'command', function () { term.classList.remove('closed'); window.Term && window.Term.focus(); }],
-    ['Brew a coffee', 'command', function () { termRun('coffee'); }],
+    ['Open the espresso machine', 'file', function () { go('machine'); }],
+    ['Let Tonic pull a shot', 'command', function () { window.Machine && window.Machine.auto(); }],
     ['Order an espresso tonic', 'command', function () { Tonic.order && Tonic.order(); }],
     ['Turn the lights off', 'command', lightsOff]
   ].forEach(function (c) { ITEMS.push({ label: c[0], hint: c[1], run: c[2] }); });

@@ -76,6 +76,7 @@
         <li><a href="#experience" data-sec="experience"><i class="fi fi-md">#</i>experience.md <span class="mod" title="1 unsaved change">●</span></a></li>
         <li><a href="#about" data-sec="about"><i class="fi fi-md">#</i>about.md</a></li>
         <li><a href="#contact" data-sec="contact"><i class="fi fi-md">#</i>contact.md</a></li>
+        <li><a href="#machine" data-sec="machine"><i class="fi fi-cup">◉</i>espresso.machine</a></li>
       </ul>
       <div class="legend">
         <p><i class="dot-s green"></i>shipped or active</p>
@@ -93,6 +94,7 @@
         <a href="#experience" data-sec="experience" class="tab" draggable="true">experience.md <span class="mod">●</span></a>
         <a href="#about" data-sec="about" class="tab" draggable="true">about.md</a>
         <a href="#contact" data-sec="contact" class="tab" draggable="true">contact.md</a>
+        <a href="#machine" data-sec="machine" class="tab" draggable="true">espresso.machine</a>
       </div>
 
       <div class="doc" id="doc" tabindex="-1">
@@ -464,6 +466,108 @@
           </div>
         </section>
 
+        <!-- espresso.machine -->
+        <section class="buf" id="machine" data-file="espresso.machine">
+          <header class="buf-h"><span class="path">espresso.machine</span><span class="buf-meta">manual lever · 9 bar</span></header>
+          <div class="buf-body">
+            <h2>Espresso machine</h2>
+            <p class="sec-note">A manual lever machine for Tonic. Grind, tamp, lock in, pull to nine bar, then hand over the cup.</p>
+            <div class="mach" id="mach">
+              <svg class="mach-svg" id="mach-svg" viewBox="0 -66 360 386" role="img" aria-label="A lever espresso machine with a grinder beside it">
+                <defs>
+                  <clipPath id="m-cup-clip"><path d="M222 262h28l-3 25h-22z" /></clipPath>
+                  <clipPath id="m-basket-clip"><path d="M-22 -6h44l-4 12h-36z" /></clipPath>
+                </defs>
+                <rect class="m-counter" x="0" y="300" width="360" height="3" rx="1.5" />
+                <!-- grinder -->
+                <g class="m-grinder" id="m-grinder">
+                  <path class="m-glass" d="M30 34h70l-14 52H44z" />
+                  <g id="m-beans" class="m-beans">
+                    <ellipse cx="50" cy="70" rx="5" ry="3.4" transform="rotate(20 50 70)" /><ellipse cx="62" cy="74" rx="5" ry="3.4" transform="rotate(-30 62 74)" />
+                    <ellipse cx="75" cy="70" rx="5" ry="3.4" transform="rotate(50 75 70)" /><ellipse cx="56" cy="62" rx="5" ry="3.4" transform="rotate(-10 56 62)" />
+                    <ellipse cx="70" cy="60" rx="5" ry="3.4" transform="rotate(30 70 60)" /><ellipse cx="82" cy="58" rx="5" ry="3.4" transform="rotate(-40 82 58)" />
+                    <ellipse cx="45" cy="54" rx="5" ry="3.4" transform="rotate(60 45 54)" /><ellipse cx="64" cy="50" rx="5" ry="3.4" transform="rotate(10 64 50)" />
+                  </g>
+                  <rect class="m-dark" x="40" y="86" width="50" height="112" rx="8" />
+                  <circle class="m-dial" cx="65" cy="122" r="12" />
+                  <line id="m-dial-ptr" class="m-dial-ptr" x1="65" y1="122" x2="65" y2="112" />
+                  <text class="m-tiny" x="65" y="150" text-anchor="middle">grind</text>
+                  <rect class="m-dark" x="58" y="198" width="14" height="10" rx="2" />
+                  <rect id="m-gstream" class="m-gstream" x="62" y="208" width="6" height="22" />
+                </g>
+                <!-- tamper -->
+                <g id="m-tamper" class="m-tamper">
+                  <rect class="m-steel" x="56" y="168" width="18" height="28" rx="8" /><rect class="m-steel" x="45" y="194" width="40" height="8" rx="2" />
+                </g>
+                <!-- the machine -->
+                <path class="m-wand" d="M282 150q18 4 14 40l-4 34" />
+                <rect class="m-body" x="200" y="70" width="70" height="150" rx="10" />
+                <ellipse class="m-body" cx="235" cy="72" rx="36" ry="10" />
+                <circle class="m-face" cx="235" cy="120" r="23" />
+                <path id="m-arc" class="m-arc" d="" />
+                <g id="m-ticks" class="m-ticks"></g>
+                <line id="m-needle" class="m-needle" x1="235" y1="120" x2="235" y2="102" />
+                <circle class="m-hub" cx="235" cy="120" r="2.5" />
+                <text class="m-tiny" x="235" y="136" text-anchor="middle">bar</text>
+                <rect class="m-steel" x="214" y="182" width="42" height="14" rx="3" />
+                <rect class="m-steel" x="220" y="196" width="30" height="4" rx="1" />
+                <!-- lever: rotates about the pivot -->
+                <g id="m-lever-g" class="m-lever-g">
+                  <rect class="m-rod" x="232" y="-48" width="6" height="108" rx="3" />
+                  <circle id="m-knob" class="m-knob" cx="235" cy="-50" r="11" />
+                </g>
+                <circle class="m-pivot" cx="235" cy="60" r="6" />
+                <!-- stream and cup -->
+                <line id="m-stream" class="m-stream" x1="235" y1="203" x2="235" y2="276" />
+                <rect class="m-steel" x="180" y="288" width="110" height="10" rx="3" />
+                <g id="m-cup" class="m-cup">
+                  <g clip-path="url(#m-cup-clip)">
+                    <rect id="m-cupfill" class="m-coffee" x="220" y="287" width="32" height="0" />
+                    <rect id="m-cupcrema" class="m-crema" x="220" y="287" width="32" height="0" />
+                  </g>
+                  <path class="m-cupglass" d="M222 262h28l-3 25h-22z" />
+                </g>
+                <!-- portafilter: slides from the grinder to the group head -->
+                <g id="m-pf" class="m-pf">
+                  <g clip-path="url(#m-basket-clip)"><rect id="m-grounds" class="m-grounds" x="-24" y="6" width="48" height="0" /></g>
+                  <path class="m-basket" d="M-24 -7h48l-4 14h-40z" />
+                  <rect class="m-handle" x="24" y="-3" width="46" height="7" rx="3.5" />
+                </g>
+              </svg>
+
+              <ol class="mach-steps" id="mach-steps">
+                <li data-step="grind">
+                  <h4><span class="n">1</span>Grind</h4>
+                  <label class="m-row">Size <input type="range" id="m-grind" min="1" max="10" value="5" step="1" /> <b id="m-grind-v">5 · medium</b></label>
+                  <div class="m-row"><button type="button" class="m-btn" id="m-grind-btn">Hold to grind</button><span class="m-read"><b id="m-dose">0.0</b> g</span><span class="m-target">aim for 18 g</span></div>
+                </li>
+                <li data-step="tamp">
+                  <h4><span class="n">2</span>Tamp</h4>
+                  <div class="m-row"><button type="button" class="m-btn" id="m-tamp-btn">Hold to tamp</button><span class="m-meter"><i class="m-zone"></i><i id="m-tamp-fill" class="m-fill"></i></span><span class="m-read"><b id="m-tamp">0</b> kg</span></div>
+                  <p class="m-hint">Release in the shaded band, 13 to 20 kg.</p>
+                </li>
+                <li data-step="lock">
+                  <h4><span class="n">3</span>Lock in</h4>
+                  <div class="m-row"><button type="button" class="m-btn" id="m-lock-btn">Lock the portafilter</button></div>
+                </li>
+                <li data-step="pull">
+                  <h4><span class="n">4</span>Pull</h4>
+                  <p class="m-hint">Drag the lever's knob down and hold the needle in the green, around 9 bar. Let go to stop.</p>
+                  <label class="m-row">Lever <input type="range" id="m-lever" min="0" max="100" value="0" aria-describedby="m-readout" /></label>
+                  <div class="m-gauges" id="m-readout"><span><b id="m-bar">0.0</b> bar</span><span><b id="m-time">0</b> s</span><span><b id="m-yield">0.0</b> g out</span></div>
+                </li>
+                <li data-step="serve">
+                  <h4><span class="n">5</span>Serve</h4>
+                  <p class="m-hint">Drag the cup over to Tonic, or:</p>
+                  <div class="m-row wrap"><button type="button" class="m-btn" id="m-give">Give it to Tonic</button><button type="button" class="m-btn" id="m-tonic">Pour it over tonic and ice</button></div>
+                </li>
+              </ol>
+            </div>
+            <div class="m-report" id="m-report" hidden></div>
+            <p class="m-foot"><button type="button" class="linkish" id="m-auto">Let Tonic pull one</button> · <button type="button" class="linkish" id="m-reset">Knock out and start over</button></p>
+          </div>
+        </section>
+
         <footer class="doc-foot">
           <p class="runs">Runs on <span>HTML</span><span>CSS</span><span>vanilla JS</span><span>Go</span><span>Hetzner CPX11</span><span>port 22</span></p>
           <p class="colophon">An editor with one project open. The agent panel borrows the look of Claude Code, Codex, Antigravity, and OpenCode as a homage; not affiliated with any of them, and every answer in it was written by me in advance. <a href="https://github.com/andymsun/andymsun-portfolio">Source.</a></p>
@@ -517,10 +621,10 @@
           <path class="t-eye" d="" /><path class="t-eye" d="" />
           <text class="t-chest" x="100" y="130" text-anchor="middle">&gt;_</text>
           <path class="t-front" d="" />
-          <g class="t-hearts"><path d="M92 40c-3-4-9-1-6 4l6 5 6-5c3-5-3-8-6-4z" /><path d="M110 30c-2-3-7-1-5 3l5 4 5-4c2-4-3-6-5-3z" /></g>
           <text class="t-z" x="150" y="50">z</text>
         </svg>
         <p class="bubble" id="bubble" aria-live="polite"></p>
+        <a class="caf" href="#machine" title="Caffeine. Pull Tonic a shot on the espresso machine."><span class="caf-bar"><i id="caf-fill"></i></span><span id="caf-pct">40%</span><span id="caf-word">fresh</span></a>
       </div>
 
       <div class="chat" id="chat" aria-live="polite"></div>
@@ -532,7 +636,7 @@
         <button type="button" data-ask="best">Best project?</button>
         <button type="button" data-ask="hire">How do I reach him?</button>
         <button type="button" data-ask="ssh">How do I ssh in?</button>
-        <button type="button" data-ask="coffee">Brew a coffee</button>
+        <button type="button" data-ask="coffee">Pull Tonic a shot</button>
       </div>
 
       <form class="ask" id="ask" autocomplete="off">
@@ -547,6 +651,7 @@
       <span class="sb-dots"><i class="dot-s green"></i>8 <i class="dot-s yellow"></i>5 <i class="dot-s red"></i>1</span>
       <span class="sb-sp"></span>
       <span id="sb-pos">Ln 1</span>
+      <button type="button" class="sb-coffee" id="sb-coffee" title="Tonic's caffeine. Click to open the espresso machine."><span class="cf-ic" aria-hidden="true">☕</span><span class="cf-bar" aria-hidden="true"><i id="cf-fill"></i></span><span id="cf-txt">40%</span></button>
       <span id="sb-visits" title="Shared with ssh ssh.andymsun.com">visitors</span>
       <span class="sb-skin" id="sb-skin">Claude Code</span>
       <span class="sb-hide">UTF-8</span>
@@ -587,8 +692,10 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="tonic.js"></script>
+  <script src="coffee.js"></script>
   <script src="app.js"></script>
   <script src="term.js"></script>
+  <script src="machine.js"></script>
   <script src="agent.js"></script>
   <script src="eggs.js"></script>
 </body>
